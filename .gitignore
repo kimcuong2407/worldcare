@@ -1,0 +1,7 @@
+node_modules
+dist
+apidoc
+coverage
+.env
+.nyc_output
+.idea

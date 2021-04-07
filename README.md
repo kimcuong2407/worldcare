@@ -1,2 +1,0 @@
-# WorldCare-Backend
-

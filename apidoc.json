@@ -1,0 +1,11 @@
+{
+  "name": "Backend APIs Documentation",
+  "title": "Backend APIs",
+  "version": "3.0.0",
+  "template": {
+    "forceLanguage": "en",
+    "withCompare": true,
+    "withGenerator": true,
+    "aloneDisplay": true
+  }
+}
