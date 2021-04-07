@@ -1,1 +1,3 @@
-export default { };
+const TOKEN_EXPIRES_IN_SECONDS = 8640000;
+
+export default { TOKEN_EXPIRES_IN_SECONDS };
