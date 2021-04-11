@@ -34,5 +34,5 @@ routes(app);
 app.use(handleError);
 
 app.listen(PORT, () => {
-  logger.info(`App listening on port http://localhost:${PORT}!`);
+  logger.info(`App listening on port http://localhost:${PORT}`);
 });
