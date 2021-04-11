@@ -5,12 +5,11 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "idl-development/async-func-name": "warn",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-throw-literal": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off"
   },
-  "plugins": ["idl-development"],
-  "extends": ["plugin:idl-development/all"]
+  "plugins": ["@typescript-eslint"]
+
 }

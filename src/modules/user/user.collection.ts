@@ -20,10 +20,7 @@ const UserSchema = new Schema({
     type: String,
     index: true
   },
-  password: {
-    type: String,
-    select: false
-  },
+  password: String,
   address: String,
   avatar: String,
   dob: String,

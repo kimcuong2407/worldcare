@@ -5,7 +5,7 @@ import { InternalServerError, ValidationFailedError } from '@app/core/types/Erro
 
 const logger = loggerHelper.getLogger('server.controller');
 
-const loginAction = (req: express.Request, res: express.Response): void => {
+const loginAction = async (req: express.Request, res: express.Response, next: express.NextFunction): void => {
   try {
     const {
       login, password
@@ -13,12 +13,11 @@ const loginAction = (req: express.Request, res: express.Response): void => {
     if(!login || !password) {
       throw new ValidationFailedError('Login and password are required.');
     }
-
-    const auth = authService.authenticate(login, password)
+    const auth = await authService.authenticate(login, password)
     res.send(auth);
   } catch (e) {
     logger.error('LoginAction', e);
-    throw new InternalServerError(e || 'Error');
+    next(e);
   }
 };
 
