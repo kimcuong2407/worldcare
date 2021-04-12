@@ -10,16 +10,26 @@ import loggerHelper from '@utils/logger.util';
 import { PORT } from '@app/core/config';
 import routes from './routes';
 import handleError from './utils/errorHandler.util';
+import './core/casbin';
 
 const logger = loggerHelper.getLogger('main');
 
 const app = express();
 
+
 // app.use(compression({ level: COMPRESSION_LEVEL }));
 
+
+const parseLanguage = (req: express.Request, res: express.Response, next: express.NextFunction)=>{
+  const language: string = req.acceptsLanguages()[0];
+  req.language = language || 'vi';
+  console.log("req.language", req.language);
+  next();
+}
 app.get('/', (req, res) => {
   res.send('External sever error!');
 });
+app.use(parseLanguage)
 
 app.use(cors());
 

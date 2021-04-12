@@ -1,5 +1,5 @@
 ############# Builder image #############
-FROM 399008899479.dkr.ecr.us-west-2.amazonaws.com/idlogiq/nodejs:10.16.0 as builder
+FROM node:12.22.1-stretch-slim as builder
 
 WORKDIR /source.tmp
 
@@ -12,12 +12,12 @@ RUN npm install && \
 
 
 ############# Runner image #############
-FROM 399008899479.dkr.ecr.us-west-2.amazonaws.com/idlogiq/nodejs:10.16.0
+FROM node:12.22.1-stretch-slim
 
 WORKDIR /opt/idlogiq/rpm-backend
 
 COPY --from=builder /source.tmp/dist .
 
-EXPOSE 3700
+EXPOSE 3000
 
 CMD [ "node", "index.js" ]
