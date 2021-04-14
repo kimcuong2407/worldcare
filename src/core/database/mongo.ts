@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import loggerHelper from '@utils/logger.util';
+import autoIncrement from 'mongoose-auto-increment';
+import { MONGO_URL } from '../config';
 
 const logger = loggerHelper.getLogger('mongo');
 const connectWithRetry = (): void => {
-  mongoose.connect(process.env.MONGO_URL, {
+  mongoose.connect(MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -15,5 +17,11 @@ const connectWithRetry = (): void => {
     logger.info('mongo connected');
   });
 };
+
+
+var connection = mongoose.createConnection(MONGO_URL);
+ 
+autoIncrement.initialize(connection);
+
 
 connectWithRetry();

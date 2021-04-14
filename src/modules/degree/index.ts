@@ -1,26 +1,13 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable func-names */
-import mongoose from 'mongoose';
-import mongoosePaginate from 'mongoose-paginate-v2';
-import mongooseIntl from 'mongoose-intl';
+import middleware from '@app/core/middleware';
+import express from 'express';
+import degreeActions from './degree.controller';
 
-const { Schema } = mongoose;
+const degreeRoutes = (app: express.Application): void => {
+  app.post('/api/v1/degree', degreeActions.createDegreeAction);
+  app.get('/api/v1/degree', degreeActions.fetchDegreeAction);
+  app.put('/api/v1/degree/:id', degreeActions.updateDegreeAction);
+  app.get('/api/v1/degree/:id', degreeActions.getDegreeByIdAction);
 
-const DegreeSchema = new Schema({
-  name: {
-    type: String
-  },
-  incrementId: {
-    type: Number,
-    unique: true,
-  },
-}, {
-  timestamps: true,
-});
+};
 
-DegreeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-DegreeSchema.plugin(mongoosePaginate);
-
-const DegreeCollection = mongoose.model('degree', DegreeSchema, 'degree');
-
-export default DegreeCollection;
+export default degreeRoutes;
