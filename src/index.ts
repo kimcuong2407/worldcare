@@ -11,13 +11,13 @@ import { ACCEPTED_LANGUAGES, PORT } from '@app/core/config';
 import routes from './routes';
 import handleError from './utils/errorHandler.util';
 import './core/casbin';
+import multer from 'multer';
 
 const logger = loggerHelper.getLogger('main');
 
 const app = express();
 
 // app.use(compression({ level: COMPRESSION_LEVEL }));
-
 
 const parseLanguage = (req: express.Request, res: express.Response, next: express.NextFunction)=>{
   const language: string = req.acceptsLanguages()[0];
