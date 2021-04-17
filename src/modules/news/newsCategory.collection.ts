@@ -8,7 +8,7 @@ import last from 'lodash/last';
 
 const { Schema } = mongoose;
 
-const HospitalSchema = new Schema({
+const NewsCategorySchema = new Schema({
   __v: { type: Number, select: false },
   name: {
     type: String,
@@ -18,17 +18,20 @@ const HospitalSchema = new Schema({
     type: String,
     intl: true,
   },
-  hospitalname: String,
-  email: {
-    type: String,
-    index: true
+  meta: {
+    title: {
+      type: String,
+      intl: true,
+    },
+    description: {
+      type: String,
+      intl: true,
+    },
+    keywords: {
+      type: String,
+      intl: true,
+    },
   },
-  startTime: String,
-  endTime: String,
-  logo: String,
-  services: Array,
-  photos: [String],
-  lastActivity: Date,
   slug: {
     type: String,
     unique: true,
@@ -37,9 +40,9 @@ const HospitalSchema = new Schema({
   timestamps: true,
 });
 
-HospitalSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-HospitalSchema.plugin(mongoosePaginate);
+NewsCategorySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+NewsCategorySchema.plugin(mongoosePaginate);
 
-const HospitalCollection = mongoose.model('hospital', HospitalSchema, 'hospital');
+const NewsCategoryCollection = mongoose.model('NewsCategory', NewsCategorySchema, 'news_category');
 
-export default HospitalCollection;
+export default NewsCategoryCollection;
