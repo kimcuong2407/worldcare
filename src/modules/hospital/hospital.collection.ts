@@ -23,6 +23,13 @@ const HospitalSchema = new Schema({
     type: String,
     index: true
   },
+  services: [{ type: Schema.Types.ObjectId, ref: 'service' }],
+  address: {
+    street: String,
+    ward: String,
+    district: String,
+    city: String,
+  },
   startTime: String,
   endTime: String,
   logo: String,
