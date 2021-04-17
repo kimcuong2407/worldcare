@@ -8,7 +8,7 @@ import S3, { ManagedUpload } from 'aws-sdk/clients/s3';
 
 const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
 
-const uploadImage = async (file: any, resourcePath: string) => {
+const uploadImage = async (file: any, resourcePath: string): Promise<any> => {
 
   if (!file) {
     throw new Error("File is empty")
@@ -33,25 +33,23 @@ const uploadImage = async (file: any, resourcePath: string) => {
   const filename = [resourcePath, '/', uuidv4(), ext].join('');
 
   const uploadParams: S3.PutObjectRequest = {
-    
     Bucket: S3_BUCKET,
     Key: filename,
     Body: file.buffer,
-    ACL: 'public-read',
+    // ACL: 'public-read',
     ContentLength: file.size,
     ContentType: file.mimetype,
   };
-
   // call S3 to retrieve upload file to specified bucket
-  return s3.upload(uploadParams, (err: any, data: ManagedUpload.SendData) => {
-    if (err) {
-      console.log(err)
-      throw new InternalServerError(err);
-    }
-    if (data) {
-      console.log(data)
-      return Promise.resolve(data.Location);
-    }
+  return new Promise((resolve, reject) => {
+    s3.upload(uploadParams, (err: any, data: ManagedUpload.SendData) => {
+      if (err) {
+        return reject(err);
+      }
+      if (data) {
+        return resolve(data);
+      }
+    });
   });
 }
 
