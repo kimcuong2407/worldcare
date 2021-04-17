@@ -1,4 +1,6 @@
-declare module 'idllogger';
+
+
+declare module 'casbin-mongoose-adapter';
 declare namespace Express {
   export interface Request {
     span?: any,

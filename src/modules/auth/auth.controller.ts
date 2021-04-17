@@ -5,7 +5,7 @@ import { InternalServerError, ValidationFailedError } from '@app/core/types/Erro
 
 const logger = loggerHelper.getLogger('server.controller');
 
-const loginAction = async (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+const loginAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
       login, password

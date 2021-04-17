@@ -6,7 +6,11 @@ import omit from 'lodash/omit';
 
 const logger = loggerHelper.getLogger('user.controller');
 
-const getProfileAction = async (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+const getProfileAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+  ) => {
   try {
     const user = await userService.getUserProfileById(get(req.user, 'id'));
     

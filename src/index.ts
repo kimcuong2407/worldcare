@@ -1,5 +1,5 @@
-import 'dotenv/config';
 import './moduleAlias';
+import 'dotenv/config';
 import '@core/database/mongo';
 import express from 'express';
 import bodyParser from 'body-parser';

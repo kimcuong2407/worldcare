@@ -9,7 +9,6 @@ const logger = loggerHelper.getLogger('user.controller');
 
 const createHospitalAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    
     res.send(setResponse({}));
   } catch (e) {
     logger.error('createHospitalAction', e);
