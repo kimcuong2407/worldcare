@@ -22,7 +22,7 @@ const NewsSchema = new Schema({
     type: String,
     intl: true,
   },
-  category: [{ type: Schema.Types.ObjectId, ref: 'NewsCategory' }],
+  category: [{ type: Schema.Types.ObjectId, ref: 'newscategory' }],
   meta: {
     title: {
       type: String,

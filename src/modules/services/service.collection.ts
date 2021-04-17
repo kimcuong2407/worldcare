@@ -8,9 +8,9 @@ import last from 'lodash/last';
 
 const { Schema } = mongoose;
 
-const NewsCategorySchema = new Schema({
+const ServiceSchema = new Schema({
   __v: { type: Number, select: false },
-  name: {
+  title: {
     type: String,
     intl: true,
   },
@@ -18,6 +18,11 @@ const NewsCategorySchema = new Schema({
     type: String,
     intl: true,
   },
+  content: {
+    type: String,
+    intl: true,
+  },
+  cover: String,
   meta: {
     title: {
       type: String,
@@ -32,17 +37,22 @@ const NewsCategorySchema = new Schema({
       intl: true,
     },
   },
+  parentService: [{ type: Schema.Types.ObjectId, ref: 'service' }],
   slug: {
     type: String,
     unique: true,
   },
+  faq: [{
+    question: String,
+    answer: String,
+  }]
 }, {
   timestamps: true,
 });
 
-NewsCategorySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-NewsCategorySchema.plugin(mongoosePaginate);
+ServiceSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+ServiceSchema.plugin(mongoosePaginate);
 
-const NewsCategoryCollection = mongoose.model('newscategory', NewsCategorySchema, 'news_category');
+const ServiceCollection = mongoose.model('service', ServiceSchema, 'service');
 
-export default NewsCategoryCollection;
+export default ServiceCollection;
