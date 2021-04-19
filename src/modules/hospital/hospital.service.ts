@@ -34,7 +34,12 @@ const fetchHospital = async (params: any, language= 'vi') => {
     $text: { $search: keyword }
   } : {};
   HospitalCollection.setDefaultLanguage(language);
-  const data = await HospitalCollection.paginate(query, options);
+  SpecialityCollection.setDefaultLanguage(language)
+
+  const data = await HospitalCollection.paginate(query, {
+    ...options,
+    'populate': { path: 'speciality', select: 'name'},
+  });
   return data;
 }
 
