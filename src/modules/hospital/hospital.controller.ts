@@ -4,12 +4,11 @@ import hospitalService from './hospital.service';
 import slugify from 'slugify';
 import { normalizeText } from 'normalize-text';
 import get from 'lodash/get';
-import identity from 'lodash/identity';
 import lowerCase from 'lodash/lowerCase';
-import pickBy from 'lodash/pickBy';
 import trim from 'lodash/trim';
 import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
+import { isNil, isString, omitBy } from 'lodash';
 
 const logger = loggerHelper.getLogger('hospital.controller');
 
@@ -33,7 +32,8 @@ const createHospitalAction = async (req: express.Request, res: express.Response,
       hospitalSettings,
       logo,
       photos,
-      slug: slug || slugify(trim(lowerCase(normalizeText(hospitalName)))),
+      slug: slug || slugify(trim(lowerCase(normalizeText(
+        isString(hospitalName) ? hospitalName : get(hospitalName, 'vi', ''))))),
     };
     const data = await hospitalService.createHospital(hospitalInfo);
     res.send(data);
@@ -78,7 +78,7 @@ const updateHospitalInfoAction = async (req: express.Request, res: express.Respo
       hospitalName, description, email, phoneNumber,
       speciality, address, workingHours, hospitalSettings, logo, photos, slug,
     } = req.body;
-    const hospitalInfo: any = pickBy({
+    const hospitalInfo: any = omitBy({
       hospitalName,
       description,
       email,
@@ -90,7 +90,7 @@ const updateHospitalInfoAction = async (req: express.Request, res: express.Respo
       logo,
       photos,
       slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
-    }, identity);
+    }, isNil);
     const params = { hospitalId, hospitalInfo };
     const data = await hospitalService.updateHospitalInfo(params);
     res.send(data);

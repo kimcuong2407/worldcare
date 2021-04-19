@@ -12,11 +12,7 @@ export interface HospitalModel extends mongoose.Document {
     district: string;
     city: string;
   } ;
-  workingHours: [{
-    isOpen: boolean,
-    startTime: string,
-    endTime: string,
-  }];
+  workingHours: [object];
   hospitalSettings: {
     slotTime: number,
     capacityPerSlot: number,

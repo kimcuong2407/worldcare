@@ -8,32 +8,53 @@ import identity from 'lodash/identity';
 import lowerCase from 'lodash/lowerCase';
 import pickBy from 'lodash/pickBy';
 import trim from 'lodash/trim';
-import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
+import { Types } from 'mongoose';
+import hospitalService from '@app/modules/hospital/hospital.service';
+import { isNil, omitBy } from 'lodash';
 
 const logger = loggerHelper.getLogger('staff.controller');
 
 const createStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
-      staffName, description, email, phoneNumber,
-      speciality, address, workingHours, staffSettings, logo, photos, slug,
+      firstName, lastName, fullName, gender, description,
+      phoneNumber, email, hospital, title, degree, speciality, avatar,
+      createdBy, updatedBy,
     } = req.body;
-    if (!staffName || !description ){
+    if (!firstName || !lastName ){
       throw new Error('Please verify your input!');
     }
+    
+    if (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital)))) {
+      throw new Error('There is no hospitalId');
+    }
+    // Ignore these validate first
+    // if (!Types.ObjectId.isValid(title) || (!(await hospitalService.isHospital(hospital)))) {
+    //   throw new Error('There is no hospitalId');
+    // }
+    // if (!Types.ObjectId.isValid(degree) || (!(await hospitalService.isHospital(hospital)))) {
+    //   throw new Error('There is no hospitalId');
+    // }
+    // if (!Types.ObjectId.isValid(speciality) || (!(await hospitalService.isHospital(hospital)))) {
+    //   throw new Error('There is no hospitalId');
+    // }
+
     const staffInfo: any = {
-      staffName,
+      firstName,
+      lastName,
+      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
-      email,
+      gender,
       phoneNumber,
+      email,
+      hospital: hospital,
+      title,
+      degree,
       speciality,
-      address,
-      workingHours: workingHours || WORKING_HOURS,
-      staffSettings,
-      logo,
-      photos,
-      slug: slug || slugify(trim(lowerCase(normalizeText(staffName)))),
+      avatar,
+      createdBy,
+      updatedBy,
     };
     const data = await staffService.createStaff(staffInfo);
     res.send(data);
@@ -73,22 +94,31 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
   try {
     const staffId = get(req.params, 'staffId');
     const {
-      staffName, description, email, phoneNumber,
-      speciality, address, workingHours, staffSettings, logo, photos, slug,
+      firstName, lastName, fullName, gender, description,
+      phoneNumber, email, hospital, title, degree, speciality, avatar,
+      createdBy, updatedBy,
     } = req.body;
-    const staffInfo: any = pickBy({
-      staffName,
+
+    const staffInfo: any = omitBy({
+      firstName,
+      lastName,
+      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
-      email,
+      gender,
       phoneNumber,
+      email,
+      hospital: hospital,
+      title,
+      degree,
       speciality,
-      address,
-      workingHours,
-      staffSettings,
-      logo,
-      photos,
-      slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
-    }, identity);
+      avatar,
+      createdBy,
+      updatedBy,
+    }, isNil);
+    if(get(staffInfo, 'hospital'))
+      if (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital)))) {
+        throw new Error('There is no hospitalId');
+      }
     const params = { staffId, staffInfo };
     const data = await staffService.updateStaffInfo(params);
     res.send(data);

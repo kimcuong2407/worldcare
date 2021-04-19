@@ -2,13 +2,11 @@
 /* eslint-disable func-names */
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import get from 'lodash/get';
-import last from 'lodash/last';
 import mongooseIntl from 'mongoose-intl';
 
 const { Schema } = mongoose;
 
-const UserSchema = new Schema({
+const StaffSchema = new Schema({
   __v: { type: Number, select: false },
   firstName: {
     type: String
@@ -36,11 +34,14 @@ const UserSchema = new Schema({
   updatedBy: String,
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  },
 });
 
-UserSchema.plugin(mongoosePaginate);
-UserSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+StaffSchema.plugin(mongoosePaginate);
+StaffSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 
-const UserCollection = mongoose.model('user', UserSchema, 'user');
+const UserCollection = mongoose.model('staff', StaffSchema, 'staff');
 
 export default UserCollection;

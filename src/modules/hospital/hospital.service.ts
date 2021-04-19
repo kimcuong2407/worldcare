@@ -95,10 +95,18 @@ const deleteHospital = async (hospitalId: string) => {
   return true;
 };
 
+const isHospital = async (hospitalId: string) => {
+  const data = await HospitalCollection.exists({
+    _id: Types.ObjectId(hospitalId),
+  });
+  return data;
+}
+
 export default {
   createHospital,
   fetchHospital,
   fetchHospitalInfo,
   updateHospitalInfo,
   deleteHospital,
+  isHospital,
 };
