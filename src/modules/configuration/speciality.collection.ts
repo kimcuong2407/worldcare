@@ -17,9 +17,9 @@ const SpecialitySchema = new Schema({
   },
 }, {
   timestamps: true,
-  //  toJSON: {
-  //       virtuals: true,
-  //   }
+   toJSON: {
+        virtuals: true,
+    }
 });
 
 SpecialitySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });

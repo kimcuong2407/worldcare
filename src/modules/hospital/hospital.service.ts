@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
+import SpecialityCollection from '../configuration/speciality.collection';
 import HospitalCollection from "./hospital.collection";
 import { HospitalModel } from "./hospital.model";
 
@@ -40,6 +41,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
 const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi') => {
   let hospital = null;
   HospitalCollection.setDefaultLanguage(language);
+  SpecialityCollection.setDefaultLanguage(language)
   if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
     hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
   } else {
