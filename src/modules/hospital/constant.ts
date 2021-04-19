@@ -1,66 +1,52 @@
 export const WORKING_HOURS: any = [
   {
-    weekDay: {
-      en: 'Monday',
-      vi: 'Thứ hai',
+    0: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Tuesday',
-      vi: 'Thứ ba',
+    1: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Wednesday',
-      vi: 'Thứ tư',
+    2: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Thursday',
-      vi: 'Thứ năm',
+    3: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Friday',
-      vi: 'Thứ sáu',
+    4: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Saturday',
-      vi: 'Thứ bảy',
+    5: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   },
   {
-    weekDay: {
-      en: 'Sunday',
-      vi: 'Chủ Nhật',
+    6: {
+      isOpen: true,
+      startTime: '07:00',
+      endTime: '11:00',
     },
-    isOpen: true,
-    startTime: '07:00 AM',
-    endTime: '11:00 PM',
   }
 ];
 
