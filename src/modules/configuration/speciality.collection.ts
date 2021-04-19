@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
-/* eslint-disable func-names */
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseIntl from 'mongoose-intl';
@@ -12,6 +10,7 @@ const SpecialitySchema = new Schema({
     type: String,
     intl: true
   },
+  parentSpeciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   incrementId: {
     type: Number,
     unique: true,
