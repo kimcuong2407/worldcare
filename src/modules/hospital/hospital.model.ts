@@ -13,7 +13,6 @@ export interface HospitalModel extends mongoose.Document {
     city: string;
   } ;
   workingHours: [{
-    weekDays: string,
     isOpen: boolean,
     startTime: string,
     endTime: string,

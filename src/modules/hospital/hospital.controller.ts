@@ -49,8 +49,9 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
     const options = {
       page, limit,
     }
+    const language: string = get(req.headers, 'language');
     const keyword = get(req, 'query.keyword', '');
-    const data = await hospitalService.fetchHospital({keyword, options});
+    const data = await hospitalService.fetchHospital({keyword, options}, language);
     res.send(data);
   } catch (e) {
     logger.error('fetchHospitalInfoAction', e);
@@ -61,7 +62,8 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
 const fetchHospitalInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const hospitalId = get(req.params, 'hospitalId');
-    const data = await hospitalService.fetchHospitalInfo(hospitalId);
+    const language: string = get(req.headers, 'language');
+    const data = await hospitalService.fetchHospitalInfo(hospitalId, language);
     res.send(data);
   } catch (e) {
     logger.error('fetchHospitalInfoAction', e);
@@ -87,7 +89,7 @@ const updateHospitalInfoAction = async (req: express.Request, res: express.Respo
       hospitalSettings,
       logo,
       photos,
-      slug: slug || slugify(trim(lowerCase(normalizeText(hospitalName)))),
+      slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
     }, identity);
     const params = { hospitalId, hospitalInfo };
     const data = await hospitalService.updateHospitalInfo(params);

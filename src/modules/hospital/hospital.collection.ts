@@ -6,19 +6,14 @@ import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 const { Schema } = mongoose;
 
 const HospitalWorkingHoursSchema = new Schema({
-  weekDay: {
-    type: String,
-    intl: true,
-  },
   isOpen: Boolean,
   startTime: String,
   endTime: String,
 }, {
-  timestamps: true,
   id: false,
-  // toJSON: {
-  //   virtuals: true,
-  // }
+  toJSON: {
+    virtuals: true,
+  }
 });
 
 const HospitalSchema = new Schema({
@@ -46,7 +41,7 @@ const HospitalSchema = new Schema({
     district: String,
     city: String,
   },
-  workingHours: [HospitalWorkingHoursSchema],
+  workingHours: [Object],
   hospitalSettings: {
     slotTime: Number,
     capacityPerSlot: Number,
@@ -60,9 +55,9 @@ const HospitalSchema = new Schema({
   },
 }, {
   timestamps: true,
-  // toJSON: {
-  //   virtuals: true,
-  // }
+  toJSON: {
+    virtuals: true,
+  }
 });
 
 HospitalSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });

@@ -32,11 +32,13 @@ const fetchHospital = async (params: any, language= 'vi') => {
   const query = keyword ? {
     $text: { $search: keyword }
   } : {};
+  HospitalCollection.setDefaultLanguage(language);
   const data = await HospitalCollection.paginate(query, options);
   return data;
 }
 
 const fetchHospitalInfo = async (hospitalId: string, language= 'vi') => {
+  HospitalCollection.setDefaultLanguage(language);
   const data = await HospitalCollection.findById(hospitalId);
   if (!data) {
     throw new Error('There is no hospitalId!');
