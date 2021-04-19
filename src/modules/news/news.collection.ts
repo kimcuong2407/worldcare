@@ -22,20 +22,18 @@ const NewsSchema = new Schema({
     type: String,
     intl: true,
   },
-  category: [{ type: Schema.Types.ObjectId, ref: 'newscategory' }],
-  meta: {
-    title: {
-      type: String,
-      intl: true,
-    },
-    description: {
-      type: String,
-      intl: true,
-    },
-    keywords: {
-      type: String,
-      intl: true,
-    },
+  category: [{ type: Schema.Types.ObjectId, ref: 'news_category' }],
+  metatitle: {
+    type: String,
+    intl: true,
+  },
+  metaDescription: {
+    type: String,
+    intl: true,
+  },
+  metaKeywords: {
+    type: String,
+    intl: true,
   },
   slug: {
     type: String,

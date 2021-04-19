@@ -18,19 +18,17 @@ const NewsCategorySchema = new Schema({
     type: String,
     intl: true,
   },
-  meta: {
-    title: {
-      type: String,
-      intl: true,
-    },
-    description: {
-      type: String,
-      intl: true,
-    },
-    keywords: {
-      type: String,
-      intl: true,
-    },
+  metaTitle: {
+    type: String,
+    intl: true,
+  },
+  metaDescription: {
+    type: String,
+    intl: true,
+  },
+  metaKeywords: {
+    type: String,
+    intl: true,
   },
   slug: {
     type: String,
@@ -43,6 +41,6 @@ const NewsCategorySchema = new Schema({
 NewsCategorySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 NewsCategorySchema.plugin(mongoosePaginate);
 
-const NewsCategoryCollection = mongoose.model('newscategory', NewsCategorySchema, 'news_category');
+const NewsCategoryCollection = mongoose.model('news_category', NewsCategorySchema, 'news_category');
 
 export default NewsCategoryCollection;
