@@ -19,8 +19,8 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
   try {
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, avatar,
-      createdBy, updatedBy,
+      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      avatar, createdBy, updatedBy,
     } = req.body;
     if (!firstName || !lastName ){
       throw new Error('Please verify your input!');
@@ -52,6 +52,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       title,
       degree,
       speciality,
+      employeeType,
       avatar,
       createdBy,
       updatedBy,
@@ -95,8 +96,8 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
     const staffId = get(req.params, 'staffId');
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, avatar,
-      createdBy, updatedBy,
+      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      avatar, createdBy, updatedBy,
     } = req.body;
 
     const staffInfo: any = omitBy({
@@ -111,6 +112,7 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
       title,
       degree,
       speciality,
+      employeeType,
       avatar,
       createdBy,
       updatedBy,
