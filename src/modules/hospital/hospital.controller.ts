@@ -61,9 +61,9 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
 
 const fetchHospitalInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const hospitalId = get(req.params, 'hospitalId');
+    const hospitalIdOrSlug = get(req.params, 'hospitalId');
     const language: string = get(req.headers, 'language');
-    const data = await hospitalService.fetchHospitalInfo(hospitalId, language);
+    const data = await hospitalService.fetchHospitalInfo(hospitalIdOrSlug, language);
     res.send(data);
   } catch (e) {
     logger.error('fetchHospitalInfoAction', e);

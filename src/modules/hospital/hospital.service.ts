@@ -37,14 +37,21 @@ const fetchHospital = async (params: any, language= 'vi') => {
   return data;
 }
 
-const fetchHospitalInfo = async (hospitalId: string, language= 'vi') => {
+const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi') => {
+  let hospital = null;
   HospitalCollection.setDefaultLanguage(language);
-  const data = await HospitalCollection.findById(hospitalId);
-  if (!data) {
+  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
+  } else {
+    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name');
+  }
+
+  if (!hospital) {
     throw new Error('There is no hospitalId!');
   }
-  return data;
-};
+  
+  return hospital;
+}
 
 const updateHospitalInfo = async (params: any) => {
   const { hospitalId, hospitalInfo } = params;
