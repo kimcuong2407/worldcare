@@ -11,7 +11,6 @@ import { ACCEPTED_LANGUAGES, PORT } from '@app/core/config';
 import routes from './routes';
 import handleError from './utils/errorHandler.util';
 import './core/casbin';
-import multer from 'multer';
 
 const logger = loggerHelper.getLogger('main');
 

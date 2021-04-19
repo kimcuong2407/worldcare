@@ -27,7 +27,7 @@ class Casbin {
     model.addDef("p", "p", "sub, obj, act")
     model.addDef("g", "g", "_, _")
     model.addDef("e", "e", "some(where (p.eft == allow))")
-    model.addDef("m", "m", "g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act")
+    model.addDef("m", "m", "g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.act == p.act")
 
     this.adapter = await MongooseAdapter.newAdapter(MONGO_URL);
     this.enforcer = await newEnforcer(model, this.adapter);

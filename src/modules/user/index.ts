@@ -4,6 +4,7 @@ import userActions from './user.controller';
 
 const userRoutes = (app: express.Application): void => {
   app.get('/api/v1/profile', middleware.authenticate, userActions.getProfileAction);
+
 };
 
 export default userRoutes;
