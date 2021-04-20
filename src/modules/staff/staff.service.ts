@@ -9,13 +9,6 @@ import { StaffModel } from "./staff.model";
 const logger = loggerHelper.getLogger('staff.service');
 
 const createStaff = async (staffInfo: StaffModel, language = 'vi') => {
-  const findFilter = {
-    slug: get(staffInfo, 'slug', ''),
-  };
-  const existedStaff = await StaffCollection.find(findFilter);
-  if (!isEmpty(existedStaff)) {
-    throw new Error('The staff slug has been duplicated!');
-  }
   const staff = await StaffCollection.create(staffInfo);
   const { createdAt, updatedAt, ...rest } = get(staff, '_doc', {});
   return {
@@ -33,13 +26,26 @@ const fetchStaff = async (params: any, language= 'vi') => {
     $text: { $search: keyword }
   } : {};
   StaffCollection.setDefaultLanguage(language);
-  const data = await StaffCollection.paginate(query, options);
+  const data = await StaffCollection.paginate(query, {
+    ...options,
+    'populate': [
+      { path: 'hospital', select: 'hospitalName' },
+      { path: 'degree', select: 'name' },
+      { path: 'title', select: 'name' },
+      { path: 'speciality', select: 'name' },
+      { path: 'employeeType', select: 'name' },
+    ],
+  });
   return data;
 }
 
 const fetchStaffInfo = async (staffId: string, language= 'vi') => {
   StaffCollection.setDefaultLanguage(language);
-  const data = await StaffCollection.findById(staffId);
+  const data = await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
+    .populate('degree', 'name')
+    .populate('title', 'name')
+    .populate('speciality', 'name')
+    .populate('employeeType', 'name');
   if (!data) {
     throw new Error('There is no staffId!');
   }
@@ -48,16 +54,6 @@ const fetchStaffInfo = async (staffId: string, language= 'vi') => {
 
 const updateStaffInfo = async (params: any) => {
   const { staffId, staffInfo } = params;
-  const findFilter = {
-    _id: {
-      $ne: Types.ObjectId(staffId),
-    },
-    slug: get(staffInfo, 'slug', ''),
-  };
-  const existedStaff = await StaffCollection.find(findFilter);
-  if (!isEmpty(existedStaff)) {
-    throw new Error('The staff slug has been duplicated!');
-  }
   const staff = await StaffCollection.findByIdAndUpdate(staffId, staffInfo, { new: true });
   if (!staff) {
     throw new Error('There is no staffId!');

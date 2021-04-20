@@ -7,7 +7,7 @@ import autoIncrement from 'mongoose-auto-increment';
 
 const { Schema } = mongoose;
 
-const TitleSchema = new Schema({
+const employeeTypeSchema = new Schema({
   name: {
     type: String,
     intl: true
@@ -18,14 +18,14 @@ const TitleSchema = new Schema({
   },
 }, {
   timestamps: true,
-   toJSON: {
-        virtuals: true,
-    }
+  toJSON: {
+      virtuals: true,
+  }
 });
 
-TitleSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-TitleSchema.plugin(mongoosePaginate);
-TitleSchema.plugin(autoIncrement.plugin, {
+employeeTypeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+employeeTypeSchema.plugin(mongoosePaginate);
+employeeTypeSchema.plugin(autoIncrement.plugin, {
   model: 'title',
   field: 'incrementId',
   startAt: 1,
@@ -33,6 +33,6 @@ TitleSchema.plugin(autoIncrement.plugin, {
 });
 
 
-const TitleCollection = mongoose.model('title', TitleSchema, 'title');
+const EmployeeTypeCollection = mongoose.model('employeetype', employeeTypeSchema, 'employeetype');
 
-export default TitleCollection;
+export default EmployeeTypeCollection;

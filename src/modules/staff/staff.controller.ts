@@ -11,7 +11,8 @@ import trim from 'lodash/trim';
 import appUtil from '@app/utils/app.util';
 import { Types } from 'mongoose';
 import hospitalService from '@app/modules/hospital/hospital.service';
-import { isNil, omitBy } from 'lodash';
+import configurationService from '@app/modules/configuration/configuration.service';
+import { isNil, map, omitBy } from 'lodash';
 
 const logger = loggerHelper.getLogger('staff.controller');
 
@@ -26,19 +27,22 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       throw new Error('Please verify your input!');
     }
     
-    if (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital)))) {
+    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
       throw new Error('There is no hospitalId');
     }
-    // Ignore these validate first
-    // if (!Types.ObjectId.isValid(title) || (!(await hospitalService.isHospital(hospital)))) {
-    //   throw new Error('There is no hospitalId');
-    // }
-    // if (!Types.ObjectId.isValid(degree) || (!(await hospitalService.isHospital(hospital)))) {
-    //   throw new Error('There is no hospitalId');
-    // }
-    // if (!Types.ObjectId.isValid(speciality) || (!(await hospitalService.isHospital(hospital)))) {
-    //   throw new Error('There is no hospitalId');
-    // }
+    if (title && (!Types.ObjectId.isValid(title) || (!(await configurationService.getTitleById(title))))) {
+      throw new Error('There is no titleId');
+    }
+    console.log(await configurationService.getDegreeById(degree), degree);
+    if (degree && (!Types.ObjectId.isValid(degree) || (!(await configurationService.getDegreeById(degree))))) {
+      throw new Error('There is no degreeId');
+    }
+    if (speciality && (!Types.ObjectId.isValid(speciality) || (!(await configurationService.getSpecialityById(speciality))))) {
+      throw new Error('There is no sepcialityId');
+    }
+    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
+      throw new Error('There is no employeeTypeId');
+    }
 
     const staffInfo: any = {
       firstName,
@@ -100,6 +104,27 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
       avatar, createdBy, updatedBy,
     } = req.body;
 
+    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+      throw new Error('There is no hospitalId');
+    }
+    map(title, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
+        throw new Error('There is no titleId');
+      }
+    });
+    map(degree, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getDegreeById(id))))) {
+        throw new Error('There is no degreeId');
+      }
+    });
+    map(speciality, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getSpecialityById(id))))) {
+        throw new Error('There is no sepcialityId');
+      }
+    });
+    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
+      throw new Error('There is no employeeTypeId');
+    }
     const staffInfo: any = omitBy({
       firstName,
       lastName,
@@ -117,10 +142,7 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
       createdBy,
       updatedBy,
     }, isNil);
-    if(get(staffInfo, 'hospital'))
-      if (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital)))) {
-        throw new Error('There is no hospitalId');
-      }
+  
     const params = { staffId, staffInfo };
     const data = await staffService.updateStaffInfo(params);
     res.send(data);

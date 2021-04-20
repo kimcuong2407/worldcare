@@ -19,7 +19,10 @@ const configurationRoutes = (app: express.Application): void => {
   app.put('/api/v1/speciality/:id', configurationActions.updateSpecialityAction);
   app.get('/api/v1/speciality/:id', configurationActions.getSpecialityByIdAction);
 
-
+  app.post('/api/v1/employee-type', configurationActions.createEmployeeTypeAction);
+  app.get('/api/v1/employee-type', configurationActions.fetchEmployeeTypeAction);
+  app.put('/api/v1/employee-type/:id', configurationActions.updateEmployeeTypeAction);
+  app.get('/api/v1/employee-type/:id', configurationActions.getEmployeeTypeByIdAction);
 };
 
 export default configurationRoutes;

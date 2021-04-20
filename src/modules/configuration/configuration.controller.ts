@@ -8,6 +8,7 @@ import pick from 'lodash/pick';
 
 const logger = loggerHelper.getLogger('degree.controller');
 
+// DEGREE
 const createDegreeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const degree = await configurationService.createDegree(req.body);
@@ -61,6 +62,7 @@ const getDegreeByIdAction = async (req: express.Request, res: express.Response, 
 };
 
 
+// TITLE
 const createTitleAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const title = await configurationService.createTitle(req.body);
@@ -115,7 +117,7 @@ const getTitleByIdAction = async (req: express.Request, res: express.Response, n
 };
 
 
-
+// SPECIALITY
 const createSpecialityAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const speciality = await configurationService.createSpeciality(req.body);
@@ -168,10 +170,66 @@ const getSpecialityByIdAction = async (req: express.Request, res: express.Respon
     next(e);
   }
 };
+
+
+// EMPLOYEE
+const createEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const employeeType = await configurationService.createEmployeeType(req.body);
+
+    res.send(setResponse(employeeType));
+  } catch (e) {
+    logger.error('createEmployeeTypeAction', e);
+    next(e);
+  }
+};
+
+
+const updateEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const employeeTypeId = get(req.params, 'id');
+    const employeeType = await configurationService.updateEmployeeTypeById(employeeTypeId, req.body);
+
+    res.send(setResponse(employeeType));
+  } catch (e) {
+    logger.error('createEmployeeTypeAction', e);
+    next(e);
+  }
+};
+
+
+const fetchEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const employeeTypes = await configurationService.getEmployeeType(
+      [
+        'name',
+        'incrementId'
+      ]
+    );
+    res.send(setResponse(map(employeeTypes, (employeeType) => pick(employeeType, ['name', 'id', 'incrementId']))));
+  } catch (e) {
+    logger.error('createDegreeAction', e);
+    next(e);
+  }
+};
+
+
+const getEmployeeTypeByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const employeeTypeId = get(req.params, 'id');
+    const employeeType = await configurationService.getEmployeeTypeById(employeeTypeId);
+    res.send(employeeType);
+  } catch (e) {
+    logger.error('createDegreeAction', e);
+    next(e);
+  }
+};
+
+
 export default {
   createDegreeAction, fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
   createTitleAction, fetchTitleAction, updateTitleAction, getTitleByIdAction,
-  
   createSpecialityAction, fetchSpecialityAction, updateSpecialityAction, getSpecialityByIdAction,
+  createEmployeeTypeAction, fetchEmployeeTypeAction, updateEmployeeTypeAction, getEmployeeTypeByIdAction,
 };
 

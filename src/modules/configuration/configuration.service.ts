@@ -4,20 +4,23 @@ import jwtUtil from "@app/utils/jwt.util";
 import { get } from "lodash";
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from "../user/user.collection";
-import TitleCollection from "./degree.collection";
 import DegreeCollection from "./degree.collection";
+import TitleCollection from "./title.collection";
+import EmployeeTypeCollection from "./employeeType.collection";
 import SpecialityCollection from "./speciality.collection";
 
+// DEGREE
 const createDegree = async (degree: any, language = 'vi') => {
   const createdDegree = await DegreeCollection.create(degree);
+  DegreeCollection.setDefaultLanguage(language);
   const data = await DegreeCollection.findOne({_id: createdDegree._id});
   data.setLanguage(language);
   return data;
 }
 
 const getDegree = async (fields: string[], language = 'vi') => {
+  DegreeCollection.setDefaultLanguage(language);
   const data = await DegreeCollection.find({}, fields);
-  // data.setLanguage(language);
   return data;
 };
 
@@ -31,24 +34,24 @@ const updateDegreeById = async (degreeId: string, degree: any) => {
   return data;
 }
 
-const getDegreeById = async (degreeId: string) => {
+const getDegreeById = async (degreeId: string, language = 'vi') => {
+  DegreeCollection.setDefaultLanguage(language);
   const degree = await DegreeCollection.findById(degreeId);
-  degree.setLanguage('en');
-  return degree.toJSON();
+  return degree;
 }
 
 
-
+// TITLE
 const createTitle = async (degree: any, language = 'vi') => {
   const createdTitle = await TitleCollection.create(degree);
+  TitleCollection.setDefaultLanguage(language);
   const data = await TitleCollection.findOne({_id: createdTitle._id});
-  data.setLanguage(language);
   return data;
 }
 
 const getTitle = async (fields: string[], language = 'vi') => {
+  TitleCollection.setDefaultLanguage(language);
   const data = await TitleCollection.find({}, fields);
-  // data.setLanguage(language);
   return data;
 };
 
@@ -62,15 +65,16 @@ const updateTitleById = async (degreeId: string, degree: any) => {
   return data;
 }
 
-const getTitleById = async (degreeId: string) => {
+const getTitleById = async (degreeId: string, language = 'vi') => {
+  TitleCollection.setDefaultLanguage(language);
   const degree = await TitleCollection.findById(degreeId);
-  degree.setLanguage('en');
-  return degree.toJSON();
+  return degree;
 }
 
 
-
+// SPECIALITY
 const createSpeciality = async (degree: any, language = 'vi') => {
+  SpecialityCollection.setDefaultLanguage(language);
   const createdSpeciality = await SpecialityCollection.create(degree);
   const data = await SpecialityCollection.findOne({_id: createdSpeciality._id});
   data.setLanguage(language);
@@ -78,8 +82,8 @@ const createSpeciality = async (degree: any, language = 'vi') => {
 }
 
 const getSpeciality = async (fields: string[], language = 'vi') => {
+  SpecialityCollection.setDefaultLanguage(language);
   const data = await SpecialityCollection.find({}, fields);
-  // data.setLanguage(language);
   return data;
 };
 
@@ -93,11 +97,43 @@ const updateSpecialityById = async (degreeId: string, degree: any) => {
   return data;
 }
 
-const getSpecialityById = async (degreeId: string) => {
+const getSpecialityById = async (degreeId: string, language = 'vi') => {
+  SpecialityCollection.setDefaultLanguage(language);
   const degree = await SpecialityCollection.findById(degreeId);
-  degree.setLanguage('en');
-  return degree.toJSON();
+  return degree;
 }
+
+// EMPLOYEETYPE
+const createEmployeeType = async (employeeType: any, language = 'vi') => {
+  const createdEmployeeType = await EmployeeTypeCollection.create(employeeType);
+  EmployeeTypeCollection.setDefaultLanguage(language);
+  const data = await EmployeeTypeCollection.findOne({_id: createdEmployeeType._id});
+  data.setLanguage(language);
+  return data;
+}
+
+const getEmployeeType = async (fields: string[], language = 'vi') => {
+  EmployeeTypeCollection.setDefaultLanguage(language);
+  const data = await EmployeeTypeCollection.find({}, fields);
+  return data;
+};
+
+const updateEmployeeTypeById = async (employeeTypeId: string, employeeType: any) => {
+  const updatedEmployeeType = await EmployeeTypeCollection.updateOne({_id: employeeTypeId}, {
+    $set: {
+      ...employeeType
+    }
+  });
+  const data = await EmployeeTypeCollection.findOne({_id: employeeTypeId});
+  return data;
+}
+
+const getEmployeeTypeById = async (employeeTypeId: string, language = 'vi') => {
+  EmployeeTypeCollection.setDefaultLanguage(language);
+  const employeeType = await EmployeeTypeCollection.findById(employeeTypeId);
+  return employeeType;
+}
+
 export default {
   createTitle,
   getTitle,
@@ -107,8 +143,12 @@ export default {
   getDegree,
   updateDegreeById,
   getDegreeById,
-    createSpeciality,
+  createSpeciality,
   getSpeciality,
   updateSpecialityById,
   getSpecialityById,
+  createEmployeeType,
+  updateEmployeeTypeById,
+  getEmployeeType,
+  getEmployeeTypeById
 };

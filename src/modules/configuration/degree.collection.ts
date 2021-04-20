@@ -7,7 +7,7 @@ import autoIncrement from 'mongoose-auto-increment';
 
 const { Schema } = mongoose;
 
-const TitleSchema = new Schema({
+const DegreeSchema = new Schema({
   name: {
     type: String,
     intl: true
@@ -18,21 +18,21 @@ const TitleSchema = new Schema({
   },
 }, {
   timestamps: true,
-  //  toJSON: {
-  //       virtuals: true,
-  //   }
+   toJSON: {
+        virtuals: true,
+    }
 });
 
-TitleSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-TitleSchema.plugin(mongoosePaginate);
-TitleSchema.plugin(autoIncrement.plugin, {
-  model: 'title',
+DegreeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+DegreeSchema.plugin(mongoosePaginate);
+DegreeSchema.plugin(autoIncrement.plugin, {
+  model: 'degree',
   field: 'incrementId',
   startAt: 1,
   incrementBy: 1
 });
 
 
-const TitleCollection = mongoose.model('title', TitleSchema, 'title');
+const DegreeCollection = mongoose.model('degree', DegreeSchema, 'degree');
 
-export default TitleCollection;
+export default DegreeCollection;

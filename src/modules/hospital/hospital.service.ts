@@ -34,7 +34,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
     $text: { $search: keyword }
   } : {};
   HospitalCollection.setDefaultLanguage(language);
-  SpecialityCollection.setDefaultLanguage(language)
+  SpecialityCollection.setDefaultLanguage(language);
 
   const data = await HospitalCollection.paginate(query, {
     ...options,
@@ -46,7 +46,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
 const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi') => {
   let hospital = null;
   HospitalCollection.setDefaultLanguage(language);
-  SpecialityCollection.setDefaultLanguage(language)
+  SpecialityCollection.setDefaultLanguage(language);
   if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
     hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
   } else {
