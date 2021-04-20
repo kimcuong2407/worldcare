@@ -26,13 +26,13 @@ const employeeTypeSchema = new Schema({
 employeeTypeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 employeeTypeSchema.plugin(mongoosePaginate);
 employeeTypeSchema.plugin(autoIncrement.plugin, {
-  model: 'title',
+  model: 'employee_type',
   field: 'incrementId',
   startAt: 1,
   incrementBy: 1
 });
 
 
-const EmployeeTypeCollection = mongoose.model('employeetype', employeeTypeSchema, 'employeetype');
+const EmployeeTypeCollection = mongoose.model('employee_type', employeeTypeSchema, 'employee_type');
 
 export default EmployeeTypeCollection;
