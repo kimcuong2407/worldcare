@@ -8,32 +8,58 @@ import identity from 'lodash/identity';
 import lowerCase from 'lodash/lowerCase';
 import pickBy from 'lodash/pickBy';
 import trim from 'lodash/trim';
-import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
+import { Types } from 'mongoose';
+import hospitalService from '@app/modules/hospital/hospital.service';
+import configurationService from '@app/modules/configuration/configuration.service';
+import { isNil, map, omitBy } from 'lodash';
 
 const logger = loggerHelper.getLogger('staff.controller');
 
 const createStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
-      staffName, description, email, phoneNumber,
-      speciality, address, workingHours, staffSettings, logo, photos, slug,
+      firstName, lastName, fullName, gender, description,
+      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      avatar, createdBy, updatedBy,
     } = req.body;
-    if (!staffName || !description ){
+    if (!firstName || !lastName ){
       throw new Error('Please verify your input!');
     }
+    
+    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+      throw new Error('There is no hospitalId');
+    }
+    if (title && (!Types.ObjectId.isValid(title) || (!(await configurationService.getTitleById(title))))) {
+      throw new Error('There is no titleId');
+    }
+    console.log(await configurationService.getDegreeById(degree), degree);
+    if (degree && (!Types.ObjectId.isValid(degree) || (!(await configurationService.getDegreeById(degree))))) {
+      throw new Error('There is no degreeId');
+    }
+    if (speciality && (!Types.ObjectId.isValid(speciality) || (!(await configurationService.getSpecialityById(speciality))))) {
+      throw new Error('There is no sepcialityId');
+    }
+    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
+      throw new Error('There is no employeeTypeId');
+    }
+
     const staffInfo: any = {
-      staffName,
+      firstName,
+      lastName,
+      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
-      email,
+      gender,
       phoneNumber,
+      email,
+      hospital: hospital,
+      title,
+      degree,
       speciality,
-      address,
-      workingHours: workingHours || WORKING_HOURS,
-      staffSettings,
-      logo,
-      photos,
-      slug: slug || slugify(trim(lowerCase(normalizeText(staffName)))),
+      employeeType,
+      avatar,
+      createdBy,
+      updatedBy,
     };
     const data = await staffService.createStaff(staffInfo);
     res.send(data);
@@ -73,22 +99,50 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
   try {
     const staffId = get(req.params, 'staffId');
     const {
-      staffName, description, email, phoneNumber,
-      speciality, address, workingHours, staffSettings, logo, photos, slug,
+      firstName, lastName, fullName, gender, description,
+      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      avatar, createdBy, updatedBy,
     } = req.body;
-    const staffInfo: any = pickBy({
-      staffName,
+
+    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+      throw new Error('There is no hospitalId');
+    }
+    map(title, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
+        throw new Error('There is no titleId');
+      }
+    });
+    map(degree, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getDegreeById(id))))) {
+        throw new Error('There is no degreeId');
+      }
+    });
+    map(speciality, async (id) => {
+      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getSpecialityById(id))))) {
+        throw new Error('There is no sepcialityId');
+      }
+    });
+    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
+      throw new Error('There is no employeeTypeId');
+    }
+    const staffInfo: any = omitBy({
+      firstName,
+      lastName,
+      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
-      email,
+      gender,
       phoneNumber,
+      email,
+      hospital: hospital,
+      title,
+      degree,
       speciality,
-      address,
-      workingHours,
-      staffSettings,
-      logo,
-      photos,
-      slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
-    }, identity);
+      employeeType,
+      avatar,
+      createdBy,
+      updatedBy,
+    }, isNil);
+  
     const params = { staffId, staffInfo };
     const data = await staffService.updateStaffInfo(params);
     res.send(data);
