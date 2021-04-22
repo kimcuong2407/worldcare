@@ -49,7 +49,7 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
     const options = {
       page, limit,
     }
-    const language: string = get(req.headers, 'language');
+    const language: string = get(req, 'language');
     const keyword = get(req, 'query.keyword', '');
     const data = await hospitalService.fetchHospital({keyword, options}, language);
     res.send(data);
@@ -62,7 +62,7 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
 const fetchHospitalInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const hospitalIdOrSlug = get(req.params, 'hospitalId');
-    const language: string = get(req.headers, 'language');
+    const language: string = get(req, 'language');
     const data = await hospitalService.fetchHospitalInfo(hospitalIdOrSlug, language);
     res.send(data);
   } catch (e) {
