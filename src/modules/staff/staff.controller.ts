@@ -87,7 +87,8 @@ const fetchStaffAction = async (req: express.Request, res: express.Response, nex
 const fetchStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const staffId = get(req.params, 'staffId');
-    const data = await staffService.fetchStaffInfo(staffId);
+    const raw: string = get(req.query, 'raw');
+    const data = await staffService.fetchStaffInfo(staffId, raw);
     res.send(data);
   } catch (e) {
     logger.error('fetchStaffInfoAction', e);

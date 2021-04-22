@@ -39,15 +39,18 @@ const fetchStaff = async (params: any, language= 'vi') => {
   return data;
 }
 
-const fetchStaffInfo = async (staffId: string, language= 'vi') => {
+const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) => {
   StaffCollection.setDefaultLanguage(language);
-  const data = await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
+  let data = await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
     .populate('degree', 'name')
     .populate('title', 'name')
     .populate('speciality', 'name')
     .populate('employee_type', 'name');
   if (!data) {
     throw new Error('There is no staffId!');
+  }
+  if(isRaw) {
+    data = data.toJSON({virtuals: false})
   }
   return data;
 };

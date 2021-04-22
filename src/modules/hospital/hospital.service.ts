@@ -43,7 +43,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
   return data;
 }
 
-const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi') => {
+const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw = false) => {
   let hospital = null;
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
@@ -55,6 +55,9 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi') => {
 
   if (!hospital) {
     throw new Error('There is no hospitalId!');
+  }
+  if(isRaw) {
+    hospital = hospital.toJSON({virtuals: false})
   }
   
   return hospital;

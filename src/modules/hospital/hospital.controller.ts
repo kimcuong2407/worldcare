@@ -63,7 +63,9 @@ const fetchHospitalInfoAction = async (req: express.Request, res: express.Respon
   try {
     const hospitalIdOrSlug = get(req.params, 'hospitalId');
     const language: string = get(req, 'language');
-    const data = await hospitalService.fetchHospitalInfo(hospitalIdOrSlug, language);
+    const raw: string = get(req.query, 'raw');
+
+    const data = await hospitalService.fetchHospitalInfo(hospitalIdOrSlug, language, raw);
     res.send(data);
   } catch (e) {
     logger.error('fetchHospitalInfoAction', e);
