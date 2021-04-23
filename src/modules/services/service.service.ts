@@ -8,8 +8,8 @@ import UserCollection from "../user/user.collection";
 import ServiceCollection from "./service.collection";
 
 // DEGREE
-const createService = async (category: any, language = 'vi') => {
-  const createdService = await ServiceCollection.create(category);
+const createService = async (service: any, language = 'vi') => {
+  const createdService = await ServiceCollection.create(service);
   ServiceCollection.setDefaultLanguage(language);
   const data = await ServiceCollection.findOne({_id: createdService._id});
   data.setLanguage(language);
@@ -22,30 +22,30 @@ const getService = async (fields: string[], language = 'vi') => {
   return data;
 };
 
-const updateServiceById = async (categoryId: string, category: any) => {
-  const updatedService = await ServiceCollection.updateOne({_id: categoryId}, {
+const updateServiceById = async (serviceId: string, service: any) => {
+  const updatedService = await ServiceCollection.updateOne({_id: serviceId}, {
     $set: {
-      ...category
+      ...service
     }
   });
-  const data = await ServiceCollection.findOne({_id: categoryId});
+  const data = await ServiceCollection.findOne({_id: serviceId});
   return data;
 }
 
-const getServiceByIdOrSlug = async (categoryId: string, language = 'vi') => {
+const getServiceByIdOrSlug = async (serviceId: string, language = 'vi') => {
   ServiceCollection.setDefaultLanguage(language);
-  let category;
-  if( Types.ObjectId.isValid(categoryId)) {
-    category = await ServiceCollection.findById(categoryId);
+  let service;
+  if( Types.ObjectId.isValid(serviceId)) {
+    service = await ServiceCollection.findById(serviceId);
   } else {
-    category = await ServiceCollection.findOne({slug: categoryId}).populate('speciality', 'name');
+    service = await ServiceCollection.findOne({slug: serviceId}).populate('speciality', 'name');
   }
 
-  return category;
+  return service;
 }
 
-const deleteService = async (categoryId: string) => {
-  return ServiceCollection.deleteOne({_id: categoryId})
+const deleteService = async (serviceId: string) => {
+  return ServiceCollection.deleteOne({_id: serviceId})
 }
 
 
