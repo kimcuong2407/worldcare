@@ -6,6 +6,9 @@ import configurationRoutes from './modules/configuration';
 import fileRoutes from './modules/file';
 import hospitalRoutes from './modules/hospital';
 import staffRoutes from './modules/staff';
+import categoryRoutes from './modules/news';
+import serviceRoutes from './modules/services';
+import appointmentRoutes from './modules/appointment';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -15,4 +18,7 @@ export default (app: express.Application): void => {
   staffRoutes(app);
   configurationRoutes(app);
   fileRoutes(app);
+  categoryRoutes(app);
+  serviceRoutes(app);
+  appointmentRoutes(app);
 };
