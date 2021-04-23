@@ -34,6 +34,9 @@ const NewsCategorySchema = new Schema({
     type: String,
     unique: true,
   },
+  photo: {
+    type: String,
+  },
 }, {
   timestamps: true,
 });

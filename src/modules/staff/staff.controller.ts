@@ -20,14 +20,14 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
   try {
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      phoneNumber, email, hospitalId, title, degree, speciality, employeeType,
       avatar, createdBy, updatedBy,
     } = req.body;
     if (!firstName || !lastName ){
       throw new Error('Please verify your input!');
     }
     
-    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+    if (hospitalId && (!Types.ObjectId.isValid(hospitalId) || (!(await hospitalService.isHospital(hospitalId))))) {
       throw new Error('There is no hospitalId');
     }
     if (title && (!Types.ObjectId.isValid(title) || (!(await configurationService.getTitleById(title))))) {
@@ -52,7 +52,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       gender,
       phoneNumber,
       email,
-      hospital: hospital,
+      hospital: hospitalId,
       title,
       degree,
       speciality,
@@ -71,15 +71,21 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
 
 const fetchStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    const { hospitalId, degree, title, speciality } = req.query;
     const { page, limit } = appUtil.getPaging(req);
     const options = {
-      page, limit,
+      page,
+      limit,
+      hospitalId,
+      degree,
+      title,
+      speciality,
     }
     const keyword = get(req, 'query.keyword', '');
     const data = await staffService.fetchStaff({keyword, options});
     res.send(data);
   } catch (e) {
-    logger.error('fetchStaffInfoAction', e);
+    logger.error('fetchStaffAction', e);
     next(e);
   }
 };

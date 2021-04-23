@@ -20,11 +20,30 @@ const createStaff = async (staffInfo: StaffModel, language = 'vi') => {
 
 const fetchStaff = async (params: any, language= 'vi') => {
   const {
-    keyword, options,
+    keyword, options, hospitalId, title, degree, speciality, employeeType
   } = params;
-  const query = keyword ? {
-    $text: { $search: keyword }
-  } : {};
+  const query: any = {
+  };
+
+  if(hospitalId) {
+    query.hospital = hospitalId;
+  }
+  if(degree) {
+    query.degree = degree;
+  }
+  if(title) {
+    query.title = title;
+  }
+  if(title) {
+    query.degree = title;
+  }
+  if(speciality) {
+    query.speciality = speciality;
+  }
+  
+  if(keyword) {
+    query['$text'] = { $search: keyword }
+  } 
   StaffCollection.setDefaultLanguage(language);
   const data = await StaffCollection.paginate(query, {
     ...options,
