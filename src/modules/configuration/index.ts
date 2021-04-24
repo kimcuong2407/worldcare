@@ -23,6 +23,10 @@ const configurationRoutes = (app: express.Application): void => {
   app.get('/api/v1/employee-type', configurationActions.fetchEmployeeTypeAction);
   app.put('/api/v1/employee-type/:id', configurationActions.updateEmployeeTypeAction);
   app.get('/api/v1/employee-type/:id', configurationActions.getEmployeeTypeByIdAction);
+  app.get('/api/v1/city', configurationActions.getCityListAction);
+  app.get('/api/v1/city/:cityCode/district', configurationActions.getDistrictListAction);
+  app.get('/api/v1/district/:districtCode/ward', configurationActions.getWardListByDistrictAction);
+
 };
 
 export default configurationRoutes;

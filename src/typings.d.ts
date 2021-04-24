@@ -11,6 +11,9 @@ declare namespace Express {
   }
 }
 
+// declare module 'sub-vn' {
+//   getProvinces: any;
+// }
 
 declare module 'mongoose' {
   import mongoose = require('mongoose');

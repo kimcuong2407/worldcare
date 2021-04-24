@@ -5,6 +5,7 @@ import loggerHelper from '@utils/logger.util';
 import configurationService from './configuration.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
+import subVN from 'sub-vn';
 
 const logger = loggerHelper.getLogger('degree.controller');
 
@@ -226,10 +227,48 @@ const getEmployeeTypeByIdAction = async (req: express.Request, res: express.Resp
 };
 
 
+
+const getCityListAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const cities = subVN.getProvinces();
+    res.send(setResponse(cities));
+  } catch (e) {
+    logger.error('getCityListAction', e);
+    next(e);
+  }
+};
+
+
+const getDistrictListAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const cityCode = get(req.params, 'cityCode')
+    const district = subVN.getDistrictsByProvinceCode(cityCode);
+    res.send(setResponse(district));
+  } catch (e) {
+    logger.error('getCityListAction', e);
+    next(e);
+  }
+};
+
+const getWardListByDistrictAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const districtCode = get(req.params, 'districtCode')
+    const district = subVN.getWardsByDistrictCode(districtCode);
+    res.send(setResponse(district));
+  } catch (e) {
+    logger.error('getCityListAction', e);
+    next(e);
+  }
+};
+
+
 export default {
   createDegreeAction, fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
   createTitleAction, fetchTitleAction, updateTitleAction, getTitleByIdAction,
   createSpecialityAction, fetchSpecialityAction, updateSpecialityAction, getSpecialityByIdAction,
   createEmployeeTypeAction, fetchEmployeeTypeAction, updateEmployeeTypeAction, getEmployeeTypeByIdAction,
+  getCityListAction,
+  getDistrictListAction,
+  getWardListByDistrictAction,
 };
 
