@@ -4,6 +4,7 @@ FROM node:12.22.1-stretch-slim as builder
 WORKDIR /source.tmp
 
 COPY . .
+RUN apk add --no-cache git
 
 RUN npm install && \
   npm run build && \
