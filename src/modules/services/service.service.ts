@@ -16,9 +16,9 @@ const createService = async (service: any, language = 'vi') => {
   return data;
 }
 
-const getService = async (fields: string[], language = 'vi') => {
+const getService = async (language = 'vi') => {
   ServiceCollection.setDefaultLanguage(language);
-  const data = await ServiceCollection.find({}, fields);
+  const data = await ServiceCollection.paginate({});
   return data;
 };
 

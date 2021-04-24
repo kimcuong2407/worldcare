@@ -6,14 +6,14 @@ import serviceService from './service.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 
-const logger = loggerHelper.getLogger('degree.controller');
+const logger = loggerHelper.getLogger('service.controller');
 
 // DEGREE
 const createServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degree = await serviceService.createService(req.body);
+    const service = await serviceService.createService(req.body);
 
-    res.send(setResponse(degree));
+    res.send(setResponse(service));
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -23,10 +23,10 @@ const createServiceAction = async (req: express.Request, res: express.Response, 
 
 const updateServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
-    const degree = await serviceService.updateServiceById(degreeId, req.body);
+    const serviceId = get(req.params, 'id');
+    const service = await serviceService.updateServiceById(serviceId, req.body);
 
-    res.send(setResponse(degree));
+    res.send(setResponse(service));
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -36,13 +36,8 @@ const updateServiceAction = async (req: express.Request, res: express.Response, 
 
 const fetchServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degrees = await serviceService.getService(
-      [
-        'name',
-        'incrementId'
-      ]
-    );
-    res.send(setResponse(map(degrees, (degree) => pick(degree, ['name', 'id', 'incrementId']))));
+    const services = await serviceService.getService();
+    res.send(setResponse(services));
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -52,10 +47,10 @@ const fetchServiceAction = async (req: express.Request, res: express.Response, n
 
 const getServiceByIdOrSlugAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const serviceId = get(req.params, 'id');
     
-    const degree = await serviceService.getServiceByIdOrSlug(degreeId);
-    res.send(degree);
+    const service = await serviceService.getServiceByIdOrSlug(serviceId);
+    res.send(service);
   } catch (e) {
     logger.error('getServiceByIdOrSlugAction', e);
     next(e);
@@ -65,10 +60,10 @@ const getServiceByIdOrSlugAction = async (req: express.Request, res: express.Res
 
 const deleteServiceByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const serviceId = get(req.params, 'id');
     
-    const degree = await serviceService.deleteService(degreeId);
-    res.send(degree);
+    const service = await serviceService.deleteService(serviceId);
+    res.send(service);
   } catch (e) {
     logger.error('deleteServiceByIdAction', e);
     next(e);

@@ -6,7 +6,7 @@ const { Schema } = mongoose;
 
 const ServiceSchema = new Schema({
   __v: { type: Number, select: false },
-  title: {
+  name: {
     type: String,
     intl: true,
   },
