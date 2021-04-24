@@ -63,9 +63,9 @@ module.exports = {
         ],
         address: {
           street: '245 Hoàng Diệu',
-          ward: 'Nam Dương',
-          district: 'Hải CHâu',
-          city: 'Đà Nẵng'
+          ward: '20257',
+          district: '492',
+          city: '48'
         },
         speciality: ['607da1fe1fc9315254b537f7'],
         hospitalSettings: {

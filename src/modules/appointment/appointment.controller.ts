@@ -6,14 +6,14 @@ import appointmentService from './appointment.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 
-const logger = loggerHelper.getLogger('degree.controller');
+const logger = loggerHelper.getLogger('appointment.controller');
 
 // DEGREE
 const createServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degree = await appointmentService.createAppointment(req.body);
+    const appointment = await appointmentService.createAppointment(req.body);
 
-    res.send(setResponse(degree));
+    res.send(appointment);
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -23,10 +23,10 @@ const createServiceAction = async (req: express.Request, res: express.Response, 
 
 const updateServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
-    const degree = await appointmentService.updateAppointmentById(degreeId, req.body);
+    const appointmentId = get(req.params, 'id');
+    const appointment = await appointmentService.updateAppointmentById(appointmentId, req.body);
 
-    res.send(setResponse(degree));
+    res.send(appointment);
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -36,13 +36,13 @@ const updateServiceAction = async (req: express.Request, res: express.Response, 
 
 const fetchServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degrees = await appointmentService.getAppointment(
+    const appointments = await appointmentService.getAppointment(
       [
         'name',
         'incrementId'
       ]
     );
-    res.send(setResponse(map(degrees, (degree) => pick(degree, ['name', 'id', 'incrementId']))));
+    res.send(map(appointments, (appointment) => pick(appointment, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -52,10 +52,10 @@ const fetchServiceAction = async (req: express.Request, res: express.Response, n
 
 const getServiceByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const appointmentId = get(req.params, 'id');
     
-    const degree = await appointmentService.getAppointmentById(degreeId);
-    res.send(degree);
+    const appointment = await appointmentService.getAppointmentById(appointmentId);
+    res.send(appointment);
   } catch (e) {
     logger.error('getServiceByIdAction', e);
     next(e);
@@ -65,10 +65,10 @@ const getServiceByIdAction = async (req: express.Request, res: express.Response,
 
 const deleteServiceByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const appointmentId = get(req.params, 'id');
     
-    const degree = await appointmentService.deleteAppointment(degreeId);
-    res.send(degree);
+    const appointment = await appointmentService.deleteAppointment(appointmentId);
+    res.send(appointment);
   } catch (e) {
     logger.error('deleteServiceByIdAction', e);
     next(e);

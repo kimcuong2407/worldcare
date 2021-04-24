@@ -17,7 +17,7 @@ const loginAction = async (req: express.Request, res: express.Response, next: ex
       throw new ValidationFailedError('Login and password are required.');
     }
     const auth = await authService.authenticate(login, password)
-    res.send(setResponse(auth));
+    res.send(auth);
   } catch (e) {
     logger.error('LoginAction', e);
     next(e);
@@ -32,7 +32,7 @@ const fetchHospitalRolesAction = async (
   ) => {
   try {
     const roles = await casbin.enforcer.getFilteredGroupingPolicy(2, 'tenant1');
-    res.send(setResponse(roles));
+    res.send(roles);
   } catch (e) {
     logger.error('fetchHospitalRolesAction', e);
     next(e);
@@ -46,7 +46,7 @@ const createHospitalRolesAction = async (
   ) => {
   try {
     const roles = await casbin.enforcer.getFilteredGroupingPolicy(2, 'tenant1');
-    res.send(setResponse(map(roles, (role) => get(role, 2))));
+    res.send(map(roles, (role) => get(role, 2)));
   } catch (e) {
     logger.error('createHospitalRolesAction', e);
     next(e);

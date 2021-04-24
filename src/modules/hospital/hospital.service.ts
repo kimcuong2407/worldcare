@@ -1,4 +1,6 @@
+import addressUtil from '@app/utils/address.util';
 import loggerHelper from '@utils/logger.util';
+import { map } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
@@ -26,6 +28,14 @@ const createHospital = async (hospitalInfo: HospitalModel, language = 'vi') => {
   };
 };
 
+const formatHospital = (hospital: any) => {
+  const address = addressUtil.formatAddress(get(hospital, 'address'));
+  return {
+    ...hospital,
+    address,
+  }
+}
+
 const fetchHospital = async (params: any, language= 'vi') => {
   const {
     keyword, options,
@@ -38,9 +48,14 @@ const fetchHospital = async (params: any, language= 'vi') => {
 
   const data = await HospitalCollection.paginate(query, {
     ...options,
+    lean: true,
     'populate': { path: 'speciality', select: 'name'},
   });
-  return data;
+  
+  return {
+    ...data,
+    docs: map( get(data, 'docs', []), formatHospital)
+  }
 }
 
 const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw = false) => {
@@ -48,9 +63,9 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
   if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
-    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
+    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name').exec();
   } else {
-    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name');
+    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name').exec();
   }
 
   if (!hospital) {
@@ -60,7 +75,7 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
     hospital = hospital.toJSON({virtuals: false})
   }
   
-  return hospital;
+  return formatHospital(hospital);
 }
 
 const updateHospitalInfo = async (params: any) => {
@@ -89,7 +104,7 @@ const updateHospitalInfo = async (params: any) => {
 
 const deleteHospital = async (hospitalId: string) => {
   const data = await HospitalCollection.findByIdAndDelete(hospitalId);
-  if (isNull(data)){
+  if (isNull(data)) {
     const data = await HospitalCollection.findById(hospitalId);
     if (!data) {
       throw new Error('There is no hospitalId!');

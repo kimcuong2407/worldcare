@@ -13,7 +13,7 @@ const createServiceAction = async (req: express.Request, res: express.Response, 
   try {
     const service = await serviceService.createService(req.body);
 
-    res.send(setResponse(service));
+    res.send(service);
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -26,7 +26,7 @@ const updateServiceAction = async (req: express.Request, res: express.Response, 
     const serviceId = get(req.params, 'id');
     const service = await serviceService.updateServiceById(serviceId, req.body);
 
-    res.send(setResponse(service));
+    res.send(service);
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);
@@ -37,7 +37,7 @@ const updateServiceAction = async (req: express.Request, res: express.Response, 
 const fetchServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const services = await serviceService.getService();
-    res.send(setResponse(services));
+    res.send(services);
   } catch (e) {
     logger.error('createServiceAction', e);
     next(e);

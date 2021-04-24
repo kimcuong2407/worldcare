@@ -6,14 +6,14 @@ import newsService from './news.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 
-const logger = loggerHelper.getLogger('degree.controller');
+const logger = loggerHelper.getLogger('category.controller');
 
 // DEGREE
 const createNewsCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degree = await newsService.createNewsCategory(req.body);
+    const category = await newsService.createNewsCategory(req.body);
 
-    res.send(setResponse(degree));
+    res.send(category);
   } catch (e) {
     logger.error('createNewsCategoryAction', e);
     next(e);
@@ -23,10 +23,10 @@ const createNewsCategoryAction = async (req: express.Request, res: express.Respo
 
 const updateNewsCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
-    const degree = await newsService.updateNewsCategoryById(degreeId, req.body);
+    const categoryId = get(req.params, 'id');
+    const category = await newsService.updateNewsCategoryById(categoryId, req.body);
 
-    res.send(setResponse(degree));
+    res.send(category);
   } catch (e) {
     logger.error('createNewsCategoryAction', e);
     next(e);
@@ -36,13 +36,13 @@ const updateNewsCategoryAction = async (req: express.Request, res: express.Respo
 
 const fetchNewsCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degrees = await newsService.getNewsCategory(
+    const categorys = await newsService.getNewsCategory(
       [
         'name',
         'incrementId'
       ]
     );
-    res.send(setResponse(map(degrees, (degree) => pick(degree, ['name', 'id', 'incrementId']))));
+    res.send(map(categorys, (category) => pick(category, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createNewsCategoryAction', e);
     next(e);
@@ -52,10 +52,10 @@ const fetchNewsCategoryAction = async (req: express.Request, res: express.Respon
 
 const getNewsCategoryByIdOrSlugAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const categoryId = get(req.params, 'id');
     
-    const degree = await newsService.getNewsCategoryByIdOrSlug(degreeId);
-    res.send(degree);
+    const category = await newsService.getNewsCategoryByIdOrSlug(categoryId);
+    res.send(category);
   } catch (e) {
     logger.error('getNewsCategoryByIdOrSlugAction', e);
     next(e);
@@ -65,10 +65,10 @@ const getNewsCategoryByIdOrSlugAction = async (req: express.Request, res: expres
 
 const deleteNewsCategoryByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const degreeId = get(req.params, 'id');
+    const categoryId = get(req.params, 'id');
     
-    const degree = await newsService.deleteNewsCategory(degreeId);
-    res.send(degree);
+    const category = await newsService.deleteNewsCategory(categoryId);
+    res.send(category);
   } catch (e) {
     logger.error('deleteNewsCategoryByIdAction', e);
     next(e);

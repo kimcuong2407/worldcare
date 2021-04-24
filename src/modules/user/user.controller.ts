@@ -15,7 +15,7 @@ const getProfileAction = async (
   try {
     const user = await userService.getUserProfileById(get(req.user, 'id'));
     
-    res.send(setResponse(omit(user, 'password')));
+    res.send(omit(user, 'password'));
   } catch (e) {
     logger.error('getProfileAction', e);
     next(e);

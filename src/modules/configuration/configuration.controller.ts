@@ -14,7 +14,7 @@ const createDegreeAction = async (req: express.Request, res: express.Response, n
   try {
     const degree = await configurationService.createDegree(req.body);
 
-    res.send(setResponse(degree));
+    res.send(degree);
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -27,7 +27,7 @@ const updateDegreeAction = async (req: express.Request, res: express.Response, n
     const degreeId = get(req.params, 'id');
     const degree = await configurationService.updateDegreeById(degreeId, req.body);
 
-    res.send(setResponse(degree));
+    res.send(degree);
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -43,7 +43,7 @@ const fetchDegreeAction = async (req: express.Request, res: express.Response, ne
         'incrementId'
       ]
     );
-    res.send(setResponse(map(degrees, (degree) => pick(degree, ['name', 'id', 'incrementId']))));
+    res.send(map(degrees, (degree) => pick(degree, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -68,7 +68,7 @@ const createTitleAction = async (req: express.Request, res: express.Response, ne
   try {
     const title = await configurationService.createTitle(req.body);
 
-    res.send(setResponse(title));
+    res.send(title);
   } catch (e) {
     logger.error('createTitleAction', e);
     next(e);
@@ -81,7 +81,7 @@ const updateTitleAction = async (req: express.Request, res: express.Response, ne
     const titleId = get(req.params, 'id');
     const title = await configurationService.updateTitleById(titleId, req.body);
 
-    res.send(setResponse(title));
+    res.send(title);
   } catch (e) {
     logger.error('createTitleAction', e);
     next(e);
@@ -98,7 +98,7 @@ const fetchTitleAction = async (req: express.Request, res: express.Response, nex
       ]
     );
 
-    res.send(setResponse(map(titles, (degree) => pick(degree, ['name', 'id', 'incrementId']))));
+    res.send(map(titles, (degree) => pick(degree, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createTitleAction', e);
     next(e);
@@ -110,7 +110,7 @@ const getTitleByIdAction = async (req: express.Request, res: express.Response, n
   try {
     const titleId = get(req.params, 'id');
     const title = await configurationService.getTitleById(titleId);
-    res.send(setResponse(title));
+    res.send(title);
   } catch (e) {
     logger.error('createTitleAction', e);
     next(e);
@@ -123,7 +123,7 @@ const createSpecialityAction = async (req: express.Request, res: express.Respons
   try {
     const speciality = await configurationService.createSpeciality(req.body);
 
-    res.send(setResponse(speciality));
+    res.send(speciality);
   } catch (e) {
     logger.error('createSpecialityAction', e);
     next(e);
@@ -136,7 +136,7 @@ const updateSpecialityAction = async (req: express.Request, res: express.Respons
     const specialityId = get(req.params, 'id');
     const speciality = await configurationService.updateSpecialityById(specialityId, req.body);
 
-    res.send(setResponse(speciality));
+    res.send(speciality);
   } catch (e) {
     logger.error('createSpecialityAction', e);
     next(e);
@@ -153,7 +153,7 @@ const fetchSpecialityAction = async (req: express.Request, res: express.Response
       ]
     );
 
-    res.send(setResponse(map(specialities, (speciality) => pick(speciality, ['name', 'id', 'incrementId']))));
+    res.send(map(specialities, (speciality) => pick(speciality, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createSpecialityAction', e);
     next(e);
@@ -165,7 +165,7 @@ const getSpecialityByIdAction = async (req: express.Request, res: express.Respon
   try {
     const specialityId = get(req.params, 'id');
     const speciality = await configurationService.getSpecialityById(specialityId);
-    res.send(setResponse(speciality));
+    res.send(speciality);
   } catch (e) {
     logger.error('createSpecialityAction', e);
     next(e);
@@ -178,7 +178,7 @@ const createEmployeeTypeAction = async (req: express.Request, res: express.Respo
   try {
     const employeeType = await configurationService.createEmployeeType(req.body);
 
-    res.send(setResponse(employeeType));
+    res.send(employeeType);
   } catch (e) {
     logger.error('createEmployeeTypeAction', e);
     next(e);
@@ -191,7 +191,7 @@ const updateEmployeeTypeAction = async (req: express.Request, res: express.Respo
     const employeeTypeId = get(req.params, 'id');
     const employeeType = await configurationService.updateEmployeeTypeById(employeeTypeId, req.body);
 
-    res.send(setResponse(employeeType));
+    res.send(employeeType);
   } catch (e) {
     logger.error('createEmployeeTypeAction', e);
     next(e);
@@ -207,7 +207,7 @@ const fetchEmployeeTypeAction = async (req: express.Request, res: express.Respon
         'incrementId'
       ]
     );
-    res.send(setResponse(map(employeeTypes, (employeeType) => pick(employeeType, ['name', 'id', 'incrementId']))));
+    res.send(map(employeeTypes, (employeeType) => pick(employeeType, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -231,7 +231,7 @@ const getEmployeeTypeByIdAction = async (req: express.Request, res: express.Resp
 const getCityListAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const cities = subVN.getProvinces();
-    res.send(setResponse(cities));
+    res.send(cities);
   } catch (e) {
     logger.error('getCityListAction', e);
     next(e);
@@ -243,7 +243,7 @@ const getDistrictListAction = async (req: express.Request, res: express.Response
   try {
     const cityCode = get(req.params, 'cityCode')
     const district = subVN.getDistrictsByProvinceCode(cityCode);
-    res.send(setResponse(district));
+    res.send(district);
   } catch (e) {
     logger.error('getCityListAction', e);
     next(e);
@@ -254,7 +254,7 @@ const getWardListByDistrictAction = async (req: express.Request, res: express.Re
   try {
     const districtCode = get(req.params, 'districtCode')
     const district = subVN.getWardsByDistrictCode(districtCode);
-    res.send(setResponse(district));
+    res.send(district);
   } catch (e) {
     logger.error('getCityListAction', e);
     next(e);

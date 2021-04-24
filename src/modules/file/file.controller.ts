@@ -11,7 +11,7 @@ const uploadFileAction = async (req: express.Request, res: express.Response, nex
   try {
     const resource = get(req.params, 'resource');
     const uploadedFile = await uploadImage(req.file, resource);
-    res.send(setResponse({url: uploadedFile.Location}));
+    res.send({url: uploadedFile.Location});
   } catch (e) {
     logger.error('uploadFileAction', e);
     next(e);
