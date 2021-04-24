@@ -106,7 +106,7 @@
     "npm": "^7.11.1",
     "serialize-javascript": "^5.0.1",
     "slugify": "^1.5.0",
-    "sub-vn": "git+https://github.com/nguyenpc/sub-vn.git#master",
+    "sub-vn": "https://github.com/nguyenpc/sub-vn.git#master",
     "uuid": "^8.3.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
