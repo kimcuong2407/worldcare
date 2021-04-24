@@ -1,9 +1,12 @@
 import { UnAuthenticated } from "@app/core/types/ErrorTypes";
+import zalo from "@app/core/zalo";
 import bcryptUtil from "@app/utils/bcrypt.util";
 import jwtUtil from "@app/utils/jwt.util";
 import { get } from "lodash";
+import moment from "moment";
 import { Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
+import hospitalService from "../hospital/hospital.service";
 import AppointmentCollection from "./appointment.collection";
 import CustomerCollection from "./customer.collection";
 
@@ -15,6 +18,7 @@ const createAppointment = async (appointment: any) => {
     { phoneNumber, name },
     { phoneNumber, name, email },
     { upsert: true }).exec();
+  const hospital =  await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
     customer: get(customerInfo, '_id'),
     time,
@@ -22,11 +26,13 @@ const createAppointment = async (appointment: any) => {
     hospital: hospitalId,
     message,
   });
+  await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
+    vào lúc ${moment(time).format('DD/MM/YYYY hh:mm')}`);
   const data = await AppointmentCollection.findOne({ _id: createdAppointment._id });
   return data;
 }
 
-const fetchAppointment = async (startTime, endTime) => {
+const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
   const query: any = {};
   const andQuery = [];
   if (startTime) {
@@ -39,7 +45,7 @@ const fetchAppointment = async (startTime, endTime) => {
       time: { $lte: startTime }
     });
   }
-  console.log(andQuery)
+  
   const data = await AppointmentCollection.find({ $and: andQuery })
     .populate('customer', 'name')
     .populate('hospital', 'hospitalName')
