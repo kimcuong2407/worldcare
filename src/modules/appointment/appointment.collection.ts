@@ -9,10 +9,10 @@ const { Schema } = mongoose;
 const AppointmentSchema = new Schema({
   __v: { type: Number, select: false },
   time: Date,
-  hospital: [{ type: Schema.Types.ObjectId, ref: 'hospital' }],
-  services: Array,
+  hospital: { type: Schema.Types.ObjectId, ref: 'hospital' },
+  service: { type: Schema.Types.ObjectId, ref: 'service' },
   message: String,
-  customer: [{ type: Schema.Types.ObjectId, ref: 'customer' }],
+  customer: { type: Schema.Types.ObjectId, ref: 'customer' },
 }, {
   timestamps: true,
 });

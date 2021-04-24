@@ -2,83 +2,82 @@ import { setResponse } from '../../utils/response.util';
 import express from 'express';
 import get from 'lodash/get';
 import loggerHelper from '@utils/logger.util';
-import appointmentService from './appointment.service';
+import appointmentAppointment from './appointment.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 
 const logger = loggerHelper.getLogger('appointment.controller');
 
 // DEGREE
-const createServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const createAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const appointment = await appointmentService.createAppointment(req.body);
+    const { customer, time, serviceId, hospitalId, message } = req.body;
+    const appointment = await appointmentAppointment.createAppointment({
+      customer, time, serviceId, hospitalId, message
+    });
 
     res.send(appointment);
   } catch (e) {
-    logger.error('createServiceAction', e);
+    logger.error('createAppointmentAction', e);
     next(e);
   }
 };
 
 
-const updateServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const updateAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const appointmentId = get(req.params, 'id');
-    const appointment = await appointmentService.updateAppointmentById(appointmentId, req.body);
+    const appointment = await appointmentAppointment.updateAppointmentById(appointmentId, req.body);
 
     res.send(appointment);
   } catch (e) {
-    logger.error('createServiceAction', e);
+    logger.error('createAppointmentAction', e);
     next(e);
   }
 };
 
 
-const fetchServiceAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const fetchAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const appointments = await appointmentService.getAppointment(
-      [
-        'name',
-        'incrementId'
-      ]
-    );
-    res.send(map(appointments, (appointment) => pick(appointment, ['name', 'id', 'incrementId'])));
+    const { startTime, endTime } = req.query;
+    const appointments = await appointmentAppointment.fetchAppointment(startTime, endTime);
+    res.send(appointments);
   } catch (e) {
-    logger.error('createServiceAction', e);
+    logger.error('createAppointmentAction', e);
     next(e);
   }
 };
 
 
-const getServiceByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-    const appointmentId = get(req.params, 'id');
-    
-    const appointment = await appointmentService.getAppointmentById(appointmentId);
-    res.send(appointment);
-  } catch (e) {
-    logger.error('getServiceByIdAction', e);
-    next(e);
-  }
-};
-
-
-const deleteServiceByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const getAppointmentByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const appointmentId = get(req.params, 'id');
     
-    const appointment = await appointmentService.deleteAppointment(appointmentId);
+    const appointment = await appointmentAppointment.getAppointmentById(appointmentId);
     res.send(appointment);
   } catch (e) {
-    logger.error('deleteServiceByIdAction', e);
+    logger.error('getAppointmentByIdAction', e);
+    next(e);
+  }
+};
+
+
+const deleteAppointmentByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const appointmentId = get(req.params, 'id');
+    
+    const appointment = await appointmentAppointment.deleteAppointment(appointmentId);
+    res.send(appointment);
+  } catch (e) {
+    logger.error('deleteAppointmentByIdAction', e);
     next(e);
   }
 };
 
 export default {
-  createServiceAction,
-  deleteServiceByIdAction,
-  fetchServiceAction,
-  getServiceByIdAction,
-  updateServiceAction,
+  createAppointmentAction,
+  deleteAppointmentByIdAction,
+  fetchAppointmentAction,
+  getAppointmentByIdAction,
+  updateAppointmentAction,
 }
