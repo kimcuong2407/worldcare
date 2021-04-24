@@ -63,9 +63,9 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
   if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
-    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name').exec();
+    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
   } else {
-    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name').exec();
+    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name');
   }
 
   if (!hospital) {
@@ -73,9 +73,10 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
   }
   if(isRaw) {
     hospital = hospital.toJSON({virtuals: false})
+    return hospital;
   }
   
-  return formatHospital(hospital);
+  return formatHospital(hospital.toJSON());
 }
 
 const updateHospitalInfo = async (params: any) => {
