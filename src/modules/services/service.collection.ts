@@ -44,6 +44,9 @@ const ServiceSchema = new Schema({
   }]
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  }
 });
 
 ServiceSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
