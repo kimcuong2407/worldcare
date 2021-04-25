@@ -21,15 +21,15 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
   try {
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
+      phoneNumber, email, hospital, title, degree, speciality, employeeGroup,
       avatar, employeeHistory, certification, slug, lang, address
     } = req.body;
     if (!firstName || !lastName ){
       throw new ValidationFailedError('First name and last name are required.');
     }
     
-    if (hospitalId && (!Types.ObjectId.isValid(hospitalId) || (!(await hospitalService.isHospital(hospitalId))))) {
-      throw new ValidationFailedError('There is no hospitalId');
+    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+      throw new ValidationFailedError('There is no hospital');
     }
     title && map(title, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
@@ -59,7 +59,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       gender,
       phoneNumber,
       email,
-      hospital: hospitalId,
+      hospital: hospital,
       title: title || [],
       degree: degree || [],
       speciality: speciality || [],

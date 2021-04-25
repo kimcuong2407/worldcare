@@ -1,4 +1,6 @@
+import addressUtil from '@app/utils/address.util';
 import loggerHelper from '@utils/logger.util';
+import { map } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
@@ -17,6 +19,15 @@ const createStaff = async (staffInfo: StaffModel, language = 'vi') => {
     updatedAt: new Date(updatedAt).getTime(),
   };
 };
+
+const formatStaff = (staff: any) => {
+  staff = staff.toJSON();
+  const address = addressUtil.formatAddress(get(staff, 'address'));
+  return {
+    ...staff,
+    address,
+  }
+}
 
 const fetchStaff = async (params: any, language= 'vi') => {
   const {
@@ -55,23 +66,29 @@ const fetchStaff = async (params: any, language= 'vi') => {
       { path: 'employee_group', select: 'name' },
     ],
   });
-  return data;
+  const {docs, ...rest} = data
+  return {
+    docs: map(docs, formatStaff),
+    ...rest
+  };
 }
 
 const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) => {
   StaffCollection.setDefaultLanguage(language);
-  let data = await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
-    .populate('degree.degreeId', 'name')
-    .populate('title', 'name')
-    .populate('speciality', 'name')
-    .populate('employee_group', 'name');
+  let data = await StaffCollection.findById(staffId);
   if (!data) {
     throw new Error('There is no staffId!');
   }
   if(isRaw) {
     data = data.toJSON({virtuals: false})
+  } else {
+    data = await await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
+    .populate('degree.degreeId', 'name')
+    .populate('title', 'name')
+    .populate('speciality', 'name')
+    .populate('employee_group', 'name');
   }
-  return data;
+  return formatStaff(data);
 };
 
 const updateStaffInfo = async (params: any) => {
