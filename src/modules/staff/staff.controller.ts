@@ -82,18 +82,16 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
 
 const fetchStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const { hospitalId, degree, title, speciality } = req.query;
+    const { hospitalId, degree, title, speciality, employeeGroup } = req.query;
     const { page, limit } = appUtil.getPaging(req);
     const options = {
       page,
       limit,
-      hospitalId,
-      degree,
-      title,
-      speciality,
     }
     const keyword = get(req, 'query.keyword', '');
-    const data = await staffService.fetchStaff({keyword, options});
+    const language: string = get(req, 'language');
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const data = await staffService.fetchStaff({keyword, hospitalId, degree, title, speciality, employeeGroup, options}, language, raw);
     res.send(data);
   } catch (e) {
     logger.error('fetchStaffAction', e);
