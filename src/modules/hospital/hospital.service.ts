@@ -29,6 +29,7 @@ const createHospital = async (hospitalInfo: HospitalModel, language = 'vi') => {
 };
 
 const formatHospital = (hospital: any) => {
+  hospital = hospital.toJSON();
   const address = addressUtil.formatAddress(get(hospital, 'address'));
   return {
     ...hospital,
@@ -37,24 +38,40 @@ const formatHospital = (hospital: any) => {
 }
 
 const fetchHospital = async (params: any, language= 'vi') => {
-  const {
-    keyword, options,
-  } = params;
-  const query = keyword ? {
-    $text: { $search: keyword }
-  } : {};
+
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
 
-  const data = await HospitalCollection.paginate(query, {
-    ...options,
-    lean: true,
-    'populate': { path: 'speciality', select: 'name'},
-  });
+  const {
+    specialityId, keyword, options,
+  } = params;
+  const query: any = {
+    deletedAt: null,
+  };
+
+  if(keyword) {
+    query['$text'] = { $search: keyword }
+  }
+  console.log(await HospitalCollection.find({speciality: {$in: [specialityId]}}))
+  
+  if(specialityId) {
+    query['speciality'] = specialityId;
+  }
+  const aggregate = HospitalCollection.aggregate([
+    {
+      $match: query
+    }
+  ]);
+
+  const result = await HospitalCollection.aggregatePaginate(aggregate, { ...options });
+
+  const data = await HospitalCollection.find({
+    _id: { $in: map(result.docs, '_id')}
+  }).populate({ path: 'speciality', select: 'name', ref: 'speciality'})
   
   return {
-    ...data,
-    docs: map( get(data, 'docs', []), formatHospital)
+    ...result,
+    docs: map(data, formatHospital)
   }
 }
 
@@ -76,7 +93,7 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
     return hospital;
   }
   
-  return formatHospital(hospital.toJSON());
+  return formatHospital(hospital);
 }
 
 const updateHospitalInfo = async (params: any) => {

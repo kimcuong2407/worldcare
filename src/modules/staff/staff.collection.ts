@@ -29,7 +29,7 @@ const StaffSchema = new Schema({
   title: [{ type: Schema.Types.ObjectId, ref: 'title' }],
   degree: [{ type: Schema.Types.ObjectId, ref: 'degree' }],
   speciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
-  employeeType: { type: Schema.Types.ObjectId, ref: 'employeetype' },
+  employeeGroup: { type: Schema.Types.ObjectId, ref: 'employee_group' },
   avatar: String,
   createdBy: String,
   updatedBy: String,

@@ -39,8 +39,12 @@ const NewsSchema = new Schema({
     type: String,
     unique: true,
   },
+  deletedAt: Date,
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  }
 });
 
 NewsSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });

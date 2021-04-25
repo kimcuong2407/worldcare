@@ -20,7 +20,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
   try {
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospitalId, title, degree, speciality, employeeType,
+      phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
       avatar, createdBy, updatedBy,
     } = req.body;
     if (!firstName || !lastName ){
@@ -40,8 +40,8 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
     if (speciality && (!Types.ObjectId.isValid(speciality) || (!(await configurationService.getSpecialityById(speciality))))) {
       throw new Error('There is no sepcialityId');
     }
-    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
-      throw new Error('There is no employeeTypeId');
+    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeTypeById(employeeGroup))))) {
+      throw new Error('There is no employeeGroupId');
     }
 
     const staffInfo: any = {
@@ -56,7 +56,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       title,
       degree,
       speciality,
-      employeeType,
+      employeeGroup,
       avatar,
       createdBy,
       updatedBy,
@@ -107,7 +107,7 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
     const staffId = get(req.params, 'staffId');
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, employeeType,
+      phoneNumber, email, hospital, title, degree, speciality, employeeGroup,
       avatar, createdBy, updatedBy,
     } = req.body;
 
@@ -129,8 +129,8 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
         throw new Error('There is no sepcialityId');
       }
     });
-    if(employeeType && (!Types.ObjectId.isValid(employeeType) || (!(await configurationService.getEmployeeTypeById(employeeType))))) {
-      throw new Error('There is no employeeTypeId');
+    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeTypeById(employeeGroup))))) {
+      throw new Error('There is no employeeGroupId');
     }
     const staffInfo: any = omitBy({
       firstName,
@@ -144,7 +144,7 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
       title,
       degree,
       speciality,
-      employeeType,
+      employeeGroup,
       avatar,
       createdBy,
       updatedBy,

@@ -174,40 +174,40 @@ const getSpecialityByIdAction = async (req: express.Request, res: express.Respon
 
 
 // EMPLOYEE
-const createEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const createEmployeeGroupAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const employeeType = await configurationService.createEmployeeType(req.body);
+    const employeeGroup = await configurationService.createEmployeeGroup(req.body);
 
-    res.send(employeeType);
+    res.send(employeeGroup);
   } catch (e) {
-    logger.error('createEmployeeTypeAction', e);
+    logger.error('createEmployeeGroupAction', e);
     next(e);
   }
 };
 
 
-const updateEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const updateEmployeeGroupAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const employeeTypeId = get(req.params, 'id');
-    const employeeType = await configurationService.updateEmployeeTypeById(employeeTypeId, req.body);
+    const employeeGroupId = get(req.params, 'id');
+    const employeeGroup = await configurationService.updateEmployeeGroupById(employeeGroupId, req.body);
 
-    res.send(employeeType);
+    res.send(employeeGroup);
   } catch (e) {
-    logger.error('createEmployeeTypeAction', e);
+    logger.error('createEmployeeGroupAction', e);
     next(e);
   }
 };
 
 
-const fetchEmployeeTypeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const fetchEmployeeGroupAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const employeeTypes = await configurationService.getEmployeeType(
+    const employeeGroups = await configurationService.getEmployeeGroup(
       [
         'name',
         'incrementId'
       ]
     );
-    res.send(map(employeeTypes, (employeeType) => pick(employeeType, ['name', 'id', 'incrementId'])));
+    res.send(map(employeeGroups, (employeeGroup) => pick(employeeGroup, ['name', 'id', 'incrementId'])));
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -215,11 +215,11 @@ const fetchEmployeeTypeAction = async (req: express.Request, res: express.Respon
 };
 
 
-const getEmployeeTypeByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const getEmployeeGroupByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const employeeTypeId = get(req.params, 'id');
-    const employeeType = await configurationService.getEmployeeTypeById(employeeTypeId);
-    res.send(employeeType);
+    const employeeGroupId = get(req.params, 'id');
+    const employeeGroup = await configurationService.getEmployeeGroupById(employeeGroupId);
+    res.send(employeeGroup);
   } catch (e) {
     logger.error('createDegreeAction', e);
     next(e);
@@ -266,7 +266,7 @@ export default {
   createDegreeAction, fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
   createTitleAction, fetchTitleAction, updateTitleAction, getTitleByIdAction,
   createSpecialityAction, fetchSpecialityAction, updateSpecialityAction, getSpecialityByIdAction,
-  createEmployeeTypeAction, fetchEmployeeTypeAction, updateEmployeeTypeAction, getEmployeeTypeByIdAction,
+  createEmployeeGroupAction, fetchEmployeeGroupAction, updateEmployeeGroupAction, getEmployeeGroupByIdAction,
   getCityListAction,
   getDistrictListAction,
   getWardListByDistrictAction,

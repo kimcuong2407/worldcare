@@ -53,6 +53,7 @@ const HospitalSchema = new Schema({
     type: String,
     unique: true,
   },
+  deletedAt: Date,
 }, {
   timestamps: true,
   toJSON: {
@@ -62,6 +63,7 @@ const HospitalSchema = new Schema({
 
 HospitalSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 HospitalSchema.plugin(mongoosePaginate);
+HospitalSchema.plugin(mongooseAggregatePaginate);
 
 const HospitalCollection = mongoose.model('hospital', HospitalSchema, 'hospital');
 

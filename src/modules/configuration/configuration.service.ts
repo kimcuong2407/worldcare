@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import UserCollection from "../user/user.collection";
 import DegreeCollection from "./degree.collection";
 import TitleCollection from "./title.collection";
-import EmployeeTypeCollection from "./employeeType.collection";
+import EmployeeGroupCollection from "./employeeGroup.collection";
 import SpecialityCollection from "./speciality.collection";
 
 // DEGREE
@@ -104,34 +104,34 @@ const getSpecialityById = async (degreeId: string, language = 'vi') => {
 }
 
 // EMPLOYEETYPE
-const createEmployeeType = async (employeeType: any, language = 'vi') => {
-  const createdEmployeeType = await EmployeeTypeCollection.create(employeeType);
-  EmployeeTypeCollection.setDefaultLanguage(language);
-  const data = await EmployeeTypeCollection.findOne({_id: createdEmployeeType._id});
+const createEmployeeGroup = async (employeeGroup: any, language = 'vi') => {
+  const createdEmployeeGroup = await EmployeeGroupCollection.create(employeeGroup);
+  EmployeeGroupCollection.setDefaultLanguage(language);
+  const data = await EmployeeGroupCollection.findOne({_id: createdEmployeeGroup._id});
   data.setLanguage(language);
   return data;
 }
 
-const getEmployeeType = async (fields: string[], language = 'vi') => {
-  EmployeeTypeCollection.setDefaultLanguage(language);
-  const data = await EmployeeTypeCollection.find({}, fields);
+const getEmployeeGroup = async (fields: string[], language = 'vi') => {
+  EmployeeGroupCollection.setDefaultLanguage(language);
+  const data = await EmployeeGroupCollection.find({}, fields);
   return data;
 };
 
-const updateEmployeeTypeById = async (employeeTypeId: string, employeeType: any) => {
-  const updatedEmployeeType = await EmployeeTypeCollection.updateOne({_id: employeeTypeId}, {
+const updateEmployeeGroupById = async (employeeGroupId: string, employeeGroup: any) => {
+  const updatedEmployeeGroup = await EmployeeGroupCollection.updateOne({_id: employeeGroupId}, {
     $set: {
-      ...employeeType
+      ...employeeGroup
     }
   });
-  const data = await EmployeeTypeCollection.findOne({_id: employeeTypeId});
+  const data = await EmployeeGroupCollection.findOne({_id: employeeGroupId});
   return data;
 }
 
-const getEmployeeTypeById = async (employeeTypeId: string, language = 'vi') => {
-  EmployeeTypeCollection.setDefaultLanguage(language);
-  const employeeType = await EmployeeTypeCollection.findById(employeeTypeId);
-  return employeeType;
+const getEmployeeGroupById = async (employeeGroupId: string, language = 'vi') => {
+  EmployeeGroupCollection.setDefaultLanguage(language);
+  const employeeGroup = await EmployeeGroupCollection.findById(employeeGroupId);
+  return employeeGroup;
 }
 
 export default {
@@ -147,8 +147,8 @@ export default {
   getSpeciality,
   updateSpecialityById,
   getSpecialityById,
-  createEmployeeType,
-  updateEmployeeTypeById,
-  getEmployeeType,
-  getEmployeeTypeById
+  createEmployeeGroup,
+  updateEmployeeGroupById,
+  getEmployeeGroup,
+  getEmployeeGroupById
 };

@@ -36,13 +36,9 @@ const updateNewsCategoryAction = async (req: express.Request, res: express.Respo
 
 const fetchNewsCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const categorys = await newsService.getNewsCategory(
-      [
-        'name',
-        'incrementId'
-      ]
-    );
-    res.send(map(categorys, (category) => pick(category, ['name', 'id', 'incrementId'])));
+    const language: string = get(req, 'language');
+    const categorys = await newsService.getNewsCategory(language);
+    res.send(categorys);
   } catch (e) {
     logger.error('createNewsCategoryAction', e);
     next(e);
@@ -53,8 +49,11 @@ const fetchNewsCategoryAction = async (req: express.Request, res: express.Respon
 const getNewsCategoryByIdOrSlugAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const categoryId = get(req.params, 'id');
-    
-    const category = await newsService.getNewsCategoryByIdOrSlug(categoryId);
+    const language: string = get(req, 'language');
+
+    const raw: string = get(req.query, 'raw');
+
+    const category = await newsService.getNewsCategoryByIdOrSlug(categoryId, language, raw);
     res.send(category);
   } catch (e) {
     logger.error('getNewsCategoryByIdOrSlugAction', e);

@@ -7,7 +7,7 @@ import autoIncrement from 'mongoose-auto-increment';
 
 const { Schema } = mongoose;
 
-const employeeTypeSchema = new Schema({
+const employeeGroupSchema = new Schema({
   name: {
     type: String,
     intl: true
@@ -23,16 +23,16 @@ const employeeTypeSchema = new Schema({
   }
 });
 
-employeeTypeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-employeeTypeSchema.plugin(mongoosePaginate);
-employeeTypeSchema.plugin(autoIncrement.plugin, {
-  model: 'employee_type',
+employeeGroupSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+employeeGroupSchema.plugin(mongoosePaginate);
+employeeGroupSchema.plugin(autoIncrement.plugin, {
+  model: 'employee_group',
   field: 'incrementId',
   startAt: 1,
   incrementBy: 1
 });
 
 
-const EmployeeTypeCollection = mongoose.model('employee_type', employeeTypeSchema, 'employee_type');
+const EmployeeTypeCollection = mongoose.model('employee_group', employeeGroupSchema, 'employee_group');
 
 export default EmployeeTypeCollection;

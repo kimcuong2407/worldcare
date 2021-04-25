@@ -16,9 +16,9 @@ const createNewsCategory = async (category: any, language = 'vi') => {
   return data;
 }
 
-const getNewsCategory = async (fields: string[], language = 'vi') => {
+const getNewsCategory = async (language = 'vi') => {
   NewsCategoryCollection.setDefaultLanguage(language);
-  const data = await NewsCategoryCollection.find({}, fields);
+  const data = await NewsCategoryCollection.find({deletedAt: null});
   return data;
 };
 
@@ -32,20 +32,24 @@ const updateNewsCategoryById = async (categoryId: string, category: any) => {
   return data;
 }
 
-const getNewsCategoryByIdOrSlug = async (categoryId: string, language = 'vi') => {
+const getNewsCategoryByIdOrSlug = async (categoryId: string, language = 'vi', isRaw=false) => {
   NewsCategoryCollection.setDefaultLanguage(language);
+  
   let category;
   if( Types.ObjectId.isValid(categoryId)) {
     category = await NewsCategoryCollection.findById(categoryId);
   } else {
-    category = await NewsCategoryCollection.findOne({slug: categoryId}).populate('speciality', 'name');
+    category = await NewsCategoryCollection.findOne({slug: categoryId});
   }
-
+  if(isRaw) {
+    category = category.toJSON({virtuals: false})
+    return category;
+  }
   return category;
 }
 
 const deleteNewsCategory = async (categoryId: string) => {
-  return NewsCategoryCollection.deleteOne({_id: categoryId})
+  return NewsCategoryCollection.updateOne({_id: categoryId}, {deletedAt: new Date(), slug: uuidv4()})
 }
 
 

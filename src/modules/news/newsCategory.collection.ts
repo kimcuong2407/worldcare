@@ -37,8 +37,12 @@ const NewsCategorySchema = new Schema({
   photo: {
     type: String,
   },
+  deletedAt: Date,
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  }
 });
 
 NewsCategorySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });

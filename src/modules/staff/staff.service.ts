@@ -20,7 +20,7 @@ const createStaff = async (staffInfo: StaffModel, language = 'vi') => {
 
 const fetchStaff = async (params: any, language= 'vi') => {
   const {
-    keyword, options, hospitalId, title, degree, speciality, employeeType
+    keyword, options, hospitalId, title, degree, speciality, employeeGroup
   } = params;
   const query: any = {
   };
@@ -52,7 +52,7 @@ const fetchStaff = async (params: any, language= 'vi') => {
       { path: 'degree', select: 'name' },
       { path: 'title', select: 'name' },
       { path: 'speciality', select: 'name' },
-      { path: 'employee_type', select: 'name' },
+      { path: 'employee_group', select: 'name' },
     ],
   });
   return data;
@@ -64,7 +64,7 @@ const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) =>
     .populate('degree', 'name')
     .populate('title', 'name')
     .populate('speciality', 'name')
-    .populate('employee_type', 'name');
+    .populate('employee_group', 'name');
   if (!data) {
     throw new Error('There is no staffId!');
   }
