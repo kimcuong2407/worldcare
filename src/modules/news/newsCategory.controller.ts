@@ -5,6 +5,7 @@ import loggerHelper from '@utils/logger.util';
 import newsService from './news.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
+import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('category.controller');
 
@@ -51,7 +52,7 @@ const getNewsCategoryByIdOrSlugAction = async (req: express.Request, res: expres
     const categoryId = get(req.params, 'id');
     const language: string = get(req, 'language');
 
-    const raw: string = get(req.query, 'raw');
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
 
     const category = await newsService.getNewsCategoryByIdOrSlug(categoryId, language, raw);
     res.send(category);

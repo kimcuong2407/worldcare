@@ -8,7 +8,7 @@ import lowerCase from 'lodash/lowerCase';
 import trim from 'lodash/trim';
 import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
-import { isNil, isString, omitBy } from 'lodash';
+import { isNil, isString, isUndefined, omitBy } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
 
 const logger = loggerHelper.getLogger('hospital.controller');
@@ -65,8 +65,7 @@ const fetchHospitalInfoAction = async (req: express.Request, res: express.Respon
   try {
     const hospitalIdOrSlug = get(req.params, 'hospitalId');
     const language: string = get(req, 'language');
-    const raw: string = get(req.query, 'raw');
-
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const data = await hospitalService.fetchHospitalInfo(hospitalIdOrSlug, language, raw);
     res.send(data);
   } catch (e) {
