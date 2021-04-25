@@ -44,7 +44,7 @@ const StaffSchema = new Schema({
     unique: true,
   },
   deletedAt: Date,
-  language: [String],
+  lang: [String],
   certification: [
     {
       name: String,

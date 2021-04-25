@@ -21,7 +21,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
     const {
       firstName, lastName, fullName, gender, description,
       phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
-      avatar, employeeHistory, certification, slug, language
+      avatar, employeeHistory, certification, slug, lang
     } = req.body;
     if (!firstName || !lastName ){
       throw new Error('Please verify your input!');
@@ -65,7 +65,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       avatar,
       employeeHistory,
       certification,
-      language,
+      lang,
       slug: slug || slugify(trim(lowerCase(normalizeText(`${firstName}-${lastName}-${new Date().getTime()}`))))
       // createdBy,
       // updatedBy,
