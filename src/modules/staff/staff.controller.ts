@@ -141,7 +141,7 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
         throw new Error('There is no sepcialityId');
       }
     });
-    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeTypeById(employeeGroup))))) {
+    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
       throw new Error('There is no employeeGroupId');
     }
     const staffInfo: any = omitBy({
