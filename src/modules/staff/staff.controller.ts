@@ -12,7 +12,7 @@ import appUtil from '@app/utils/app.util';
 import { Types } from 'mongoose';
 import hospitalService from '@app/modules/hospital/hospital.service';
 import configurationService from '@app/modules/configuration/configuration.service';
-import { isNil, map, omitBy } from 'lodash';
+import { isNil, isUndefined, map, omitBy } from 'lodash';
 
 const logger = loggerHelper.getLogger('staff.controller');
 
@@ -102,8 +102,9 @@ const fetchStaffAction = async (req: express.Request, res: express.Response, nex
 const fetchStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const staffId = get(req.params, 'staffId');
-    const raw: string = get(req.query, 'raw');
-    const data = await staffService.fetchStaffInfo(staffId, raw);
+    const language: string = get(req, 'language');
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const data = await staffService.fetchStaffInfo(staffId, language, raw);
     res.send(data);
   } catch (e) {
     logger.error('fetchStaffInfoAction', e);
@@ -116,11 +117,11 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
     const staffId = get(req.params, 'staffId');
     const {
       firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, employeeGroup,
-      avatar,
+      phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
+      avatar, employeeHistory, certification, slug, lang
     } = req.body;
 
-    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
+    if (hospitalId && (!Types.ObjectId.isValid(hospitalId) || (!(await hospitalService.isHospital(hospitalId))))) {
       throw new Error('There is no hospitalId');
     }
     map(title, async (id) => {
@@ -149,14 +150,18 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
       gender,
       phoneNumber,
       email,
-      hospital: hospital,
+      hospital: hospitalId,
       title,
       degree,
       speciality,
       employeeGroup,
       avatar,
-      createdBy,
-      updatedBy,
+      employeeHistory,
+      certification,
+      lang,
+      slug,
+      // createdBy,
+      // updatedBy,
     }, isNil);
   
     const params = { staffId, staffInfo };
