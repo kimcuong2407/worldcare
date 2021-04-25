@@ -81,6 +81,7 @@ const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) =>
   }
   if(isRaw) {
     data = data.toJSON({virtuals: false})
+    return data;
   } else {
     data = await await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
     .populate('degree.degreeId', 'name')
