@@ -4,7 +4,7 @@ import bcryptUtil from "@app/utils/bcrypt.util";
 import jwtUtil from "@app/utils/jwt.util";
 import { get } from "lodash";
 import moment from "moment";
-import { Types } from "mongoose";
+import { Query, Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import hospitalService from "../hospital/hospital.service";
 import AppointmentCollection from "./appointment.collection";
@@ -45,8 +45,21 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
       time: { $lte: startTime }
     });
   }
-  
-  const data = await AppointmentCollection.find({ $and: andQuery })
+
+  if(hospitalId) {
+    andQuery.push({
+      hospital: hospitalId
+    });
+  }
+  if(serviceId) {
+    andQuery.push({
+      service: serviceId
+    });
+  }
+  if (andQuery && andQuery.length) {
+    query['$and'] = andQuery;
+  }
+  const data = await AppointmentCollection.find(query)
     .populate('customer', 'name')
     .populate('hospital', 'hospitalName')
     .populate('service', 'name');
