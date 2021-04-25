@@ -13,6 +13,7 @@ import { Types } from 'mongoose';
 import hospitalService from '@app/modules/hospital/hospital.service';
 import configurationService from '@app/modules/configuration/configuration.service';
 import { isNil, isUndefined, map, omitBy } from 'lodash';
+import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('staff.controller');
 
@@ -21,37 +22,38 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
     const {
       firstName, lastName, fullName, gender, description,
       phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
-      avatar, employeeHistory, certification, slug, lang
+      avatar, employeeHistory, certification, slug, lang, address
     } = req.body;
     if (!firstName || !lastName ){
-      throw new Error('Please verify your input!');
+      throw new ValidationFailedError('First name and last name are required.');
     }
     
     if (hospitalId && (!Types.ObjectId.isValid(hospitalId) || (!(await hospitalService.isHospital(hospitalId))))) {
-      throw new Error('There is no hospitalId');
+      throw new ValidationFailedError('There is no hospitalId');
     }
     title && map(title, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
-        throw new Error('There is no titleId');
+        throw new ValidationFailedError('There is no titleId');
       }
     });
     degree && map(degree, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getDegreeById(id))))) {
-        throw new Error('There is no degreeId');
+        throw new ValidationFailedError('There is no degreeId');
       }
     });
     speciality && map(speciality, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getSpecialityById(id))))) {
-        throw new Error('There is no sepcialityId');
+        throw new ValidationFailedError('There is no sepcialityId');
       }
     });
     if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
-      throw new Error('There is no employeeGroupId');
+      throw new ValidationFailedError('There is no employeeGroupId');
     }
 
     const staffInfo: any = {
       firstName,
       lastName,
+      address,
       fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
       gender,
