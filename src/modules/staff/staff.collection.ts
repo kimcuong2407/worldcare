@@ -19,7 +19,13 @@ const StaffSchema = new Schema({
     type: String,
     intl: true
   },
-  gender: Boolean,
+  address: {
+    street: String,
+    ward: String,
+    district: String,
+    city: String,
+  },
+  gender: String,
   phoneNumber: String,
   email: {
     type: String,
@@ -27,12 +33,33 @@ const StaffSchema = new Schema({
   },
   hospital: { type: Schema.Types.ObjectId, ref: 'hospital' },
   title: [{ type: Schema.Types.ObjectId, ref: 'title' }],
-  degree: [{ type: Schema.Types.ObjectId, ref: 'degree' }],
+  degree: { degreeId: {type: Schema.Types.ObjectId, ref: 'degree'}, issuedAt: Date },
   speciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   employeeGroup: { type: Schema.Types.ObjectId, ref: 'employee_group' },
   avatar: String,
   createdBy: String,
   updatedBy: String,
+  slug: {
+    type: String,
+    unique: true,
+  },
+  deletedAt: Date,
+  language: [String],
+  certification: [
+    {
+      name: String,
+      certifiedBy: String,
+      certifiedAt: Date,
+    }
+  ],
+  employeeHistory: [
+    {
+      location: String,
+      role: String,
+      startTime: Date,
+      endTime: Date
+    }
+  ]
 }, {
   timestamps: true,
   toJSON: {
@@ -43,6 +70,6 @@ const StaffSchema = new Schema({
 StaffSchema.plugin(mongoosePaginate);
 StaffSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 
-const UserCollection = mongoose.model('staff', StaffSchema, 'staff');
+const StaffCollection = mongoose.model('staff', StaffSchema, 'staff');
 
-export default UserCollection;
+export default StaffCollection;

@@ -49,7 +49,7 @@ const fetchStaff = async (params: any, language= 'vi') => {
     ...options,
     'populate': [
       { path: 'hospital', select: 'hospitalName' },
-      { path: 'degree', select: 'name' },
+      { path: 'degree.degreeId', select: 'name' },
       { path: 'title', select: 'name' },
       { path: 'speciality', select: 'name' },
       { path: 'employee_group', select: 'name' },
@@ -61,7 +61,7 @@ const fetchStaff = async (params: any, language= 'vi') => {
 const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) => {
   StaffCollection.setDefaultLanguage(language);
   let data = await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
-    .populate('degree', 'name')
+    .populate('degree.degreeId', 'name')
     .populate('title', 'name')
     .populate('speciality', 'name')
     .populate('employee_group', 'name');
