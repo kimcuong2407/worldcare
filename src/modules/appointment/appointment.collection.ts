@@ -20,7 +20,8 @@ const AppointmentSchema = new Schema({
   status: {
     type: String,
     default: 'CREATED',
-  }
+  },
+  deletedAt: Date,
 }, {
   timestamps: true,
 });

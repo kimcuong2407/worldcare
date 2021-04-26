@@ -2,7 +2,7 @@ import { UnAuthenticated } from "@app/core/types/ErrorTypes";
 import zalo from "@app/core/zalo";
 import bcryptUtil from "@app/utils/bcrypt.util";
 import jwtUtil from "@app/utils/jwt.util";
-import { get } from "lodash";
+import { get, isNil, omitBy } from "lodash";
 import moment from "moment";
 import { Query, Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
@@ -38,6 +38,9 @@ const createAppointment = async (appointment: any) => {
 const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
   const query: any = {};
   const andQuery = [];
+  andQuery.push({
+    deletedAt: null
+  })
   if (startTime) {
     andQuery.push({
       time: { $gte: startTime }
@@ -71,9 +74,28 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
 };
 
 const updateAppointmentById = async (appointmentId: string, appointment: any) => {
+  const { customer, time, serviceId, hospitalId, message, source } = appointment;
+  const { phoneNumber, name, email } = customer || {};
+  let customerInfo;
+  if (customer) {
+    customerInfo = await CustomerCollection.findOneAndUpdate(
+      { phoneNumber, name },
+      { phoneNumber, name, email },
+      { upsert: true,  new: true }).exec();
+  }
+  let updatedInfo: any = {
+    customer: get(customerInfo, '_id'),
+    time,
+    service: serviceId,
+    hospital: hospitalId,
+    message,
+    source,
+  };
+  updatedInfo = omitBy(updatedInfo, isNil);
+  console.log(updatedInfo)
   const updatedAppointment = await AppointmentCollection.updateOne({ _id: appointmentId }, {
     $set: {
-      ...appointment
+      ...updatedInfo
     }
   });
   const data = await AppointmentCollection.findOne({ _id: appointmentId });
@@ -82,15 +104,15 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
 
 const getAppointmentById = async (appointmentId: string) => {
   let appointment = await AppointmentCollection.findById(appointmentId)
-  .populate('customer', 'name')
-  .populate('hospital', 'hospitalName')
-  .populate('service', 'name');
+    .populate('customer', 'name')
+    .populate('hospital', 'hospitalName')
+    .populate('service', 'name');
 
   return appointment;
 }
 
 const deleteAppointment = async (appointmentId: string) => {
-  return AppointmentCollection.deleteOne({ _id: appointmentId })
+  return AppointmentCollection.updateOne({ _id: appointmentId }, { deletedAt: new Date() })
 }
 
 export default {
