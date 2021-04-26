@@ -1,14 +1,14 @@
-import { UnAuthenticated } from "@app/core/types/ErrorTypes";
-import zalo from "@app/core/zalo";
-import bcryptUtil from "@app/utils/bcrypt.util";
-import jwtUtil from "@app/utils/jwt.util";
-import { get, isNil, omitBy } from "lodash";
-import moment from "moment";
-import { Query, Types } from "mongoose";
+import { UnAuthenticated } from '@app/core/types/ErrorTypes';
+import zalo from '@app/core/zalo';
+import bcryptUtil from '@app/utils/bcrypt.util';
+import jwtUtil from '@app/utils/jwt.util';
+import { get, isNil, omitBy } from 'lodash';
+import moment from 'moment';
+import { Query, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import hospitalService from "../hospital/hospital.service";
-import AppointmentCollection from "./appointment.collection";
-import CustomerCollection from "./customer.collection";
+import hospitalService from '../hospital/hospital.service';
+import AppointmentCollection from './appointment.collection';
+import CustomerCollection from './customer.collection';
 
 // DEGREE
 const createAppointment = async (appointment: any) => {
@@ -28,7 +28,7 @@ const createAppointment = async (appointment: any) => {
     source,
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
-    vào lúc ${moment(time).format('DD/MM/YYYY hh:mm')}`);
+    vào lúc ${moment(time).utcOffset('+08:00').format('DD/MM/YYYY hh:mm')}`);
   const data = await AppointmentCollection.findOne({
     _id: createdAppointment._id
   }).exec();
@@ -91,7 +91,7 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
     customerInfo = await CustomerCollection.findOneAndUpdate(
       { phoneNumber, name },
       { phoneNumber, name, email },
-      { upsert: true,  new: true }).exec();
+      { upsert: true, new: true }).exec();
   }
   let updatedInfo: any = {
     customer: get(customerInfo, '_id'),
@@ -113,7 +113,7 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
 }
 
 const getAppointmentById = async (appointmentId: string, isRaw = false) => {
-  if(isRaw) {
+  if (isRaw) {
     return AppointmentCollection.findById(appointmentId).lean();
   }
 
