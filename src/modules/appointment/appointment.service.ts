@@ -81,7 +81,10 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
 }
 
 const getAppointmentById = async (appointmentId: string) => {
-  let appointment = await AppointmentCollection.findById(appointmentId);
+  let appointment = await AppointmentCollection.findById(appointmentId)
+  .populate('customer', 'name')
+  .populate('hospital', 'hospitalName')
+  .populate('service', 'name');
 
   return appointment;
 }
@@ -89,8 +92,6 @@ const getAppointmentById = async (appointmentId: string) => {
 const deleteAppointment = async (appointmentId: string) => {
   return AppointmentCollection.deleteOne({ _id: appointmentId })
 }
-
-
 
 export default {
   createAppointment,

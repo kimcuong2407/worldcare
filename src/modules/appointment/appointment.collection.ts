@@ -17,6 +17,10 @@ const AppointmentSchema = new Schema({
   },
   customer: { type: Schema.Types.ObjectId, ref: 'customer' },
   message: String,
+  status: {
+    type: String,
+    default: 'CREATED',
+  }
 }, {
   timestamps: true,
 });

@@ -19,10 +19,11 @@ const configurationRoutes = (app: express.Application): void => {
   app.put('/api/v1/speciality/:id', configurationActions.updateSpecialityAction);
   app.get('/api/v1/speciality/:id', configurationActions.getSpecialityByIdAction);
 
-  app.post('/api/v1/employee-type', configurationActions.createEmployeeTypeAction);
-  app.get('/api/v1/employee-type', configurationActions.fetchEmployeeTypeAction);
-  app.put('/api/v1/employee-type/:id', configurationActions.updateEmployeeTypeAction);
-  app.get('/api/v1/employee-type/:id', configurationActions.getEmployeeTypeByIdAction);
+  app.post('/api/v1/employee-group', configurationActions.createEmployeeGroupAction);
+  app.get('/api/v1/employee-group', configurationActions.fetchEmployeeGroupAction);
+  app.put('/api/v1/employee-group/:id', configurationActions.updateEmployeeGroupAction);
+  app.get('/api/v1/employee-group/:id', configurationActions.getEmployeeGroupByIdAction);
+
   app.get('/api/v1/city', configurationActions.getCityListAction);
   app.get('/api/v1/city/:cityCode/district', configurationActions.getDistrictListAction);
   app.get('/api/v1/district/:districtCode/ward', configurationActions.getWardListByDistrictAction);

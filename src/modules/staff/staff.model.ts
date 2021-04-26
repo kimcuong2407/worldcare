@@ -12,7 +12,7 @@ export interface StaffModel extends mongoose.Document {
   title: [string];
   degree: [string];
   speciality: [string];
-  employeeType: string;
+  employeeGroup: string;
   avatar: string;
   createdBy: string;
   updatedBy: string;
