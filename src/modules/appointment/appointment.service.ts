@@ -112,7 +112,11 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
   return data;
 }
 
-const getAppointmentById = async (appointmentId: string) => {
+const getAppointmentById = async (appointmentId: string, isRaw = false) => {
+  if(isRaw) {
+    return AppointmentCollection.findById(appointmentId).lean();
+  }
+
   let appointment = await AppointmentCollection.findById(appointmentId)
     .populate('customer', 'name')
     .populate('hospital', 'hospitalName')

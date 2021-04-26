@@ -52,8 +52,9 @@ const fetchAppointmentAction = async (req: express.Request, res: express.Respons
 const getAppointmentByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const appointmentId = get(req.params, 'id');
-    
-    const appointment = await appointmentAppointment.getAppointmentById(appointmentId);
+    const raw = get(req.query, 'raw');
+
+    const appointment = await appointmentAppointment.getAppointmentById(appointmentId, raw);
     res.send(appointment);
   } catch (e) {
     logger.error('getAppointmentByIdAction', e);
