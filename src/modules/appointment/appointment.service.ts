@@ -35,7 +35,7 @@ const createAppointment = async (appointment: any) => {
   return data;
 }
 
-const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
+const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, status, source) => {
   const query: any = {};
   const andQuery = [];
   andQuery.push({
@@ -51,7 +51,16 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
       time: { $lte: startTime }
     });
   }
-
+  if (status) {
+    andQuery.push({
+      status: status
+    });
+  }
+  if (source) {
+    andQuery.push({
+      source: source
+    });
+  }
   if (hospitalId) {
     andQuery.push({
       hospital: hospitalId
@@ -65,6 +74,7 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
   if (andQuery && andQuery.length) {
     query['$and'] = andQuery;
   }
+
   const data = await AppointmentCollection.find(query)
     .populate('customer', 'name')
     .populate('hospital', 'hospitalName')
@@ -74,7 +84,7 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
 };
 
 const updateAppointmentById = async (appointmentId: string, appointment: any) => {
-  const { customer, time, serviceId, hospitalId, message, source } = appointment;
+  const { customer, time, serviceId, hospitalId, message, source, status } = appointment;
   const { phoneNumber, name, email } = customer || {};
   let customerInfo;
   if (customer) {
@@ -90,9 +100,9 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
     hospital: hospitalId,
     message,
     source,
+    status,
   };
   updatedInfo = omitBy(updatedInfo, isNil);
-  console.log(updatedInfo)
   const updatedAppointment = await AppointmentCollection.updateOne({ _id: appointmentId }, {
     $set: {
       ...updatedInfo

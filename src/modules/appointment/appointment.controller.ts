@@ -39,8 +39,8 @@ const updateAppointmentAction = async (req: express.Request, res: express.Respon
 
 const fetchAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const { startTime, endTime, serviceId, hospitalId } = req.query;
-    const appointments = await appointmentAppointment.fetchAppointment(startTime, endTime, serviceId, hospitalId);
+    const { startTime, endTime, serviceId, hospitalId, status, source } = req.query;
+    const appointments = await appointmentAppointment.fetchAppointment(startTime, endTime, serviceId, hospitalId, status, source);
     res.send(appointments);
   } catch (e) {
     logger.error('createAppointmentAction', e);
