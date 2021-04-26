@@ -28,7 +28,7 @@ const createAppointment = async (appointment: any) => {
     source,
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
-    vào lúc ${moment(time).utcOffset('+08:00').format('DD/MM/YYYY hh:mm')}`);
+    vào lúc ${moment(time).utcOffset('+07:00').format('DD/MM/YYYY hh:mm')}`);
   const data = await AppointmentCollection.findOne({
     _id: createdAppointment._id
   }).exec();
