@@ -52,7 +52,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
   if(keyword) {
     query['$text'] = { $search: keyword }
   }
-  console.log(await HospitalCollection.find({speciality: {$in: [specialityId]}}))
+  // console.log(await HospitalCollection.find({speciality: {$in: [specialityId]}}))
   
   if(specialityId) {
     query['speciality'] = specialityId;
@@ -77,6 +77,15 @@ const fetchHospital = async (params: any, language= 'vi') => {
 
 const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw = false) => {
   let hospital = null;
+  if(isRaw) {
+    if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+      hospital = await HospitalCollection.findById(hospitalIdOrSlug);
+    } else {
+      hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug});
+    }
+    hospital = await HospitalCollection.findById(hospitalIdOrSlug).lean();
+    return hospital;
+  }
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
   if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
@@ -88,11 +97,7 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
   if (!hospital) {
     throw new Error('There is no hospitalId!');
   }
-  if(isRaw) {
-    hospital = hospital.toJSON({virtuals: false})
-    return hospital;
-  }
-  
+
   return formatHospital(hospital);
 }
 
