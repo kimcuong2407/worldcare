@@ -11,8 +11,12 @@ const AppointmentSchema = new Schema({
   time: Date,
   hospital: { type: Schema.Types.ObjectId, ref: 'hospital' },
   service: { type: Schema.Types.ObjectId, ref: 'service' },
-  message: String,
+  source: {
+    type: String,
+    default: 'WEBSITE'
+  },
   customer: { type: Schema.Types.ObjectId, ref: 'customer' },
+  message: String,
 }, {
   timestamps: true,
 });

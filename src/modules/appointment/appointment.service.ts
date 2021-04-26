@@ -12,23 +12,26 @@ import CustomerCollection from "./customer.collection";
 
 // DEGREE
 const createAppointment = async (appointment: any) => {
-  const { customer, time, serviceId, hospitalId, message } = appointment;
+  const { customer, time, serviceId, hospitalId, message, source } = appointment;
   const { phoneNumber, name, email } = customer || {};
   const customerInfo = await CustomerCollection.findOneAndUpdate(
     { phoneNumber, name },
     { phoneNumber, name, email },
     { upsert: true }).exec();
-  const hospital =  await hospitalService.fetchHospitalInfo(hospitalId);
+  const hospital = await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
     customer: get(customerInfo, '_id'),
     time,
     service: serviceId,
     hospital: hospitalId,
     message,
+    source,
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
     vào lúc ${moment(time).format('DD/MM/YYYY hh:mm')}`);
-  const data = await AppointmentCollection.findOne({ _id: createdAppointment._id });
+  const data = await AppointmentCollection.findOne({
+    _id: createdAppointment._id
+  }).exec();
   return data;
 }
 
@@ -46,12 +49,12 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId) => {
     });
   }
 
-  if(hospitalId) {
+  if (hospitalId) {
     andQuery.push({
       hospital: hospitalId
     });
   }
-  if(serviceId) {
+  if (serviceId) {
     andQuery.push({
       service: serviceId
     });
