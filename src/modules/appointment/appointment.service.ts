@@ -17,7 +17,7 @@ const createAppointment = async (appointment: any) => {
   const customerInfo = await CustomerCollection.findOneAndUpdate(
     { phoneNumber, name },
     { phoneNumber, name, email },
-    { upsert: true }).exec();
+    { upsert: true, new: true }).exec();
   const hospital = await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
     customer: get(customerInfo, '_id'),
