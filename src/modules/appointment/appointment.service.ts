@@ -74,7 +74,7 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, statu
   }
 
   const data = await AppointmentCollection.find(query)
-    .populate('customer', 'name')
+    .populate('customer', ['name', 'phoneNumber'])
     .populate('hospital', 'hospitalName')
     .populate('service', 'name');
 
@@ -116,8 +116,8 @@ const getAppointmentById = async (appointmentId: string, isRaw = false) => {
   }
 
   let appointment = await AppointmentCollection.findById(appointmentId)
-    .populate('customer', 'name')
-    .populate('hospital', 'hospitalName')
+  .populate('customer', ['name', 'phoneNumber'])
+  .populate('hospital', 'hospitalName')
     .populate('service', 'name');
 
   return appointment;
