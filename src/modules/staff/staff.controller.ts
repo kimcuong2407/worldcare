@@ -101,15 +101,15 @@ const fetchStaffAction = async (req: express.Request, res: express.Response, nex
   }
 };
 
-const fetchStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const getStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const staffId = get(req.params, 'staffId');
     const language: string = get(req, 'language');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
-    const data = await staffService.fetchStaffInfo(staffId, language, raw);
+    const data = await staffService.getStaffInfo(staffId, language, raw);
     res.send(data);
   } catch (e) {
-    logger.error('fetchStaffInfoAction', e);
+    logger.error('getStaffInfoAction', e);
     next(e);
   }
 };
@@ -189,7 +189,7 @@ const deleteStaffAction = async (req: express.Request, res: express.Response, ne
 export default { 
   createStaffAction,
   fetchStaffAction,
-  fetchStaffInfoAction,
+  getStaffInfoAction,
   updateStaffInfoAction,
   deleteStaffAction,
 };
