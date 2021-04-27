@@ -17,7 +17,7 @@ const createAppointment = async (appointment: any) => {
   const customerInfo = await CustomerCollection.findOneAndUpdate(
     { phoneNumber, name },
     { phoneNumber, name, email },
-    { upsert: true }).exec();
+    { upsert: true, new: true }).exec();
   const hospital = await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
     customer: get(customerInfo, '_id'),
@@ -29,9 +29,7 @@ const createAppointment = async (appointment: any) => {
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
     vào lúc ${moment(time).utcOffset('+07:00').format('DD/MM/YYYY hh:mm')}`);
-  const data = await AppointmentCollection.findOne({
-    _id: createdAppointment._id
-  }).exec();
+  const data = await getAppointmentById(createdAppointment._id);
   return data;
 }
 
@@ -76,7 +74,7 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, statu
   }
 
   const data = await AppointmentCollection.find(query)
-    .populate('customer', 'name')
+    .populate('customer', ['name', 'phoneNumber'])
     .populate('hospital', 'hospitalName')
     .populate('service', 'name');
 
@@ -108,7 +106,7 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
       ...updatedInfo
     }
   });
-  const data = await AppointmentCollection.findOne({ _id: appointmentId });
+  const data = await getAppointmentById(appointmentId);
   return data;
 }
 
@@ -118,8 +116,8 @@ const getAppointmentById = async (appointmentId: string, isRaw = false) => {
   }
 
   let appointment = await AppointmentCollection.findById(appointmentId)
-    .populate('customer', 'name')
-    .populate('hospital', 'hospitalName')
+  .populate('customer', ['name', 'phoneNumber'])
+  .populate('hospital', 'hospitalName')
     .populate('service', 'name');
 
   return appointment;
