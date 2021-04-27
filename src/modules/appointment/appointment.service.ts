@@ -106,7 +106,7 @@ const updateAppointmentById = async (appointmentId: string, appointment: any) =>
       ...updatedInfo
     }
   });
-  const data = await AppointmentCollection.findOne({ _id: appointmentId });
+  const data = await getAppointmentById(appointmentId);
   return data;
 }
 
