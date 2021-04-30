@@ -23,7 +23,7 @@ const NewsSchema = new Schema({
     intl: true,
   },
   category: [{ type: Schema.Types.ObjectId, ref: 'news_category' }],
-  metatitle: {
+  metaTitle: {
     type: String,
     intl: true,
   },
@@ -34,6 +34,15 @@ const NewsSchema = new Schema({
   metaKeywords: {
     type: String,
     intl: true,
+  },
+  author: {
+     type: Schema.Types.ObjectId, ref: 'user'
+  },
+  status: {
+    type: String,
+  },
+  isFeatured: {
+    type: Boolean,
   },
   slug: {
     type: String,

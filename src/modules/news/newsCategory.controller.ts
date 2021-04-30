@@ -2,7 +2,7 @@ import { setResponse } from './../../utils/response.util';
 import express from 'express';
 import get from 'lodash/get';
 import loggerHelper from '@utils/logger.util';
-import newsService from './news.service';
+import newsService from './newsCategory.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 import { isUndefined } from 'lodash';

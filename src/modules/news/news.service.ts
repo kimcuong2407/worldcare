@@ -1,63 +1,102 @@
-import { UnAuthenticated } from "@app/core/types/ErrorTypes";
-import bcryptUtil from "@app/utils/bcrypt.util";
-import jwtUtil from "@app/utils/jwt.util";
-import { get } from "lodash";
 import { Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
-import UserCollection from "../user/user.collection";
-import NewsCategoryCollection from "./newsCategory.collection";
+import NewsCollection from "./news.collection";
 
 // DEGREE
-const createNewsCategory = async (category: any, language = 'vi') => {
-  const createdNewsCategory = await NewsCategoryCollection.create(category);
-  NewsCategoryCollection.setDefaultLanguage(language);
-  const data = await NewsCategoryCollection.findOne({_id: createdNewsCategory._id});
+const createNews = async (news: any, language = 'vi') => {
+  const createdNews = await NewsCollection.create(news);
+  NewsCollection.setDefaultLanguage(language);
+  const data = await NewsCollection.findOne({_id: createdNews._id});
   data.setLanguage(language);
   return data;
 }
 
-const getNewsCategory = async (language = 'vi') => {
-  NewsCategoryCollection.setDefaultLanguage(language);
-  const data = await NewsCategoryCollection.find({deletedAt: null});
+const getNews = async (params: any, language = 'vi', isRaw=false) => {
+  const {
+    slug, status, category, startTime, endTime, options,
+  } = params;
+  const query: any = {
+  };
+  const andQuery = [];
+  if(slug) {
+    andQuery.push({
+      slug: slug
+    }
+    );
+  }
+  if(status) {
+    andQuery.push({
+      status: status
+    });
+  }
+  if(category) {
+    andQuery.push({
+      category: category
+    });
+  }
+  if (startTime) {
+    andQuery.push({
+      updatedAt: { $gte: startTime }
+    });
+  }
+  if (endTime) {
+    andQuery.push({
+      updatedAt: { $lte: startTime }
+    });
+  }
+  if (andQuery && andQuery.length) {
+    query['$and'] = andQuery;
+  }
+  NewsCollection.setDefaultLanguage(language);
+  let data = await NewsCollection.paginate(query, {
+    ...options,
+    'populate': [
+      { path: 'category', select: 'name' },
+    ],
+  });
+  if(isRaw) {
+    data = data.toJSON({virtuals: false})
+    return data;
+  }
   return data;
 };
 
-const updateNewsCategoryById = async (categoryId: string, category: any) => {
-  const updatedNewsCategory = await NewsCategoryCollection.updateOne({_id: categoryId}, {
+const updateNewsById = async (newsId: string, news: any) => {
+  const updatedNews = await NewsCollection.updateOne({_id: newsId}, {
     $set: {
-      ...category
+      ...news
     }
   });
-  const data = await NewsCategoryCollection.findOne({_id: categoryId});
+  const data = await NewsCollection.findOne({_id: newsId});
   return data;
 }
 
-const getNewsCategoryByIdOrSlug = async (categoryId: string, language = 'vi', isRaw=false) => {
-  NewsCategoryCollection.setDefaultLanguage(language);
+const getNewsByIdOrSlug = async (newsId: string, language = 'vi', isRaw=false) => {
+  NewsCollection.setDefaultLanguage(language);
   
-  let category;
-  if( Types.ObjectId.isValid(categoryId)) {
-    category = await NewsCategoryCollection.findById(categoryId);
+  let news;
+  if( Types.ObjectId.isValid(newsId)) {
+    news = await NewsCollection.findById(newsId);
   } else {
-    category = await NewsCategoryCollection.findOne({slug: categoryId});
+    news = await NewsCollection.findOne({slug: newsId});
   }
   if(isRaw) {
-    category = category.toJSON({virtuals: false})
-    return category;
+    news = news.toJSON({virtuals: false})
+    return news;
   }
-  return category;
+  return news;
 }
 
-const deleteNewsCategory = async (categoryId: string) => {
-  return NewsCategoryCollection.updateOne({_id: categoryId}, {deletedAt: new Date(), slug: uuidv4()})
+const deleteNews = async (newsId: string) => {
+  return NewsCollection.updateOne({_id: newsId}, {deletedAt: new Date(), slug: uuidv4()})
 }
 
 
 
 export default {
-  createNewsCategory,
-  getNewsCategory,
-  updateNewsCategoryById,
-  getNewsCategoryByIdOrSlug,
-  deleteNewsCategory,
+  createNews,
+  getNews,
+  updateNewsById,
+  getNewsByIdOrSlug,
+  deleteNews,
 };

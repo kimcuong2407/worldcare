@@ -51,12 +51,15 @@ const fetchStaff = async (params: any, language= 'vi') => {
   if(speciality) {
     query.speciality = speciality;
   }
+  if(employeeGroup) {
+    query.employeeGroup = employeeGroup;
+  }
   
   if(keyword) {
     query['$text'] = { $search: keyword }
   } 
   StaffCollection.setDefaultLanguage(language);
-  const data = await StaffCollection.paginate(query, {
+  let data = await StaffCollection.paginate(query, {
     ...options,
     'populate': [
       { path: 'hospital', select: 'hospitalName' },
