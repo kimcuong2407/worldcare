@@ -105,6 +105,21 @@ const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw
   }
 }
 
+const getSimillarHospital = async (hospitalIdOrSlug: string, language= 'vi') => {
+  let hospital = null;
+  let query: any = {slug: {$ne: hospitalIdOrSlug}};
+  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+    query = { _id: { $ne: Types.ObjectId(hospitalIdOrSlug) }};
+  }
+
+  hospital = await HospitalCollection.find(query).populate('speciality', 'name');
+
+  const data = await HospitalCollection.find(query).limit(5).populate({ path: 'speciality', select: 'name', ref: 'speciality'})
+  
+  return map(data, formatHospital)
+}
+
+
 const updateHospitalInfo = async (params: any) => {
   const { hospitalId, hospitalInfo } = params;
   const findFilter = {
@@ -161,4 +176,5 @@ export default {
   updateHospitalInfo,
   deleteHospital,
   isHospital,
+  getSimillarHospital,
 };

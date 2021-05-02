@@ -124,10 +124,24 @@ const deleteHospitalAction = async (req: express.Request, res: express.Response,
   }
 };
 
+const getSimillarHospitalInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const hospitalIdOrSlug = get(req.params, 'hospitalId');
+    const language: string = get(req, 'language');
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const data = await hospitalService.getSimillarHospital(hospitalIdOrSlug, language, raw);
+    res.send(data);
+  } catch (e) {
+    logger.error('fetchHospitalInfoAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createHospitalAction,
   fetchHospitalAction,
   fetchHospitalInfoAction,
   updateHospitalInfoAction,
   deleteHospitalAction,
+  getSimillarHospitalInfoAction,
 };
