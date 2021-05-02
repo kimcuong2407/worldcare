@@ -139,11 +139,18 @@ const deleteHospital = async (hospitalId: string) => {
   return true;
 };
 
-const isHospital = async (hospitalId: string) => {
-  const data = await HospitalCollection.exists({
-    _id: Types.ObjectId(hospitalId),
-  });
-  return data;
+const isHospital = async (hospitalIdOrSlug: string) => {
+  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+    const data = await HospitalCollection.exists({
+      _id: Types.ObjectId(hospitalIdOrSlug),
+    });
+    return data;
+  } else {
+    const data = await HospitalCollection.exists({
+      slug: hospitalIdOrSlug
+    });
+    return data;
+  }
 }
 
 export default {

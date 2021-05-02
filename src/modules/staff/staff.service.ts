@@ -51,12 +51,15 @@ const fetchStaff = async (params: any, language= 'vi') => {
   if(speciality) {
     query.speciality = speciality;
   }
+  if(employeeGroup) {
+    query.employeeGroup = employeeGroup;
+  }
   
   if(keyword) {
     query['$text'] = { $search: keyword }
   } 
   StaffCollection.setDefaultLanguage(language);
-  const data = await StaffCollection.paginate(query, {
+  let data = await StaffCollection.paginate(query, {
     ...options,
     'populate': [
       { path: 'hospital', select: 'hospitalName' },
@@ -73,23 +76,24 @@ const fetchStaff = async (params: any, language= 'vi') => {
   };
 }
 
-const fetchStaffInfo = async (staffId: string, language= 'vi', isRaw = false) => {
+const getStaffInfo = async (staffIdOrSlug: string, language= 'vi', isRaw = false) => {
   StaffCollection.setDefaultLanguage(language);
-  let data = await StaffCollection.findById(staffId);
-  if (!data) {
-    throw new Error('There is no staffId!');
+  let staff;
+  if( Types.ObjectId.isValid(staffIdOrSlug)) {
+    staff = await StaffCollection.findById(staffIdOrSlug);
+  } else {
+    staff = await StaffCollection.findOne({slug: staffIdOrSlug});
   }
   if(isRaw) {
-    data = data.toJSON({virtuals: false})
-    return data;
-  } else {
-    data = await await StaffCollection.findById(staffId).populate('hospital', 'hospitalName')
-    .populate('degree.degreeId', 'name')
-    .populate('title', 'name')
-    .populate('speciality', 'name')
-    .populate('employee_group', 'name');
+    return staff;
   }
-  return formatStaff(data);
+
+  staff = await staff.populate('hospital', 'hospitalName')
+  .populate('degree.degreeId', 'name')
+  .populate('title', 'name')
+  .populate('speciality', 'name')
+  .populate('employee_group', 'name');
+  return formatStaff(staff);
 };
 
 const updateStaffInfo = async (params: any) => {
@@ -120,7 +124,7 @@ const deleteStaff = async (staffId: string) => {
 export default {
   createStaff,
   fetchStaff,
-  fetchStaffInfo,
+  getStaffInfo,
   updateStaffInfo,
   deleteStaff,
 };
