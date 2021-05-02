@@ -43,7 +43,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
   SpecialityCollection.setDefaultLanguage(language);
 
   const {
-    specialityId, keyword, options,
+    specialityId, keyword, options, city,
   } = params;
   const query: any = {
     deletedAt: null,
@@ -56,6 +56,9 @@ const fetchHospital = async (params: any, language= 'vi') => {
   
   if(specialityId) {
     query['speciality'] = specialityId;
+  }
+  if(city) {
+    query['address.city'] = city;
   }
   const aggregate = HospitalCollection.aggregate([
     {
