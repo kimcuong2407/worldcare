@@ -6,6 +6,7 @@ import configurationService from './configuration.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 import subVN from 'sub-vn';
+import { SUPPORTED_CITIES } from '@app/core/config';
 
 const logger = loggerHelper.getLogger('degree.controller');
 
@@ -261,6 +262,18 @@ const getWardListByDistrictAction = async (req: express.Request, res: express.Re
   }
 };
 
+const getListSupportedCityAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const cities = SUPPORTED_CITIES.map((city) => {
+      return subVN.getCityByCode(city);
+    })
+    res.send(cities);
+  } catch (e) {
+    logger.error('getListSupportedCityAction', e);
+    next(e);
+  }
+};
+
 
 export default {
   createDegreeAction, fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
@@ -270,5 +283,6 @@ export default {
   getCityListAction,
   getDistrictListAction,
   getWardListByDistrictAction,
+  getListSupportedCityAction,
 };
 

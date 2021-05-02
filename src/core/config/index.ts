@@ -12,3 +12,5 @@ export const S3_BUCKET = process.env.S3_BUCKET || '';
 export const ZALO_ACCOUNTS = process.env.ZALO_ACCOUNTS || '1242567605949002428';
 export const ZALO_API = 'https://openapi.zalo.me';
 export const ZALO_OA_TOKEN = process.env.ZALO_OA_TOKEN;
+
+export const SUPPORTED_CITIES = process.env.SUPPORTED_CITIES ? String(process.env.SUPPORTED_CITIES).split(',') : ['48'];
