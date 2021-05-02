@@ -19,6 +19,7 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       title, description, content, category,
       metaTitle, metaDescription, metaKeywords,
       status, isFeatured, slug, coverPhoto,
+      tags,
     } = req.body;
     if(!title) {
       throw new ValidationFailedError('Title is required.');
@@ -49,6 +50,7 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       status: status || NEWS_STATUS.EDITING,
       isFeatured: isFeatured || false,
       slug,
+      tags,
       coverPhoto,
     }
     const news = await newsService.createNews(_news);
@@ -66,7 +68,7 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
     const {
       title, description, content, category,
       metaTitle, metaDescription, metaKeywords,
-      authorId, status, isFeatured, slug,
+      authorId, status, isFeatured, slug, tags,
     } = req.body;
     category && map(category, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await newsCategoryService.getNewsCategoryByIdOrSlug(id))))) {
@@ -90,6 +92,7 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       status: status || NEWS_STATUS.EDITING,
       isFeatured: isFeatured || false,
       slug,
+      tags,
     }
     const news = await newsService.updateNewsById(newsId, _news);
 

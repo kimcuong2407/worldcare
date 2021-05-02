@@ -22,6 +22,7 @@ const NewsSchema = new Schema({
     type: String,
     intl: true,
   },
+  tags: [String],
   category: [{ type: Schema.Types.ObjectId, ref: 'news_category' }],
   coverPhoto: String,
   metaTitle: {
