@@ -9,6 +9,7 @@ import userService from '../user/user.service';
 import hospitalService from '../hospital/hospital.service';
 import { NEWS_STATUS } from './constant';
 import appUtil from '@app/utils/app.util';
+import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('news.controller');
 
@@ -17,17 +18,24 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
     const {
       title, description, content, category,
       metaTitle, metaDescription, metaKeywords,
-      authorId, status, isFeatured, slug,
+      status, isFeatured, slug, coverPhoto,
     } = req.body;
+    if(!title) {
+      throw new ValidationFailedError('Title is required.');
+    }
+    if(!content) {
+      throw new ValidationFailedError('Content is required.');
+    }
+  
+    if(!category) {
+      throw new ValidationFailedError('Categrory is required.');
+    }
     category && map(category, async (id) => {
       if (id && (!Types.ObjectId.isValid(id) || (!(await newsCategoryService.getNewsCategoryByIdOrSlug(id))))) {
         throw new Error('There is no categoryId');
       }
     });
-    // get the current user who creating the news
-    if (authorId && (!Types.ObjectId.isValid(authorId) || (!(await userService.getUserProfileById(authorId))))) {
-      throw new Error('There is no userId');
-    }
+
 
     const _news = {
       title,
@@ -37,10 +45,11 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       metaTitle,
       metaDescription,
       metaKeywords,
-      author: authorId,
+      author: req.user.id,
       status: status || NEWS_STATUS.EDITING,
       isFeatured: isFeatured || false,
       slug,
+      coverPhoto,
     }
     const news = await newsService.createNews(_news);
     res.send(news);

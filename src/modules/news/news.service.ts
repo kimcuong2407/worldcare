@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import NewsCollection from "./news.collection";
+import NewsCategoryCollection from "./newsCategory.collection";
 
 // DEGREE
 const createNews = async (news: any, language = 'vi') => {
@@ -73,17 +74,23 @@ const updateNewsById = async (newsId: string, news: any) => {
 
 const getNewsByIdOrSlug = async (newsId: string, language = 'vi', isRaw=false) => {
   NewsCollection.setDefaultLanguage(language);
-  
-  let news;
+  NewsCategoryCollection.setDefaultLanguage(language);
+
+  let query: any = {
+    slug: newsId,
+  };
+
   if( Types.ObjectId.isValid(newsId)) {
-    news = await NewsCollection.findById(newsId);
-  } else {
-    news = await NewsCollection.findOne({slug: newsId});
-  }
+    query = {
+      _id: Types.ObjectId(newsId),
+    };
+  } 
+
   if(isRaw) {
-    news = news.toJSON({virtuals: false})
-    return news;
+    return NewsCollection.findOne(query).lean();
   }
+
+  const news = await NewsCollection.findOne(query).populate('category', ['name']);
   return news;
 }
 
