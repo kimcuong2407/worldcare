@@ -43,7 +43,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
   SpecialityCollection.setDefaultLanguage(language);
 
   const {
-    specialityId, keyword, options, city,
+    specialityId, keyword, options, city, hospitalId,
   } = params;
   const query: any = {
     deletedAt: null,
@@ -51,6 +51,9 @@ const fetchHospital = async (params: any, language= 'vi') => {
 
   if(keyword) {
     query['$text'] = { $search: keyword }
+  }
+  if(hospitalId) {
+    query['_id'] = Types.ObjectId(hospitalId);
   }
   // console.log(await HospitalCollection.find({speciality: {$in: [specialityId]}}))
   

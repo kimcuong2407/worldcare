@@ -52,9 +52,10 @@ const fetchHospitalAction = async (req: express.Request, res: express.Response, 
     }
     const specialityId: string = get(req.query, 'specialityId');
     const city: string = get(req.query, 'city');
+    const hospitalId: string = get(req.query, 'hospitalId');
     const language: string = get(req, 'language');
     const keyword = get(req, 'query.keyword', '');
-    const data = await hospitalService.fetchHospital({specialityId, keyword, options, city}, language);
+    const data = await hospitalService.fetchHospital({specialityId, keyword, options, city, hospitalId}, language);
     res.send(data);
   } catch (e) {
     logger.error('fetchHospitalInfoAction', e);
