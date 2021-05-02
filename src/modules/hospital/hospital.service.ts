@@ -58,7 +58,7 @@ const fetchHospital = async (params: any, language= 'vi') => {
   // console.log(await HospitalCollection.find({speciality: {$in: [specialityId]}}))
   
   if(specialityId) {
-    query['speciality'] = specialityId;
+    query['speciality'] = {$in: [Types.ObjectId(specialityId)]};
   }
   if(city) {
     query['address.city'] = city;
