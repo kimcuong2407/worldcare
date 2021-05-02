@@ -6,6 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
 import SpecialityCollection from '../configuration/speciality.collection';
+import StaffCollection from '../staff/staff.collection';
 import HospitalCollection from "./hospital.collection";
 import { HospitalModel } from "./hospital.model";
 
@@ -83,28 +84,25 @@ const fetchHospital = async (params: any, language= 'vi') => {
 
 const fetchHospitalInfo = async (hospitalIdOrSlug: string, language= 'vi', isRaw = false) => {
   let hospital = null;
-  if(isRaw) {
-    if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
-      hospital = await HospitalCollection.findById(hospitalIdOrSlug);
-    } else {
-      hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug});
-    }
-    hospital = await HospitalCollection.findById(hospitalIdOrSlug).lean();
-    return hospital;
+  let query: any = {slug: hospitalIdOrSlug};
+  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+    query = { _id: Types.ObjectId(hospitalIdOrSlug)};
   }
+
+  if(isRaw) {
+    return HospitalCollection.findOne(query).lean();
+  }
+
   HospitalCollection.setDefaultLanguage(language);
   SpecialityCollection.setDefaultLanguage(language);
-  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
-    hospital = await HospitalCollection.findById(hospitalIdOrSlug).populate('speciality', 'name');
-  } else {
-    hospital = await HospitalCollection.findOne({slug: hospitalIdOrSlug}).populate('speciality', 'name');
-  }
+  hospital = await HospitalCollection.findOne(query).populate('speciality', 'name');
+  const doctor = await StaffCollection.findOne({hospital: get(hospital, '_id')});
 
-  if (!hospital) {
-    throw new Error('There is no hospitalId!');
+  const formatted = formatHospital(hospital);
+  return {
+    ...formatted,
+    doctor: doctor,
   }
-
-  return formatHospital(hospital);
 }
 
 const updateHospitalInfo = async (params: any) => {

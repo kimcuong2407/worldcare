@@ -18,6 +18,8 @@ const createHospitalAction = async (req: express.Request, res: express.Response,
     const {
       hospitalName, description, email, phoneNumber,
       speciality, address, workingHours, hospitalSettings, logo, photos, slug,
+      diseases,
+      services,
     } = req.body;
     if (!hospitalName || !description ){
       throw new Error('Please verify your input!');
@@ -33,6 +35,8 @@ const createHospitalAction = async (req: express.Request, res: express.Response,
       hospitalSettings,
       logo,
       photos,
+      diseases,
+      services,
       slug: slug || slugify(trim(lowerCase(normalizeText(
         isString(hospitalName) ? hospitalName : get(hospitalName, 'vi', ''))))),
     };
@@ -82,6 +86,8 @@ const updateHospitalInfoAction = async (req: express.Request, res: express.Respo
     const {
       hospitalName, description, email, phoneNumber,
       speciality, address, workingHours, hospitalSettings, logo, photos, slug,
+      diseases,
+      services,
     } = req.body;
     const hospitalInfo: any = omitBy({
       hospitalName,
@@ -94,6 +100,8 @@ const updateHospitalInfoAction = async (req: express.Request, res: express.Respo
       hospitalSettings,
       logo,
       photos,
+      diseases,
+      services,
       slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
     }, isNil);
     const params = { hospitalId, hospitalInfo };
