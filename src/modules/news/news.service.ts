@@ -90,7 +90,7 @@ const getNewsByIdOrSlug = async (newsId: string, language = 'vi', isRaw=false) =
     return NewsCollection.findOne(query).lean();
   }
 
-  const news = await NewsCollection.findOne(query).populate('category', ['name']);
+  const news = await NewsCollection.findOne(query).populate('category', ['name', 'slug']);
   return news;
 }
 

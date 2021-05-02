@@ -10,6 +10,8 @@ import hospitalService from '../hospital/hospital.service';
 import { NEWS_STATUS } from './constant';
 import appUtil from '@app/utils/app.util';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import NewsCollection from './news.collection';
+import NewsCategoryCollection from './newsCategory.collection';
 
 const logger = loggerHelper.getLogger('news.controller');
 
@@ -152,10 +154,74 @@ const deleteNewsByIdAction = async (req: express.Request, res: express.Response,
   }
 };
 
+
+const getLatestNewsAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const language: string = get(req, 'language');
+
+    const categories = await NewsCategoryCollection.aggregate([
+      {
+        '$lookup': {
+          'from': 'news', 
+          'let': {
+            'category_id': '$_id'
+          }, 
+          'pipeline': [
+            {
+              '$match': {
+                '$expr': {
+                  '$and': [
+                    {
+                      '$in': [
+                        '$$category_id', '$category'
+                      ]
+                    }, {
+                      '$eq': [
+                        '$status', NEWS_STATUS.PUBLISHED
+                      ]
+                    }
+                  ]
+                }
+              }
+            }, {
+              '$sort': {
+                'created': -1
+              }
+            }, {
+              '$limit': 5
+            }
+          ], 
+          'as': 'news'
+        }
+      }, {
+        '$sort': {
+          'index': 1
+        }
+      }
+    ]);
+
+    const featured = await NewsCollection.findOne({isFeatured: true}).sort({createdAt: -1});
+    
+    res.send({
+      featured: featured,
+      latest: map(categories, (category) => {
+        const { news, ...rest } = category;
+        return {
+          ...appUtil.mapLanguage(rest, language),
+          news: map(news, (newsContent) => appUtil.mapLanguage(newsContent, language))
+        }
+      })
+    });
+  } catch (e) {
+    logger.error('getLatestNewsAction', e);
+    next(e);
+  }
+};
 export default {
   createNewsAction,
   deleteNewsByIdAction,
   fetchNewsAction,
   getNewsByIdOrSlugAction,
   updateNewsAction,
+  getLatestNewsAction,
 }

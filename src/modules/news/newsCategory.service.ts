@@ -5,6 +5,8 @@ import { get } from "lodash";
 import { Types } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from "../user/user.collection";
+import { NEWS_STATUS } from "./constant";
+import NewsCollection from "./news.collection";
 import NewsCategoryCollection from "./newsCategory.collection";
 
 // DEGREE
@@ -53,6 +55,28 @@ const deleteNewsCategory = async (categoryId: string) => {
 }
 
 
+const getNewsByCategory = async (categoryId: string, options: any, language = 'vi') => {
+  NewsCategoryCollection.setDefaultLanguage(language);
+  NewsCollection.setDefaultLanguage(language);
+
+  let query: any = {
+    slug: categoryId
+  }
+  if( Types.ObjectId.isValid(categoryId)) {
+    query = {
+      _id: Types.ObjectId(categoryId),
+    }
+  } 
+  const category = await NewsCategoryCollection.findOne(query).lean();
+  const news = NewsCollection.paginate({
+    category: get(category, '_id'),
+    status: NEWS_STATUS.PUBLISHED
+  }, {
+    ...options
+  })
+  return news;
+}
+
 
 export default {
   createNewsCategory,
@@ -60,4 +84,5 @@ export default {
   updateNewsCategoryById,
   getNewsCategoryByIdOrSlug,
   deleteNewsCategory,
+  getNewsByCategory,
 };

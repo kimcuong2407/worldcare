@@ -14,6 +14,7 @@ const NewsSchema = new Schema({
     type: String,
     intl: true,
   },
+  index: Number,
   description: {
     type: String,
     intl: true,
