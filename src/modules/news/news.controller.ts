@@ -71,6 +71,7 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       title, description, content, category,
       metaTitle, metaDescription, metaKeywords,
       authorId, status, isFeatured, slug, tags,
+      coverPhoto,
     } = req.body;
     if(category){
         map(category, async (id) => {
@@ -95,6 +96,7 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       author: authorId,
       status: status,
       isFeatured: isFeatured,
+      coverPhoto,
       slug,
       tags,
     }
