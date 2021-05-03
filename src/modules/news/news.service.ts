@@ -68,8 +68,7 @@ const updateNewsById = async (newsId: string, news: any) => {
       ...news
     }
   });
-  const data = await NewsCollection.findOne({_id: newsId});
-  return data;
+  return NewsCollection.findById(newsId).lean();
 }
 
 const getNewsByIdOrSlug = async (newsId: string, language = 'vi', isRaw=false) => {

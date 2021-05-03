@@ -13,8 +13,7 @@ import NewsCategoryCollection from "./newsCategory.collection";
 const createNewsCategory = async (category: any, language = 'vi') => {
   const createdNewsCategory = await NewsCategoryCollection.create(category);
   NewsCategoryCollection.setDefaultLanguage(language);
-  const data = await NewsCategoryCollection.findOne({_id: createdNewsCategory._id});
-  data.setLanguage(language);
+  const data = await NewsCategoryCollection.findOne({_id: createdNewsCategory._id}).lean();
   return data;
 }
 

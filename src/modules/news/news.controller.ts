@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import loggerHelper from '@utils/logger.util';
 import newsService from './news.service';
 import newsCategoryService from './newsCategory.service';
-import { isUndefined, map } from 'lodash';
+import { isNil, isUndefined, map, omit, omitBy } from 'lodash';
 import { Types } from 'mongoose';
 import userService from '../user/user.service';
 import hospitalService from '../hospital/hospital.service';
@@ -72,11 +72,13 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       metaTitle, metaDescription, metaKeywords,
       authorId, status, isFeatured, slug, tags,
     } = req.body;
-    category && map(category, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await newsCategoryService.getNewsCategoryByIdOrSlug(id))))) {
-        throw new Error('There is no categoryId');
-      }
-    });
+    if(category){
+        map(category, async (id) => {
+        if (id && (!Types.ObjectId.isValid(id) || (!(await newsCategoryService.getNewsCategoryByIdOrSlug(id))))) {
+          throw new Error('There is no categoryId');
+        }
+      });
+    }
     // get the current user who creating the news
     if (authorId && (!Types.ObjectId.isValid(authorId) || (!(await userService.getUserProfileById(authorId))))) {
       throw new Error('There is no userId');
@@ -86,17 +88,17 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       title,
       description,
       content,
-      category: category || [],
+      category: category,
       metaTitle,
       metaDescription,
       metaKeywords,
       author: authorId,
-      status: status || NEWS_STATUS.EDITING,
-      isFeatured: isFeatured || false,
+      status: status,
+      isFeatured: isFeatured,
       slug,
       tags,
     }
-    const news = await newsService.updateNewsById(newsId, _news);
+    const news = await newsService.updateNewsById(newsId, omitBy(_news, isNil));
 
     res.send(news);
   } catch (e) {
