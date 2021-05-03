@@ -67,8 +67,9 @@ const getNewsByCategory = async (categoryId: string, options: any, language = 'v
     }
   } 
   const category = await NewsCategoryCollection.findOne(query).lean();
-  const news = NewsCollection.paginate({
+  const news = await NewsCollection.paginate({
     category: get(category, '_id'),
+    deletedAt: null,
     status: NEWS_STATUS.PUBLISHED
   }, {
     ...options
