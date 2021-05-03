@@ -10,6 +10,7 @@ const SpecialitySchema = new Schema({
     type: String,
     intl: true
   },
+  service: String,
   parentSpeciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   incrementId: {
     type: Number,

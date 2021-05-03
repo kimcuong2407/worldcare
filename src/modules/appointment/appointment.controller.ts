@@ -11,9 +11,9 @@ const logger = loggerHelper.getLogger('appointment.controller');
 // DEGREE
 const createAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const { customer, time, serviceId, hospitalId, message, source } = req.body;
+    const { customer, time, serviceId, hospitalId, message, source, specialityId } = req.body;
     const appointment = await appointmentAppointment.createAppointment({
-      customer, time, serviceId, hospitalId, message, source
+      customer, time, serviceId, hospitalId, message, source, specialityId,
     });
 
     res.send(appointment);

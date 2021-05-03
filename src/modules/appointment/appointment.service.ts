@@ -6,14 +6,17 @@ import { get, isNil, omitBy } from 'lodash';
 import moment from 'moment';
 import { Query, Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
+import SpecialityCollection from '../configuration/speciality.collection';
 import hospitalService from '../hospital/hospital.service';
 import AppointmentCollection from './appointment.collection';
 import CustomerCollection from './customer.collection';
 
 // DEGREE
 const createAppointment = async (appointment: any) => {
-  const { customer, time, serviceId, hospitalId, message, source } = appointment;
+  const { customer, time, serviceId, hospitalId, message, source, specialityId } = appointment;
   const { phoneNumber, name, email } = customer || {};
+  const speciality = await SpecialityCollection.findById(specialityId).lean();
+
   const customerInfo = await CustomerCollection.findOneAndUpdate(
     { phoneNumber, name },
     { phoneNumber, name, email },
@@ -26,6 +29,8 @@ const createAppointment = async (appointment: any) => {
     hospital: hospitalId,
     message,
     source,
+    speciality: specialityId,
+    serviceType: get(speciality, 'service'),
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(hospital, 'hospitalName')} 
     vào lúc ${moment(time).utcOffset('+07:00').format('DD/MM/YYYY hh:mm')}`);
@@ -118,6 +123,7 @@ const getAppointmentById = async (appointmentId: string, isRaw = false) => {
   let appointment = await AppointmentCollection.findById(appointmentId)
   .populate('customer', ['name', 'phoneNumber'])
   .populate('hospital', 'hospitalName')
+  .populate('speciality', 'name')
     .populate('service', 'name');
 
   return appointment;

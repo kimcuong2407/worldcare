@@ -29,6 +29,7 @@ const configurationRoutes = (app: express.Application): void => {
   app.get('/api/v1/district/:districtCode/ward', configurationActions.getWardListByDistrictAction);
 
   app.get('/api/v1/supported-cities', configurationActions.getListSupportedCityAction);
+  // app.get('/api/v1/appointment-service', configurationActions.getListAppointmentServiceAction);
 
 };
 

@@ -12,6 +12,7 @@ module.exports = {
                 "name": {
                     "vi": "Khám Tại Phòng Khám"
                 },
+                serviceType: 'CLINIC_APPOINTMENT',
                 "slug": "kham-tai-phong-kham",
             },
             {
@@ -19,12 +20,14 @@ module.exports = {
                     "vi": "Điều dưỡng tại nhà",
                     "en": "Doctor at Home"
                 },
+                serviceType: 'DOCTOR_AT_HOME',
                 "slug": "dieu-duong-tai-nha",
             },
             {
                 "name": {
                     "vi": "Xét Nghiệm",
                 },
+                serviceType: 'MEDICAL_TEST',
                 "slug": "xet-nghiem",
             },
         ]);

@@ -1,6 +1,7 @@
 import mongooseIntl from 'mongoose-intl';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { MEDICAL_SERVICE } from '@app/core/constant';
 
 const { Schema } = mongoose;
 
@@ -9,6 +10,11 @@ const ServiceSchema = new Schema({
   name: {
     type: String,
     intl: true,
+  },
+  serviceType: {
+    type: String,
+    enum: Object.values(MEDICAL_SERVICE),
+    default: MEDICAL_SERVICE.CLINIC_APPOINTMENT
   },
   description: {
     type: String,

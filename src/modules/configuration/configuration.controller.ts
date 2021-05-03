@@ -150,11 +150,12 @@ const fetchSpecialityAction = async (req: express.Request, res: express.Response
     const specialities = await configurationService.getSpeciality(
       [
         'name',
-        'incrementId'
+        'incrementId',
+        'service'
       ]
     );
 
-    res.send(map(specialities, (speciality) => pick(speciality, ['name', 'id', 'incrementId'])));
+    res.send(map(specialities, (speciality) => pick(speciality, ['name', 'id', 'incrementId', 'service'])));
   } catch (e) {
     logger.error('createSpecialityAction', e);
     next(e);
