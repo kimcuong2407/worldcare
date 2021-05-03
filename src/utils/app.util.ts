@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import mixin from 'lodash/mixin';
 import { isPlainObject } from 'lodash';
 import _ from 'lodash';
+import moment from 'moment';
 
 const deeply = (map) => {
       return (obj: any, fn) => {
@@ -27,7 +28,20 @@ const mapLanguage = (obj, preferLang) => {
 });
 }
 
+const enumerateDaysBetweenDates = (startTime: number, endTime: number, format = 'YYYYMMDD') => {
+  const startDate: any = moment.utc(startTime);
+  const endDate = moment.utc(endTime);
+  const dates: any = [endDate.format(format)];
+
+  while (startDate.isBefore(endDate)) {
+    dates.push(startDate.format(format));
+    startDate.add(1, 'days');
+  }
+  return dates;
+};
+
 export default {
   getPaging,
   mapLanguage,
+  enumerateDaysBetweenDates,
 }
