@@ -17,6 +17,7 @@ const getNews = async (params: any, language = 'vi', isRaw=false) => {
     slug, status, category, startTime, endTime, options,
   } = params;
   const query: any = {
+    deletedAt: null,
   };
   const andQuery = [];
   if(slug) {
