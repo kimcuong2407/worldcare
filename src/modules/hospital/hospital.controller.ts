@@ -10,6 +10,7 @@ import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
 import { isNil, isString, isUndefined, omitBy } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
+import moment from 'moment';
 
 const logger = loggerHelper.getLogger('hospital.controller');
 
@@ -137,6 +138,20 @@ const getSimillarHospitalInfoAction = async (req: express.Request, res: express.
   }
 };
 
+
+const getAvailableHospitalSlotAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const hospitalIdOrSlug = get(req.params, 'hospitalId');
+    const startTime = moment().startOf('day').valueOf();
+    const endTime = moment().add(14, 'days').endOf('day').valueOf();
+    const data = await hospitalService.getAvailableHospitalSlot(hospitalIdOrSlug, startTime, endTime);
+    res.send(data);
+  } catch (e) {
+    logger.error('getAvailableHospitalSlotAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createHospitalAction,
   fetchHospitalAction,
@@ -144,4 +159,5 @@ export default {
   updateHospitalInfoAction,
   deleteHospitalAction,
   getSimillarHospitalInfoAction,
+  getAvailableHospitalSlotAction,
 };

@@ -1,9 +1,11 @@
 import addressUtil from '@app/utils/address.util';
+import appUtil from '@app/utils/app.util';
 import loggerHelper from '@utils/logger.util';
-import { map } from 'lodash';
+import { each, find, map } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
+import moment from 'moment';
 import { Types } from 'mongoose';
 import SpecialityCollection from '../configuration/speciality.collection';
 import StaffCollection from '../staff/staff.collection';
@@ -169,6 +171,40 @@ const isHospital = async (hospitalIdOrSlug: string) => {
   }
 }
 
+
+const getAvailableHospitalSlot = async (hospitalIdOrSlug: string, startRangeTime: number, endRangeTime: number) => {
+  let query: any = {slug: hospitalIdOrSlug};
+  if( Types.ObjectId.isValid(hospitalIdOrSlug)) {
+    query = { _id: Types.ObjectId(hospitalIdOrSlug)};
+  }
+
+  const result: any = {};
+  const hospital = await HospitalCollection.findOne(query).lean();
+  const { workingHours, hospitalSettings } = hospital;
+  const days = appUtil.enumerateDaysBetweenDates(startRangeTime, endRangeTime)
+  const slotTime = get(hospitalSettings, 'slotTime');
+  each(days, (day) => {
+    const currentDay = moment(day, 'YYYYMMDD').format('d');
+    const todaySchedule = find(workingHours, ['weekDay', Number(currentDay)]);
+    const isOpen = get(todaySchedule, 'isOpen', false);
+    const startTime = get(todaySchedule, 'startTime', false);
+    const endTime = get(todaySchedule, 'endTime', false);
+
+    if(isOpen) {
+      result[day] = [];
+      let currentTime = moment(startTime, 'HH:mm');
+      let closingTime = moment(endTime, 'HH:mm');
+      while (currentTime.isBefore(closingTime)) {
+        result[day].push(currentTime.format('HH:mm'))
+        currentTime.add(slotTime, 'minute');
+      }
+    }
+  });
+
+  return result;
+}
+
+
 export default {
   createHospital,
   fetchHospital,
@@ -177,4 +213,5 @@ export default {
   deleteHospital,
   isHospital,
   getSimillarHospital,
+  getAvailableHospitalSlot,
 };
