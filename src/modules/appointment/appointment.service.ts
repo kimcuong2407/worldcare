@@ -38,7 +38,7 @@ const createAppointment = async (appointment: any) => {
   return data;
 }
 
-const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, status, source) => {
+const fetchAppointment = async (startTime, endTime, serviceId, specialityId, hospitalId, status, source) => {
   const query: any = {};
   const andQuery = [];
   andQuery.push({
@@ -74,6 +74,12 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, statu
       service: serviceId
     });
   }
+  if (specialityId) {
+    andQuery.push({
+      speciality: specialityId
+    });
+  }
+  
   if (andQuery && andQuery.length) {
     query['$and'] = andQuery;
   }
@@ -82,6 +88,7 @@ const fetchAppointment = async (startTime, endTime, serviceId, hospitalId, statu
     .populate('customer', ['name', 'phoneNumber'])
     .populate('hospital', 'hospitalName')
     .populate('service', 'name');
+    // .populate('speciality', 'name');
 
   return data;
 };
