@@ -9,6 +9,7 @@ import staffRoutes from './modules/staff';
 import categoryRoutes from './modules/news';
 import serviceRoutes from './modules/services';
 import appointmentRoutes from './modules/appointment';
+import generalRoutes from './modules/general';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -21,4 +22,5 @@ export default (app: express.Application): void => {
   categoryRoutes(app);
   serviceRoutes(app);
   appointmentRoutes(app);
+  generalRoutes(app);
 };
