@@ -1,12 +1,13 @@
 import addressUtil from '@app/utils/address.util';
 import appUtil from '@app/utils/app.util';
 import loggerHelper from '@utils/logger.util';
-import { each, find, map } from 'lodash';
+import { countBy, each, filter, find, map } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import moment from 'moment';
 import { Types } from 'mongoose';
+import AppointmentCollection from '../appointment/appointment.collection';
 import SpecialityCollection from '../configuration/speciality.collection';
 import StaffCollection from '../staff/staff.collection';
 import HospitalCollection from "./hospital.collection";
@@ -182,20 +183,39 @@ const getAvailableHospitalSlot = async (hospitalIdOrSlug: string, startRangeTime
   const hospital = await HospitalCollection.findOne(query).lean();
   const { workingHours, hospitalSettings } = hospital;
   const days = appUtil.enumerateDaysBetweenDates(startRangeTime, endRangeTime)
+  const appointments = await AppointmentCollection.find({
+    hospital: get(hospital, '_id'),
+    time: {
+      $gte: startRangeTime,
+      $lte: endRangeTime
+    },
+    status: {
+      $ne: 'CANCEL'
+    }
+  }).select('time').lean();
   const slotTime = get(hospitalSettings, 'slotTime');
+  const capacityPerSlot = get(hospitalSettings, 'capacityPerSlot');
   each(days, (day) => {
-    const currentDay = moment(day, 'YYYYMMDD').format('d');
-    const todaySchedule = find(workingHours, ['weekDay', Number(currentDay)]);
+    const currentDay = moment(day, 'YYYYMMDD').utcOffset('+07:00');
+    const todaySchedule = find(workingHours, ['weekDay', Number(currentDay.format('d'))]);
     const isOpen = get(todaySchedule, 'isOpen', false);
     const startTime = get(todaySchedule, 'startTime', false);
     const endTime = get(todaySchedule, 'endTime', false);
-
+    const placedAppointments = filter(appointments, (app) => 
+    moment(app.time).utcOffset('+07:00').valueOf() >= currentDay.startOf('day').valueOf() &&
+    moment(app.time).utcOffset('+07:00').valueOf() <= currentDay.endOf('day').valueOf()
+    );
+    const placedTimes = countBy(map(placedAppointments, (d) => ({
+      time: moment(get(d, 'time')).utcOffset('+07:00').format("HH:mm")
+    })), 'time');
     if(isOpen) {
       result[day] = [];
       let currentTime = moment(startTime, 'HH:mm');
       let closingTime = moment(endTime, 'HH:mm');
       while (currentTime.isBefore(closingTime)) {
-        result[day].push(currentTime.format('HH:mm'))
+        if(get(placedTimes, currentTime.format('HH:mm'), 0) < capacityPerSlot){
+          result[day].push(currentTime.format('HH:mm'))
+        }
         currentTime.add(slotTime, 'minute');
       }
     }

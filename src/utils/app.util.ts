@@ -29,8 +29,8 @@ const mapLanguage = (obj, preferLang) => {
 }
 
 const enumerateDaysBetweenDates = (startTime: number, endTime: number, format = 'YYYYMMDD') => {
-  const startDate: any = moment.utc(startTime);
-  const endDate = moment.utc(endTime);
+  const startDate: any = moment.utc(startTime).utcOffset('+07:00');
+  const endDate = moment.utc(endTime).utcOffset('+07:00');
   const dates: any = [endDate.format(format)];
 
   while (startDate.isBefore(endDate)) {
