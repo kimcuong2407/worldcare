@@ -206,7 +206,8 @@ const fetchEmployeeGroupAction = async (req: express.Request, res: express.Respo
     const employeeGroups = await configurationService.getEmployeeGroup(
       [
         'name',
-        'incrementId'
+        // 'incrementId',
+        'key',
       ]
     );
     res.send(map(employeeGroups, (employeeGroup) => pick(employeeGroup, ['name', 'id', 'incrementId'])));
