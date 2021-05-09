@@ -6,6 +6,12 @@ import loggerHelper from '@utils/logger.util';
 import generalService from './general.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
+import newsService from '../news/news.service';
+import hospitalService from '../hospital/hospital.service';
+import staffService from '../staff/staff.service';
+import configurationService from '../configuration/configuration.service';
+import { find } from 'lodash';
+import { EMPLOYEE_GROUP } from '../configuration/constant';
 
 const logger = loggerHelper.getLogger('general.controller');
 
@@ -13,9 +19,39 @@ const fetchHomepageContentAction = async (req: express.Request, res: express.Res
   try {
     const language: string = get(req, 'language');
 
-    const speciality = await generalService.getSpecialityAndHospital(MEDICAL_SERVICE.CLINIC_APPOINTMENT, language);
-    
-    res.send(speciality);
+    const clinicAppointment = await generalService.getSpecialityAndHospital(MEDICAL_SERVICE.CLINIC_APPOINTMENT, language);
+    const doctorAtHome = await generalService.getSpecialityAndHospital(MEDICAL_SERVICE.DOCTOR_AT_HOME, language);
+    const employeeGroups = await configurationService.getEmployeeGroup([], language);
+    const doctorGroup = find(employeeGroups, (eg) => eg.key === EMPLOYEE_GROUP.DOCTOR);
+    const nursingGroup = find(employeeGroups, (eg) => eg.key === EMPLOYEE_GROUP.NURSING);
+
+    const { docs: doctors } = await staffService.fetchStaff({
+      options: {limit: 10},
+      employeeGroup: get(doctorGroup, '_id')
+    }, language);
+    const { docs: nursing } = await staffService.fetchStaff({
+      options: {limit: 10},
+      employeeGroup: get(nursingGroup, '_id')
+    }, language);
+
+    const { docs: hospitals } = await hospitalService.fetchHospital({
+      options: {limit: 10}
+    }, language);
+
+    const { docs: latestNews} = await newsService.getNews({
+      options: {
+        limit: 5,
+      }
+    }, language);
+
+    res.send({
+      clinicAppointment,
+      doctorAtHome,
+      latestNews,
+      hospitals,
+      doctors,
+      nursing,
+    });
   } catch (e) {
     logger.error('createAppointmentAction', e);
     next(e);

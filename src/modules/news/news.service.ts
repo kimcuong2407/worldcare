@@ -53,7 +53,7 @@ const getNews = async (params: any, language = 'vi', isRaw=false) => {
   let data = await NewsCollection.paginate(query, {
     ...options,
     'populate': [
-      { path: 'category', select: 'name' },
+      { path: 'category', select: ['name', 'slug']},
     ],
   });
   if(isRaw) {

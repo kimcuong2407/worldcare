@@ -14,10 +14,10 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
       [
         {
           '$lookup': {
-            'from': 'hospital', 
+            'from': 'hospital',
             'let': {
               'speciality': '$_id'
-            }, 
+            },
             'pipeline': [
               {
                 '$match': {
@@ -40,18 +40,18 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
               }, {
                 '$project': {
                   'hospitalName': 1,
-                  'slug': 1, 
+                  'slug': 1,
                   '_id': 1
                 }
               }
-            ], 
+            ],
             'as': 'hospital'
           }
         }, {
           '$addFields': {
             'totalHospital': {
               '$size': '$hospital'
-            }, 
+            },
             'hospital': {
               '$arrayElemAt': [
                 '$hospital', 0
@@ -67,7 +67,7 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
           }
         }
       ]
-    )
+    ).exec();
     return map(hospitalWithSpeciality, (data) => appUtil.mapLanguage(data, language));
   } catch (e) {
     logger.error('getSpecialityAndHospital', e);

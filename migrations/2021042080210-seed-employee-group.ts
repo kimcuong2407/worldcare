@@ -13,6 +13,7 @@ module.exports = {
           "vi": "Bác Sĩ",
           "en": "Doctor"
         },
+        "key": "DOCTOR",
         "incrementId": 1
       },
       {
@@ -20,6 +21,7 @@ module.exports = {
           "vi": "Y Tá",
           "en": "Nurse"
         },
+        "key": "NURSE",
         "incrementId": 2
       },
       {
@@ -27,6 +29,7 @@ module.exports = {
           "vi": "Điều Dưỡng",
           "en": "Nursing"
         },
+        "key": "NURSING",
         "incrementId": 3
       },
       {
@@ -34,6 +37,7 @@ module.exports = {
           "vi": "Dược Sĩ",
           "en": "Pharmacist"
         },
+        "key": "PHARMACIST",
         "incrementId": 4
       },
     ]);

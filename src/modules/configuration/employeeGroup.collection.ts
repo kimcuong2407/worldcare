@@ -12,6 +12,10 @@ const employeeGroupSchema = new Schema({
     type: String,
     intl: true
   },
+  key: {
+    type: String,
+    unique: true,
+  },
   incrementId: {
     type: Number,
     unique: true,
