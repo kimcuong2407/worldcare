@@ -33,6 +33,6 @@ employeeGroupSchema.plugin(autoIncrement.plugin, {
 });
 
 
-const EmployeeTypeCollection = mongoose.model('employee_group', employeeGroupSchema, 'employee_group');
+const EmployeeGroupCollection = mongoose.model('employee_group', employeeGroupSchema, 'employee_group');
 
-export default EmployeeTypeCollection;
+export default EmployeeGroupCollection;

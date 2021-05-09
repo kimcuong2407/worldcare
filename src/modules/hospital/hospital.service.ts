@@ -234,4 +234,5 @@ export default {
   isHospital,
   getSimillarHospital,
   getAvailableHospitalSlot,
+  formatHospital,
 };

@@ -5,6 +5,8 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
+import HospitalCollection from '../hospital/hospital.collection';
+import hospitalService from '../hospital/hospital.service';
 import StaffCollection from "./staff.collection";
 import { StaffModel } from "./staff.model";
 
@@ -22,9 +24,16 @@ const createStaff = async (staffInfo: StaffModel, language = 'vi') => {
 
 const formatStaff = (staff: any) => {
   staff = staff.toJSON();
+  const { hospital } = staff;
+  const { address: hospitalAddress } = hospital || {};
+
   const address = addressUtil.formatAddress(get(staff, 'address'));
   return {
     ...staff,
+    hospital: {
+      ...hospital,
+      address: addressUtil.formatAddress(hospitalAddress),
+    },
     address,
   }
 }
@@ -62,7 +71,7 @@ const fetchStaff = async (params: any, language= 'vi') => {
   let data = await StaffCollection.paginate(query, {
     ...options,
     'populate': [
-      { path: 'hospital', select: 'hospitalName' },
+      { path: 'hospital', select: ['hospitalName', 'address', 'workingHours'] },
       { path: 'degree.degreeId', select: 'name' },
       { path: 'title', select: 'name' },
       { path: 'speciality', select: 'name' },
@@ -78,21 +87,26 @@ const fetchStaff = async (params: any, language= 'vi') => {
 
 const getStaffInfo = async (staffIdOrSlug: string, language= 'vi', isRaw = false) => {
   StaffCollection.setDefaultLanguage(language);
+  HospitalCollection.setDefaultLanguage(language);
+  let query: any = {slug: staffIdOrSlug}
+
   let staff;
   if( Types.ObjectId.isValid(staffIdOrSlug)) {
-    staff = await StaffCollection.findById(staffIdOrSlug);
-  } else {
-    staff = await StaffCollection.findOne({slug: staffIdOrSlug});
-  }
+    query = {
+      _id: Types.ObjectId(staffIdOrSlug)
+    };
+  } 
+
   if(isRaw) {
-    return staff;
+    return StaffCollection.findOne(query);
   }
 
-  staff = await staff.populate('hospital', 'hospitalName')
+  staff = await StaffCollection.findOne(query)
+  .populate('hospital', ['hospitalName', 'address', 'workingHours'] )
   .populate('degree.degreeId', 'name')
   .populate('title', 'name')
   .populate('speciality', 'name')
-  .populate('employee_group', 'name');
+  .populate('employeeGroup', 'name').exec();
   return formatStaff(staff);
 };
 

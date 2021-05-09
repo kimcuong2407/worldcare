@@ -14,7 +14,6 @@ module.exports = {
           "en": "Doctor"
         },
         "incrementId": 1
-
       },
       {
         "name": {
@@ -22,7 +21,6 @@ module.exports = {
           "en": "Nurse"
         },
         "incrementId": 2
-
       },
       {
         "name": {
@@ -30,7 +28,13 @@ module.exports = {
           "en": "Nursing"
         },
         "incrementId": 3
-
+      },
+      {
+        "name": {
+          "vi": "Dược Sĩ",
+          "en": "Pharmacist"
+        },
+        "incrementId": 4
       },
     ]);
     console.log(inserted)
