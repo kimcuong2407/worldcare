@@ -209,8 +209,8 @@ const getLatestNewsAction = async (req: express.Request, res: express.Response, 
       }
     ]).exec();
 
-    const featured = await NewsCollection.findOne({ isFeatured: true }).sort({ createdAt: -1 });
-
+    const featured = await NewsCollection.findOne({isFeatured: true}).populate('category', ['name', 'slug']).sort({createdAt: -1});
+    
     res.send({
       featured: featured,
       latest: map(categories, (category) => {
