@@ -39,7 +39,8 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
                 '$limit': 1
               }, {
                 '$project': {
-                  'hospitalName': 1, 
+                  'hospitalName': 1,
+                  'slug': 1, 
                   '_id': 1
                 }
               }

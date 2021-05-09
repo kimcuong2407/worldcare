@@ -23,14 +23,14 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       status, isFeatured, slug, coverPhoto,
       tags,
     } = req.body;
-    if(!title) {
+    if (!title) {
       throw new ValidationFailedError('Title is required.');
     }
-    if(!content) {
+    if (!content) {
       throw new ValidationFailedError('Content is required.');
     }
-  
-    if(!category) {
+
+    if (!category) {
       throw new ValidationFailedError('Categrory is required.');
     }
     category && map(category, async (id) => {
@@ -73,8 +73,8 @@ const updateNewsAction = async (req: express.Request, res: express.Response, nex
       authorId, status, isFeatured, slug, tags,
       coverPhoto,
     } = req.body;
-    if(category){
-        map(category, async (id) => {
+    if (category) {
+      map(category, async (id) => {
         if (id && (!Types.ObjectId.isValid(id) || (!(await newsCategoryService.getNewsCategoryByIdOrSlug(id))))) {
           throw new Error('There is no categoryId');
         }
@@ -121,7 +121,7 @@ const fetchNewsAction = async (req: express.Request, res: express.Response, next
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const keyword = get(req, 'query.keyword', '');
     const language: string = get(req, 'language');
-    const newss = await newsService.getNews({keyword, status, slug, category, startTime, endTime, options}, language, raw);
+    const newss = await newsService.getNews({ keyword, status, slug, category, startTime, endTime, options }, language, raw);
     res.send(newss);
   } catch (e) {
     logger.error('createNewsAction', e);
@@ -149,7 +149,7 @@ const getNewsByIdOrSlugAction = async (req: express.Request, res: express.Respon
 const deleteNewsByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const newsId = get(req.params, 'id');
-    
+
     const news = await newsService.deleteNews(newsId);
     res.send(news);
   } catch (e) {
@@ -165,11 +165,16 @@ const getLatestNewsAction = async (req: express.Request, res: express.Response, 
 
     const categories = await NewsCategoryCollection.aggregate([
       {
+        '$match': {
+          'deletedAt': null,
+        }
+      },
+      {
         '$lookup': {
-          'from': 'news', 
+          'from': 'news',
           'let': {
             'category_id': '$_id'
-          }, 
+          },
           'pipeline': [
             {
               '$match': {
@@ -194,7 +199,7 @@ const getLatestNewsAction = async (req: express.Request, res: express.Response, 
             }, {
               '$limit': 5
             }
-          ], 
+          ],
           'as': 'news'
         }
       }, {
@@ -202,10 +207,10 @@ const getLatestNewsAction = async (req: express.Request, res: express.Response, 
           'index': 1
         }
       }
-    ]);
+    ]).exec();
 
-    const featured = await NewsCollection.findOne({isFeatured: true}).sort({createdAt: -1});
-    
+    const featured = await NewsCollection.findOne({ isFeatured: true }).sort({ createdAt: -1 });
+
     res.send({
       featured: featured,
       latest: map(categories, (category) => {

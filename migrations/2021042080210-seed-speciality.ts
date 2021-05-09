@@ -180,6 +180,7 @@ module.exports = {
         "name": {
           "vi": "Chăm Sóc Mẹ Và Bé"
         },
+        "description": "",
         "service": "DOCTOR_AT_HOME",
         "incrementId": 25
       },
@@ -187,6 +188,7 @@ module.exports = {
         "name": {
           "vi": "Chăm Sóc Người Bệnh"
         },
+        "description": "",
         "service": "DOCTOR_AT_HOME",
         "incrementId": 26
       },
@@ -194,6 +196,7 @@ module.exports = {
         "name": {
           "vi": "Chăm Sóc Người Già"
         },
+        "description": "",
         "service": "DOCTOR_AT_HOME",
         "incrementId": 27
       },
