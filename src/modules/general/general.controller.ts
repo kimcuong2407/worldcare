@@ -30,7 +30,7 @@ const fetchHomepageContentAction = async (req: express.Request, res: express.Res
       employeeGroup: get(doctorGroup, '_id')
     }, language);
     const { docs: nursing } = await staffService.fetchStaff({
-      options: {limit: 10},
+      options: {limit: 3},
       employeeGroup: get(nursingGroup, '_id')
     }, language);
 

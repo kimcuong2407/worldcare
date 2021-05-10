@@ -46,9 +46,9 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
         throw new ValidationFailedError('There is no sepcialityId');
       }
     });
-    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
-      throw new ValidationFailedError('There is no employeeGroupId');
-    }
+    // if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
+    //   throw new ValidationFailedError('There is no employeeGroupId');
+    // }
 
     const staffInfo: any = {
       firstName,
@@ -139,9 +139,9 @@ const updateStaffInfoAction = async (req: express.Request, res: express.Response
         throw new Error('There is no sepcialityId');
       }
     });
-    if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
-      throw new Error('There is no employeeGroupId');
-    }
+    // if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
+    //   throw new Error('There is no employeeGroupId');
+    // }
     const staffInfo: any = omitBy({
       firstName,
       lastName,
