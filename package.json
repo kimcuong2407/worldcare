@@ -16,7 +16,7 @@
     "test-report": "TS_NODE_FILES=true nyc --reporter=html mocha --exit -r ts-node/register test/**/*.test.ts;",
     "build": "tsc; cp package.json dist;",
     "start:prod": "NODE_ENV=production node -r ts-node/register/transpile-only -r tsconfig-paths/register ./dist/index.js",
-    "start": "ts-node-dev -r tsconfig-paths/register  --respawn --transpileOnly ./src/index.ts",
+    "start": "ts-node-dev --ignore-watch node_modules -r tsconfig-paths/register  --respawn --transpileOnly ./src/index.ts",
     "lint": "eslint ./src --ext .js,.ts",
     "lint:fix": "eslint ./src --ext .js,.ts --fix",
     "apidoc": "npm run gen-apidoc; ts-node-dev -r tsconfig-paths/register  --respawn --transpileOnly ./src/apidoc.ts",

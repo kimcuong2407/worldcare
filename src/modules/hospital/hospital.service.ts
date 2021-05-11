@@ -192,7 +192,7 @@ const getAvailableHospitalSlot = async (hospitalIdOrSlug: string, startRangeTime
     status: {
       $ne: 'CANCEL'
     }
-  }).select('time').lean();
+  }).select('time').lean().exec();
   const slotTime = get(hospitalSettings, 'slotTime');
   const capacityPerSlot = get(hospitalSettings, 'capacityPerSlot');
   each(days, (day) => {

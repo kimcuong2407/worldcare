@@ -142,7 +142,7 @@ const getSimillarHospitalInfoAction = async (req: express.Request, res: express.
 const getAvailableHospitalSlotAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const hospitalIdOrSlug = get(req.params, 'hospitalId');
-    const startTime = moment().startOf('day').valueOf();
+    const startTime = moment().valueOf();
     const endTime = moment().add(14, 'days').endOf('day').valueOf();
     const data = await hospitalService.getAvailableHospitalSlot(hospitalIdOrSlug, startTime, endTime);
     res.send(data);

@@ -12,7 +12,10 @@ const SpecialitySchema = new Schema({
   },
   icon: String,
   service: String,
-  description: String,
+  description: {
+    type: String,
+    intl: true
+  },
   parentSpeciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   incrementId: {
     type: Number,

@@ -87,13 +87,13 @@ const getSpeciality = async (fields: string[], language = 'vi') => {
   return data;
 };
 
-const updateSpecialityById = async (degreeId: string, degree: any) => {
-  const updatedSpeciality = await SpecialityCollection.updateOne({_id: degreeId}, {
+const updateSpecialityById = async (specialityId: string, speciality: any) => {
+  const updatedSpeciality = await SpecialityCollection.updateOne({_id: specialityId}, {
     $set: {
-      ...degree
+      ...speciality
     }
   });
-  const data = await SpecialityCollection.findOne({_id: degreeId});
+  const data = await SpecialityCollection.findOne({_id: specialityId});
   return data;
 }
 
