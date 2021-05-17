@@ -28,7 +28,7 @@ DegreeSchema.plugin(mongoosePaginate);
 DegreeSchema.plugin(autoIncrement.plugin, {
   model: 'degree',
   field: 'incrementId',
-  startAt: 1,
+  startAt: 100,
   incrementBy: 1
 });
 

@@ -33,7 +33,7 @@ SpecialitySchema.plugin(mongoosePaginate);
 SpecialitySchema.plugin(autoIncrement.plugin, {
   model: 'speciality',
   field: 'incrementId',
-  startAt: 1,
+  startAt: 100,
   incrementBy: 1
 });
 

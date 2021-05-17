@@ -32,7 +32,7 @@ employeeGroupSchema.plugin(mongoosePaginate);
 employeeGroupSchema.plugin(autoIncrement.plugin, {
   model: 'employee_group',
   field: 'incrementId',
-  startAt: 1,
+  startAt: 100,
   incrementBy: 1
 });
 

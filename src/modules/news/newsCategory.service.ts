@@ -70,9 +70,13 @@ const getNewsByCategory = async (categoryId: string, options: any, language = 'v
   const news = await NewsCollection.paginate({
     category: get(category, '_id'),
     deletedAt: null,
-    status: NEWS_STATUS.PUBLISHED
+    status: NEWS_STATUS.PUBLISHED,
+ 
   }, {
-    ...options
+    ...options,
+    'populate': [
+      { path: 'category', select: ['name', 'slug']},
+    ],
   })
   return news;
 }
