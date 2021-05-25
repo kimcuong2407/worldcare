@@ -12,10 +12,10 @@ const TitleSchema = new Schema({
     type: String,
     intl: true
   },
-  incrementId: {
-    type: Number,
-    unique: true,
-  },
+  // incrementId: {
+  //   type: Number,
+  //   unique: true,
+  // },
 }, {
   timestamps: true,
    toJSON: {
@@ -25,12 +25,12 @@ const TitleSchema = new Schema({
 
 TitleSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 TitleSchema.plugin(mongoosePaginate);
-TitleSchema.plugin(autoIncrement.plugin, {
-  model: 'title',
-  field: 'incrementId',
-  startAt: 100,
-  incrementBy: 1
-});
+// TitleSchema.plugin(autoIncrement.plugin, {
+//   model: 'title',
+//   field: 'incrementId',
+//   startAt: 100,
+//   incrementBy: 1
+// });
 
 
 const TitleCollection = mongoose.model('title', TitleSchema, 'title');

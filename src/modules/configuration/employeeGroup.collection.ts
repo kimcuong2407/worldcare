@@ -16,10 +16,10 @@ const employeeGroupSchema = new Schema({
     type: String,
     unique: true,
   },
-  incrementId: {
-    type: Number,
-    unique: true,
-  },
+  // incrementId: {
+  //   type: Number,
+  //   unique: true,
+  // },
 }, {
   timestamps: true,
   toJSON: {
@@ -29,12 +29,12 @@ const employeeGroupSchema = new Schema({
 
 employeeGroupSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 employeeGroupSchema.plugin(mongoosePaginate);
-employeeGroupSchema.plugin(autoIncrement.plugin, {
-  model: 'employee_group',
-  field: 'incrementId',
-  startAt: 100,
-  incrementBy: 1
-});
+// employeeGroupSchema.plugin(autoIncrement.plugin, {
+//   model: 'employee_group',
+//   field: 'incrementId',
+//   startAt: 100,
+//   incrementBy: 1
+// });
 
 
 const EmployeeGroupCollection = mongoose.model('employee_group', employeeGroupSchema, 'employee_group');

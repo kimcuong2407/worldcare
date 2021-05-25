@@ -34,7 +34,10 @@ const updateDegreeById = async (degreeId: string, degree: any) => {
   return data;
 }
 
-const getDegreeById = async (degreeId: string, language = 'vi') => {
+const getDegreeById = async (degreeId: string, language = 'vi', isRaw = false) => {
+  if(isRaw) {
+    return await DegreeCollection.findById(degreeId).lean();
+  }
   DegreeCollection.setDefaultLanguage(language);
   const degree = await DegreeCollection.findById(degreeId);
   return degree;
@@ -97,10 +100,19 @@ const updateSpecialityById = async (specialityId: string, speciality: any) => {
   return data;
 }
 
-const getSpecialityById = async (degreeId: string, language = 'vi') => {
+const getSpecialityById = async (specialityId: string, language = 'vi', isRaw = false) => {
+  if(isRaw) {
+    return SpecialityCollection.findById(specialityId).lean();
+  }
   SpecialityCollection.setDefaultLanguage(language);
-  const degree = await SpecialityCollection.findById(degreeId);
+  const degree = await SpecialityCollection.findById(specialityId);
   return degree;
+}
+
+
+const deleteSpecialityById = async (specialityId: string) => {
+  await SpecialityCollection.findByIdAndRemove(specialityId);
+  return true;
 }
 
 // EMPLOYEETYPE
@@ -147,8 +159,9 @@ export default {
   getSpeciality,
   updateSpecialityById,
   getSpecialityById,
+  deleteSpecialityById,
   createEmployeeGroup,
   updateEmployeeGroupById,
   getEmployeeGroup,
-  getEmployeeGroupById
+  getEmployeeGroupById,
 };

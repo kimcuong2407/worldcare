@@ -17,10 +17,10 @@ const SpecialitySchema = new Schema({
     intl: true
   },
   parentSpeciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
-  incrementId: {
-    type: Number,
-    unique: true,
-  },
+  // incrementId: {
+  //   type: Number,
+  //   unique: true,
+  // },
 }, {
   timestamps: true,
   toJSON: {
@@ -30,12 +30,12 @@ const SpecialitySchema = new Schema({
 
 SpecialitySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 SpecialitySchema.plugin(mongoosePaginate);
-SpecialitySchema.plugin(autoIncrement.plugin, {
-  model: 'speciality',
-  field: 'incrementId',
-  startAt: 100,
-  incrementBy: 1
-});
+// SpecialitySchema.plugin(autoIncrement.plugin, {
+//   model: 'speciality',
+//   field: 'incrementId',
+//   startAt: 100,
+//   incrementBy: 1
+// });
 
 
 const SpecialityCollection = mongoose.model('speciality', SpecialitySchema, 'speciality');

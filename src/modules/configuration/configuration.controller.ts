@@ -55,7 +55,9 @@ const fetchDegreeAction = async (req: express.Request, res: express.Response, ne
 const getDegreeByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const degreeId = get(req.params, 'id');
-    const degree = await configurationService.getDegreeById(degreeId);
+    const isRaw = get(req.query, 'raw');
+    const language: string = get(req, 'language');
+    const degree = await configurationService.getDegreeById(degreeId, language, isRaw);
     res.send(degree);
   } catch (e) {
     logger.error('createDegreeAction', e);
@@ -166,10 +168,23 @@ const fetchSpecialityAction = async (req: express.Request, res: express.Response
 const getSpecialityByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const specialityId = get(req.params, 'id');
-    const speciality = await configurationService.getSpecialityById(specialityId);
+    const isRaw = get(req.query, 'raw');
+    const language: string = get(req, 'language');
+    const speciality = await configurationService.getSpecialityById(specialityId, language, isRaw);
     res.send(speciality);
   } catch (e) {
-    logger.error('createSpecialityAction', e);
+    logger.error('getSpecialityByIdAction', e);
+    next(e);
+  }
+};
+
+const deleteSpecialityAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const specialityId = get(req.params, 'id');
+    const speciality = await configurationService.deleteSpecialityById(specialityId);
+    res.send(true);
+  } catch (e) {
+    logger.error('deleteSpecialityAction', e);
     next(e);
   }
 };
@@ -278,10 +293,16 @@ const getListSupportedCityAction = async (req: express.Request, res: express.Res
 
 
 export default {
-  createDegreeAction, fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
+  createDegreeAction,
+  fetchDegreeAction, updateDegreeAction, getDegreeByIdAction,
   createTitleAction, fetchTitleAction, updateTitleAction, getTitleByIdAction,
-  createSpecialityAction, fetchSpecialityAction, updateSpecialityAction, getSpecialityByIdAction,
-  createEmployeeGroupAction, fetchEmployeeGroupAction, updateEmployeeGroupAction, getEmployeeGroupByIdAction,
+  createSpecialityAction,
+  fetchSpecialityAction,
+  deleteSpecialityAction,
+  updateSpecialityAction,
+  getSpecialityByIdAction,
+  createEmployeeGroupAction,
+  fetchEmployeeGroupAction, updateEmployeeGroupAction, getEmployeeGroupByIdAction,
   getCityListAction,
   getDistrictListAction,
   getWardListByDistrictAction,

@@ -18,6 +18,7 @@ const configurationRoutes = (app: express.Application): void => {
   app.get('/api/v1/speciality',  configurationActions.fetchSpecialityAction);
   app.put('/api/v1/speciality/:id', middleware.authenticate, configurationActions.updateSpecialityAction);
   app.get('/api/v1/speciality/:id', middleware.authenticate, configurationActions.getSpecialityByIdAction);
+  app.delete('/api/v1/speciality/:id', middleware.authenticate, configurationActions.deleteSpecialityAction);
 
   app.post('/api/v1/employee-group', middleware.authenticate, configurationActions.createEmployeeGroupAction);
   app.get('/api/v1/employee-group', configurationActions.fetchEmployeeGroupAction);

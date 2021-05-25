@@ -12,10 +12,10 @@ const DegreeSchema = new Schema({
     type: String,
     intl: true
   },
-  incrementId: {
-    type: Number,
-    unique: true,
-  },
+  // incrementId: {
+  //   type: Number,
+  //   unique: true,
+  // },
 }, {
   timestamps: true,
    toJSON: {
@@ -25,12 +25,12 @@ const DegreeSchema = new Schema({
 
 DegreeSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
 DegreeSchema.plugin(mongoosePaginate);
-DegreeSchema.plugin(autoIncrement.plugin, {
-  model: 'degree',
-  field: 'incrementId',
-  startAt: 100,
-  incrementBy: 1
-});
+// DegreeSchema.plugin(autoIncrement.plugin, {
+//   model: 'degree',
+//   field: 'incrementId',
+//   startAt: 100,
+//   incrementBy: 1
+// });
 
 
 const DegreeCollection = mongoose.model('degree', DegreeSchema, 'degree');
