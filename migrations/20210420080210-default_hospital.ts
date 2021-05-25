@@ -8,15 +8,17 @@ module.exports = {
     // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: true}});
     await db.collection('hospital').insertMany([
       {
-        slug: 'phong-kham-thong-nhat',
+        slug: 'world-health-viet-nam',
         hospitalName: {
-          vi: 'Phòng khám Đa khoa Thành công'
+          vi: 'Trung Tâm World Health Việt Nam',
+          en: 'World Health Vietnam'
         },
         description: {
-          vi: 'Phòng khám Đa khoa Thành công'
+          vi: 'Trung Tâm chăm sóc sức khỏe World Health Việt Nam',
+          en: 'World Health Vietnam'
         },
-        email: "pkthanhcong@gmail.com",
-        phoneNumber: "(0236) 3825051",
+        email: "info.worldhealthcare@gmail.com",
+        phoneNumber: "0912.747.362",
         workingHours: [
           {
             weekDay: 0,
@@ -62,12 +64,11 @@ module.exports = {
           },
         ],
         address: {
-          street: '245 Hoàng Diệu',
+          street: '108 Nguyễn Hữu Dật',
           ward: '20257',
           district: '492',
           city: '48'
         },
-        speciality: ['607da1fe1fc9315254b537f7'],
         hospitalSettings: {
           slotTime: 30,
           capacityPerSlot: 2,
@@ -84,6 +85,6 @@ module.exports = {
   async down(db: any, client: any) {
     // TODO write the statements to rollback your migration (if possible)
     // Example:
-    await db.collection('hospital').remove({slug: 'phong-kham-thong-nhat'});
+    await db.collection('hospital').remove({slug: 'world-health-viet-nam'});
   }
 };

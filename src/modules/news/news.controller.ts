@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import loggerHelper from '@utils/logger.util';
 import newsService from './news.service';
 import newsCategoryService from './newsCategory.service';
-import { isNil, isUndefined, map, omit, omitBy } from 'lodash';
+import { isNil, isUndefined, lowerCase, map, omit, omitBy, trim } from 'lodash';
 import { Types } from 'mongoose';
 import userService from '../user/user.service';
 import hospitalService from '../hospital/hospital.service';
@@ -12,6 +12,8 @@ import appUtil from '@app/utils/app.util';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import NewsCollection from './news.collection';
 import NewsCategoryCollection from './newsCategory.collection';
+import slugify from 'slugify';
+import normalizeText from 'normalize-text';
 
 const logger = loggerHelper.getLogger('news.controller');
 
@@ -51,7 +53,7 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       author: req.user.id,
       status: status || NEWS_STATUS.EDITING,
       isFeatured: isFeatured || false,
-      slug,
+      slug: slug || slugify(trim(lowerCase(normalizeText(title)))),
       tags,
       coverPhoto,
     }

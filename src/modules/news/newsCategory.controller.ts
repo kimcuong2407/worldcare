@@ -5,16 +5,23 @@ import loggerHelper from '@utils/logger.util';
 import newsCategoryService from './newsCategory.service';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
-import { isUndefined } from 'lodash';
+import { isUndefined, lowerCase, trim } from 'lodash';
 import NewsCollection from './news.collection';
 import appUtil from '@app/utils/app.util';
+import slugify from 'slugify';
+import normalizeText from 'normalize-text';
 
 const logger = loggerHelper.getLogger('category.controller');
 
 // DEGREE
 const createNewsCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const category = await newsCategoryService.createNewsCategory(req.body);
+    const { slug, name, ...rest } = req.body;
+    const category = await newsCategoryService.createNewsCategory({
+      ...rest,
+      name,
+      slug: slug || slugify(trim(lowerCase(normalizeText(name))))
+    });
 
     res.send(category);
   } catch (e) {

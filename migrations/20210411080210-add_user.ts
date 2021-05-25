@@ -6,10 +6,10 @@ module.exports = {
     // See https://github.com/seppevs/migrate-mongo/#creating-a-new-migration-script
     // Example:
     // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: true}});
-    const password = await bcryptUtil.generateHash('123456');
+    const password = await bcryptUtil.generateHash('Admin@worldcarE!');
     const user = {
-      username: 'danielpham',
-      email: 'nguyen.pc@live.com',
+      username: 'admin',
+      email: 'admin@worldcare.vn',
       password: password,
     };
     const inserted = await db.collection('user').insertOne(user);
