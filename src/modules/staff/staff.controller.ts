@@ -68,7 +68,7 @@ const createStaffAction = async (req: express.Request, res: express.Response, ne
       employeeHistory,
       certification,
       lang,
-      slug: slug || slugify(trim(lowerCase(normalizeText(`${firstName}-${lastName}-${new Date().getTime()}`))))
+      slug: slug || slugify(trim(lowerCase(normalizeText(`${lastName}-${firstName}-${new Date().getTime()}`))))
       // createdBy,
       // updatedBy,
     };

@@ -53,7 +53,7 @@ const createNewsAction = async (req: express.Request, res: express.Response, nex
       author: req.user.id,
       status: status || NEWS_STATUS.EDITING,
       isFeatured: isFeatured || false,
-      slug: slug || slugify(trim(lowerCase(normalizeText(title)))),
+      slug: slug || slugify(trim(lowerCase(normalizeText(get(title, 'vi'))))),
       tags,
       coverPhoto,
     }

@@ -20,7 +20,7 @@ const createNewsCategoryAction = async (req: express.Request, res: express.Respo
     const category = await newsCategoryService.createNewsCategory({
       ...rest,
       name,
-      slug: slug || slugify(trim(lowerCase(normalizeText(name))))
+      slug: slug || slugify(trim(lowerCase(normalizeText(get(name, 'vi')))))
     });
 
     res.send(category);
