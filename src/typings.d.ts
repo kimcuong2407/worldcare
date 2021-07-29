@@ -7,6 +7,7 @@ declare namespace Express {
     user?: any,
     token?: string,
     hospitalId?: string,
+    companyId?: string,
     language?: string,
   }
 }
