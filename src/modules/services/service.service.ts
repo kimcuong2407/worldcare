@@ -1,11 +1,11 @@
-import { UnAuthenticated } from "@app/core/types/ErrorTypes";
-import bcryptUtil from "@app/utils/bcrypt.util";
-import jwtUtil from "@app/utils/jwt.util";
-import { get } from "lodash";
-import { Types } from "mongoose";
+import { UnAuthenticated } from '@app/core/types/ErrorTypes';
+import bcryptUtil from '@app/utils/bcrypt.util';
+import jwtUtil from '@app/utils/jwt.util';
+import { get } from 'lodash';
+import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import UserCollection from "../user/user.collection";
-import ServiceCollection from "./service.collection";
+import UserCollection from '../user/user.collection';
+import ServiceCollection from './service.collection';
 
 // DEGREE
 const createService = async (service: any, language = 'vi') => {

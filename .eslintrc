@@ -8,8 +8,10 @@
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-throw-literal": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "quotes": [1, "single", { "avoidEscape": true }]
   },
+
   "plugins": ["@typescript-eslint"]
 
 }

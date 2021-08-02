@@ -1,14 +1,14 @@
-const CORE_PERMISSIONS = {
-  'CREATE_HOSPITAL': 'CREATE_HOSPITAL',
-  'UPDATE_HOSPITAL': 'UPDATE_HOSPITAL',
-  'UPDATE_HOSPITAL': 'UPDATE_HOSPITAL',
-  'DELETE_HOSPITAL': 'DELETE_HOSPITAL',
-
+export const CORE_RESOURCES = {
+  company: 'company',
+  user: 'user',
+  appointment: 'appointment',
+  order: 'order',
+  customer: 'customer',
 }
 
-const HOSPITAL_PERMISSIONS = {
-}
-export default {
-  CORE_PERMISSIONS,
-  HOSPITAL_PERMISSIONS,
+export const CORE_ACTIONS = {
+  read: 'read',
+  write: 'write',
+  delete: 'delete',
+  update: 'update',
 }

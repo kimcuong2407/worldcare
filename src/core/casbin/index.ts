@@ -1,4 +1,5 @@
-import { MONGO_URL } from "../config";
+import { MONGO_URL } from '../config';
+import path from 'path';
 
 import { newEnforcer, Model, Enforcer } from 'casbin';
 import MongooseAdapter from 'casbin-mongoose-adapter';
@@ -23,16 +24,17 @@ class Casbin {
 
   async init() {
     const model = new Model();
-    model.addDef("r", "r", "sub, obj, act")
-    model.addDef("p", "p", "sub, obj, act")
-    model.addDef("g", "g", "_, _")
-    model.addDef("e", "e", "some(where (p.eft == allow))")
-    model.addDef("m", "m", "g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.act == p.act")
-
+    // model.addDef("r", "r", "sub, dom, obj, act");
+    // model.addDef("p", "p", "sub, dom, obj, act");
+    // model.addDef("g", "g", "_, _");
+    // model.addDef("g2", "g2", "_, _");
+    // model.addDef("e", "e", "some(where (p.eft == allow))");
+    // model.addDef("m", "m", "g(r.sub, p.sub) && g2(r.dom, p.dom) && r.obj == p.obj && r.act == p.act");
+    const model2 = path.resolve(__dirname, './model.conf');
     this.adapter = await MongooseAdapter.newAdapter(MONGO_URL);
-    this.enforcer = await newEnforcer(model, this.adapter);
+    this.enforcer = await newEnforcer(model2, this.adapter);
+    this.enforcer.initWithAdapter(model2, this.adapter)
   }
-
   static getInstance() {
     if (!Casbin.instance) {
       Casbin.instance = new Casbin();

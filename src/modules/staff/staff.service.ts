@@ -7,8 +7,8 @@ import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
 import HospitalCollection from '../hospital/hospital.collection';
 import hospitalService from '../hospital/hospital.service';
-import StaffCollection from "./staff.collection";
-import { StaffModel } from "./staff.model";
+import StaffCollection from './staff.collection';
+import { StaffModel } from './staff.model';
 
 const logger = loggerHelper.getLogger('staff.service');
 

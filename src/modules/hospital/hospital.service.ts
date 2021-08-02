@@ -10,8 +10,8 @@ import { Types } from 'mongoose';
 import AppointmentCollection from '../appointment/appointment.collection';
 import SpecialityCollection from '../configuration/speciality.collection';
 import StaffCollection from '../staff/staff.collection';
-import HospitalCollection from "./hospital.collection";
-import { HospitalModel } from "./hospital.model";
+import HospitalCollection from './hospital.collection';
+import { HospitalModel } from './hospital.model';
 
 const logger = loggerHelper.getLogger('hospital.service');
 
@@ -206,7 +206,7 @@ const getAvailableHospitalSlot = async (hospitalIdOrSlug: string, startRangeTime
     moment(app.time).utcOffset('+07:00').valueOf() <= currentDay.endOf('day').valueOf()
     );
     const placedTimes = countBy(map(placedAppointments, (d) => ({
-      time: moment(get(d, 'time')).utcOffset('+07:00').format("HH:mm")
+      time: moment(get(d, 'time')).utcOffset('+07:00').format('HH:mm')
     })), 'time');
     if(isOpen) {
       result[day] = [];

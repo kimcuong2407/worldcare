@@ -5,16 +5,17 @@ import { get } from 'lodash';
 import jsonwebtoken from 'jsonwebtoken';
 import authService from '@modules/auth/auth.service';
 import jwtUtil from '@app/utils/jwt.util';
-import { UnauthorizedError } from '../types/ErrorTypes';
+import { ForbiddenError, UnauthorizedError } from '../types/ErrorTypes';
+import casbin from '../casbin';
+import { Enforcer } from 'casbin';
 
 const logger = loggerHelper.getLogger('middleware.authorization');
 
-const authorizationMiddleware = (permission: string, resource?: string) => async (req: express.Request,
+const authorizationMiddleware = (resource: string, action: string) => async (req: express.Request,
   res: express.Response,
   next: express.NextFunction) => {
   const token: string = get(req, 'headers.authorization');
-  const hospitalId: string = get(req, 'headers.hospitalId') || '';
-
+  const companyId: string = get(req, 'headers.companyid') || '';
   try {
     const jwtToken = token ? token.split(' ')[1] : '';
 
@@ -24,9 +25,14 @@ const authorizationMiddleware = (permission: string, resource?: string) => async
       throw new UnauthorizedError();
     }
 
+    const isPermitted = await casbin.enforcer.enforce(get(user, 'id'), companyId, resource, action);
+
+    if (!isPermitted) {
+      throw new ForbiddenError();
+    }
     req.token = token;
     req.user = {
-      id: get(user, 'sub'),
+      id: get(user, 'id'),
       sessionId: get(user, 'jti'),
     };
     next();
@@ -36,4 +42,4 @@ const authorizationMiddleware = (permission: string, resource?: string) => async
   }
 };
 
-export default { authorizationMiddleware };
+export default authorizationMiddleware;
