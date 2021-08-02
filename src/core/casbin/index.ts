@@ -1,4 +1,4 @@
-import { MONGO_URL } from "../config";
+import { MONGO_URL } from '../config';
 import path from 'path';
 
 import { newEnforcer, Model, Enforcer } from 'casbin';

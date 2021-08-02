@@ -10,6 +10,22 @@ const formatAddress = (address: any) => {
   }
 };
 
+const formatAddressV2 = (address: any) => {
+  const { street, wardId, districtId, cityId, ...rest } = address || {};
+  return {
+    street,
+    wardId,
+    districtId,
+    cityId,
+    ward: get(subVN.getWardsByCode(wardId), 'name'),
+    district: get(subVN.getDistrictByCode(districtId), 'name'),
+    city: get(subVN.getCityByCode(cityId), 'name'),
+    ...rest,
+  }
+};
+
+
 export default {
   formatAddress,
+  formatAddressV2,
 }

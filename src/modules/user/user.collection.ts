@@ -14,7 +14,7 @@ const UserSchema = new Schema({
     type: String
   },
   gender: Boolean,
-  phone: String,
+  phoneNumber: String,
   username: String,
   email: {
     type: String,

@@ -15,8 +15,7 @@ const authorizationMiddleware = (resource: string, action: string) => async (req
   res: express.Response,
   next: express.NextFunction) => {
   const token: string = get(req, 'headers.authorization');
-  const companyId: string = get(req, 'headers.companyId') || '';
-
+  const companyId: string = get(req, 'headers.companyid') || '';
   try {
     const jwtToken = token ? token.split(' ')[1] : '';
 
@@ -25,14 +24,15 @@ const authorizationMiddleware = (resource: string, action: string) => async (req
     if (!user) {
       throw new UnauthorizedError();
     }
-    const isPermitted = await casbin.enforcer.enforce(get(user, 'sub'), companyId, resource, action);
+
+    const isPermitted = await casbin.enforcer.enforce(get(user, 'id'), companyId, resource, action);
 
     if (!isPermitted) {
       throw new ForbiddenError();
     }
     req.token = token;
     req.user = {
-      id: get(user, 'sub'),
+      id: get(user, 'id'),
       sessionId: get(user, 'jti'),
     };
     next();
@@ -42,4 +42,4 @@ const authorizationMiddleware = (resource: string, action: string) => async (req
   }
 };
 
-export default { authorizationMiddleware };
+export default authorizationMiddleware;

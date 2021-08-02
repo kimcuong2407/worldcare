@@ -1,4 +1,4 @@
-const CORE_RESOURCES = {
+export const CORE_RESOURCES = {
   company: 'company',
   user: 'user',
   appointment: 'appointment',
@@ -6,13 +6,9 @@ const CORE_RESOURCES = {
   customer: 'customer',
 }
 
-const CORE_ACTIONS = {
+export const CORE_ACTIONS = {
   read: 'read',
   write: 'write',
   delete: 'delete',
   update: 'update',
-}
-export default {
-  CORE_ACTIONS,
-  CORE_RESOURCES
 }

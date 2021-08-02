@@ -1,6 +1,6 @@
-import Axios from "axios"
-import { map } from "lodash";
-import { ZALO_ACCOUNTS, ZALO_API, ZALO_OA_TOKEN } from "../config"
+import Axios from 'axios'
+import { map } from 'lodash';
+import { ZALO_ACCOUNTS, ZALO_API, ZALO_OA_TOKEN } from '../config'
 
 
 const sendZaloMessage = async (message: string) => {
@@ -9,11 +9,11 @@ const sendZaloMessage = async (message: string) => {
   map(receivers, (receiver) => {
     promises.push(
       Axios.post(`${ZALO_API}/v2.0/oa/message?access_token=${ZALO_OA_TOKEN}`, {
-        "recipient": {
-          "user_id": receiver
+        'recipient': {
+          'user_id': receiver
         },
-        "message": {
-          "text": message
+        'message': {
+          'text': message
         }
     })
     )

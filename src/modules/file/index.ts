@@ -6,7 +6,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 const fileRoutes = (app: express.Application): void => {
-  app.post('/api/v1/file/:resource', upload.single("file"), fileActions.uploadFileAction);
+  app.post('/api/v1/file/:resource', upload.single('file'), fileActions.uploadFileAction);
 };
 
 export default fileRoutes;

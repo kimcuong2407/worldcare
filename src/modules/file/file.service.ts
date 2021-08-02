@@ -1,7 +1,7 @@
 import { S3_BUCKET } from './../../core/config/index';
 import { InternalServerError } from '@app/core/types/ErrorTypes';
 import { ValidationFailedError } from './../../core/types/ErrorTypes';
-import s3 from "@app/core/s3";
+import s3 from '@app/core/s3';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import S3, { ManagedUpload } from 'aws-sdk/clients/s3';
@@ -11,7 +11,7 @@ const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
 const uploadImage = async (file: any, resourcePath: string): Promise<any> => {
 
   if (!file) {
-    throw new Error("File is empty")
+    throw new Error('File is empty')
   }
 
   if (!file.mimetype || !(file.mimetype.match(/image\/.*/i) || file.mimetype.match(/application\/pdf/i))) {

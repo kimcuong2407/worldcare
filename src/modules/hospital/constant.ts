@@ -50,4 +50,10 @@ export const WORKING_HOURS: any = [
   }
 ];
 
+export const ENTITY_TYPE = {
+  'PHARMACY': 'PHARMACY',
+  'HOSPITAL': 'HOSPITAL',
+  'LAB': 'LAB'
+}
+
 export default {};

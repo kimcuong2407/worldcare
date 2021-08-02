@@ -1,13 +1,13 @@
-import { UnAuthenticated } from "@app/core/types/ErrorTypes";
-import bcryptUtil from "@app/utils/bcrypt.util";
-import jwtUtil from "@app/utils/jwt.util";
-import { get } from "lodash";
-import { Types } from "mongoose";
+import { UnAuthenticated } from '@app/core/types/ErrorTypes';
+import bcryptUtil from '@app/utils/bcrypt.util';
+import jwtUtil from '@app/utils/jwt.util';
+import { get } from 'lodash';
+import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import UserCollection from "../user/user.collection";
-import { NEWS_STATUS } from "./constant";
-import NewsCollection from "./news.collection";
-import NewsCategoryCollection from "./newsCategory.collection";
+import UserCollection from '../user/user.collection';
+import { NEWS_STATUS } from './constant';
+import NewsCollection from './news.collection';
+import NewsCategoryCollection from './newsCategory.collection';
 
 // DEGREE
 const createNewsCategory = async (category: any, language = 'vi') => {

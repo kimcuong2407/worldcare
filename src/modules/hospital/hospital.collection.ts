@@ -39,6 +39,8 @@ const HospitalSchema = new Schema({
     _id: false
   }],
   diseases: [String],
+  modules: [String],
+  entityType: String,
   speciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   address: {
     street: String,

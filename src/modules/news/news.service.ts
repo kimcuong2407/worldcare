@@ -1,7 +1,7 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
-import NewsCollection from "./news.collection";
-import NewsCategoryCollection from "./newsCategory.collection";
+import NewsCollection from './news.collection';
+import NewsCategoryCollection from './newsCategory.collection';
 
 // DEGREE
 const createNews = async (news: any, language = 'vi') => {
