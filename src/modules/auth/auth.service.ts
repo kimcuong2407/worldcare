@@ -1,3 +1,4 @@
+import { DEFAULT_ROLES } from './constant';
 import { makeQuery } from '@app/core/database/query';
 import { UnAuthenticated } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
@@ -6,6 +7,8 @@ import { get } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from '../user/user.collection';
 import userService from '../user/user.service';
+import RoleCollection from './roles.collection';
+import casbin from '@app/core/casbin';
 
 // Auth service
 const authenticate = async (login: string, password: string) => {
@@ -13,7 +16,10 @@ const authenticate = async (login: string, password: string) => {
   const user = await UserCollection.findOne({
     $or: [
       {
-        email: login
+        phoneNumber: login,
+      },
+      {
+        email: login,
       },
       {
         username: login
@@ -57,7 +63,29 @@ const registerUser = async (phoneNumber: string, email: string, password: string
   }
 }
 
+
+// Auth service
+const setupDefaultRoles = async (companyId: string) => {
+  await Promise.all(DEFAULT_ROLES.map( async role => {
+    const { name, permissions, } = role;
+    const createdRole = await RoleCollection.create({
+      name,
+      companyId,
+    });
+    await Promise.all(permissions.map(async per => {
+      const { resource, action } = per;
+      const policies = action.map(act => ([get(createdRole, '_id'), companyId, resource, act]))
+      return Promise.all(policies.map((pol: any) => casbin.enforcer.addPolicy(...pol)));
+    }))
+
+    return Promise.resolve();
+
+  }));
+  return Promise.resolve();
+}
+
 export default {
   authenticate,
   registerUser,
+  setupDefaultRoles,
 };

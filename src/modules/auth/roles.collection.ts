@@ -9,7 +9,10 @@ const RoleSchema = new Schema({
   name: {
     type: String,
   },
-  hospitalId: {
+  description: {
+    type: String,
+  },
+  companyId: {
     type: String,
   },
 }, {
