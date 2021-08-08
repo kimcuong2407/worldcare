@@ -13,10 +13,10 @@ import addressUtil from '@utils/address.util';
 // Auth service
 const getUserProfileById = async (userId: string) => {
   const profile = await UserCollection.findOne({ _id: userId }).lean().exec();
-  const roles = await casbin.enforcer.getRolesForUser(userId);
+  // const roles = await casbin.enforcer.getRolesForUser(userId);
   return {
     ...profile,
-    roles,
+    // roles,
   }
 };
 

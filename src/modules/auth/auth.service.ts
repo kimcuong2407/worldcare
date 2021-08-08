@@ -9,6 +9,7 @@ import UserCollection from '../user/user.collection';
 import userService from '../user/user.service';
 import RoleCollection from './roles.collection';
 import casbin from '@app/core/casbin';
+import { ROOT_COMPANY_ID } from '@app/core/constant';
 
 // Auth service
 const authenticate = async (login: string, password: string) => {
@@ -48,10 +49,11 @@ const registerUser = async (phoneNumber: string, email: string, password: string
   const sessionId = uuidv4();
   const encryptedPassword = await bcryptUtil.generateHash(password);
     const user = {
-      username: 'admin',
+      username: phoneNumber,
       phoneNumber: phoneNumber,
       email: email,
       password: encryptedPassword,
+      companyId: ROOT_COMPANY_ID,
     };
   const createdUser = await userService.createUser(user);
   const token = jwtUtil.issueToken(get(createdUser, '_id'), sessionId);
