@@ -37,7 +37,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.plugin(mongoosePaginate);
-UserSchema.index({ phoneNumber: 1, companyId: 1 }, { unique: true })
+// UserSchema.index({ phoneNumber: 1, companyId: 1 }, { unique: true })
 UserSchema.index({ username: 1, companyId: 1 }, { unique: true })
 
 const UserCollection = mongoose.model('user', UserSchema, 'user');

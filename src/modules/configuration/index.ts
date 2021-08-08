@@ -26,7 +26,9 @@ const configurationRoutes = (app: express.Application): void => {
   app.get('/api/v1/employee-group/:id', middleware.authenticate, configurationActions.getEmployeeGroupByIdAction);
 
   app.get('/api/v1/city', configurationActions.getCityListAction);
-  app.get('/api/v1/city/:cityCode/district', configurationActions.getDistrictListAction);
+  app.get('/api/v1/district', configurationActions.getDistrictListAction);
+  app.get('/api/v1/ward', configurationActions.getWardListAction);
+  app.get('/api/v1/city/:cityCode/district', configurationActions.getDistrictListByCityAction);
   app.get('/api/v1/district/:districtCode/ward', configurationActions.getWardListByDistrictAction);
 
   app.get('/api/v1/supported-cities', configurationActions.getListSupportedCityAction);

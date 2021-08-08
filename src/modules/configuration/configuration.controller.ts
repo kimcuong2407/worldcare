@@ -256,8 +256,31 @@ const getCityListAction = async (req: express.Request, res: express.Response, ne
   }
 };
 
-
 const getDistrictListAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const cities = subVN.getDistricts();
+    res.send(cities);
+  } catch (e) {
+    logger.error('getDistrictListAction', e);
+    next(e);
+  }
+};
+
+
+
+const getWardListAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const cities = subVN.getWards();
+    res.send(cities);
+  } catch (e) {
+    logger.error('getWardListAction', e);
+    next(e);
+  }
+};
+
+
+
+const getDistrictListByCityAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const cityCode = get(req.params, 'cityCode')
     const district = subVN.getDistrictsByProvinceCode(cityCode);
@@ -305,6 +328,8 @@ export default {
   fetchEmployeeGroupAction, updateEmployeeGroupAction, getEmployeeGroupByIdAction,
   getCityListAction,
   getDistrictListAction,
+  getWardListAction,
+  getDistrictListByCityAction,
   getWardListByDistrictAction,
   getListSupportedCityAction,
 };

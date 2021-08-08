@@ -167,9 +167,6 @@ const registerAction = async (req: express.Request, res: express.Response, next:
     const user = await userService.findUser({
       $or: [
         {
-          email
-        },
-        {
           phoneNumber
         }
       ]
@@ -177,7 +174,8 @@ const registerAction = async (req: express.Request, res: express.Response, next:
   if (user && user.length > 0) {
     throw new ValidationFailedError('Email hoặc số điện thoại đã được đăng ký với một tài khoản khác.');
   }
-  const auth = await authService.registerUser(phoneNumber,
+  const auth = await authService.registerUser(
+    phoneNumber,
     email,
     password,
   );
