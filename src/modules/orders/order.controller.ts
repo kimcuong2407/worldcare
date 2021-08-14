@@ -13,6 +13,7 @@ import moment from 'moment';
 import authService from '../auth/auth.service';
 import { uploadImage } from '../file/file.service';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import zalo from '@app/core/zalo';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -41,6 +42,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       companyId,
     });
     await orderService.updatePrescription(prescriptionId, get(data, 'orderNumber'));
+    await zalo.sendZaloMessage(`New order created: ${get(data, 'orderNumber')}`);
     res.send(data);
   } catch (e) {
     logger.error('createOrderAction', e);

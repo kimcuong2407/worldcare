@@ -22,7 +22,7 @@ const getPaging = (req: any) => {
   return { page, limit, offset };
 };
 
-const mapLanguage = (obj, preferLang) => {
+const mapLanguage = (obj, preferLang = 'vi') => {
  return deeply(_.mapValues)(obj,  (val: any, key) => {
   return _.get(val, preferLang, _.get(val, 'vi', val));
 });

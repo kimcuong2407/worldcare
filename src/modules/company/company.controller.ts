@@ -6,9 +6,9 @@ import { normalizeText } from 'normalize-text';
 import get from 'lodash/get';
 import lowerCase from 'lodash/lowerCase';
 import trim from 'lodash/trim';
-import { WORKING_HOURS } from './constant';
+import { ENTITY_TYPE, WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
-import { isNil, isString, isUndefined, omitBy } from 'lodash';
+import { isNil, isString, isUndefined, map, omitBy, pick } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
 import moment from 'moment';
 import authService from '../auth/auth.service';
@@ -27,6 +27,7 @@ const createCompanyAction = async (req: express.Request, res: express.Response, 
       address,
       workingHours,
       companySettings,
+      companyType,
       logo,
       photos,
       slug,
@@ -54,6 +55,7 @@ const createCompanyAction = async (req: express.Request, res: express.Response, 
       address,
       workingHours: workingHours || WORKING_HOURS,
       companySettings,
+      companyType,
       logo,
       photos,
       diseases,
@@ -198,9 +200,12 @@ const getCompanyGroupAction = async (req: express.Request, res: express.Response
 
 const getCompanyByCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const companyIdOrSlug = get(req.params, 'companyId');
-    const roles = await authService.getRolesByCompany(companyIdOrSlug);
-    res.send(roles);
+    const companyType = get(req.params, 'companyType');
+    const keyword = get(req.query, 'keyword');
+    const language: string = get(req, 'language');
+
+    const companies = await companyService.fetchCompanyByType(companyType, keyword, language);
+    res.send(map(companies, (comp) => pick(comp, ['address', 'companyId', 'name'])));
   } catch (e) {
     logger.error('getCompanyGroupAction', e);
     next(e);
