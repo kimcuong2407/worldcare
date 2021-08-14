@@ -22,6 +22,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       prescriptionId,
       addressId,
       address,
+      companyId,
     } = req.body;
     const userId = get(req, 'user.id', '');
 
@@ -37,6 +38,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       addressId,
       address,
       userId,
+      companyId,
     });
     await orderService.updatePrescription(prescriptionId, get(data, 'orderNumber'));
     res.send(data);

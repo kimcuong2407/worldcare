@@ -16,7 +16,7 @@ const OrderSchema = new Schema({
   prescriptionId: String,
   userId: String,
   customerId: String,
-  companyId: String,
+  companyId: Number,
   shippingAddressId: String,
   billingAddressId: String,
   productId: String,
