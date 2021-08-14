@@ -191,6 +191,23 @@ const isCompany = async (companyIdOrSlug: string) => {
   }
 }
 
+
+const fetchCompanyByType = async (companyType: string) => {
+
+const fetchCompany = async (companyType: string, language= 'vi') => {
+
+  const result = await CompanyCollection.paginate({
+    companyType: companyType
+  }).populate({ path: 'speciality', select: 'name', ref: 'speciality'})
+  return {
+    ...result,
+    docs: map(get(result, 'docs', []), formatCompany)
+  }
+}
+
+}
+
+
 export default {
   createCompany,
   fetchCompany,

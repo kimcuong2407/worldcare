@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import autoIncrement from 'mongoose-auto-increment';
+import { ENTITY_TYPE } from './constant';
 
 const { Schema } = mongoose;
 
@@ -18,7 +19,6 @@ const CompanyWorkingHoursSchema = new Schema({
 });
 
 const CompanySchema = new Schema({
-  __v: { type: Number, select: false },
   name: {
     type: String,
     intl: true,
@@ -30,6 +30,10 @@ const CompanySchema = new Schema({
   companyCode: {
     type: String,
     uniqe: true,
+  },
+  companyType: {
+    type: String,
+    enum: Object.values(ENTITY_TYPE),
   },
   description: {
     type: String,

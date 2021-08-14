@@ -173,6 +173,40 @@ const getAvailableCompanySlotAction = async (req: express.Request, res: express.
   }
 };
 
+
+const createCompanyUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const companyIdOrSlug = get(req.params, 'companyId');
+    const data = {};
+    res.send(data);
+  } catch (e) {
+    logger.error('getAvailableCompanySlotAction', e);
+    next(e);
+  }
+};
+
+const getCompanyGroupAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const companyIdOrSlug = get(req.params, 'companyId');
+    const roles = await authService.getRolesByCompany(companyIdOrSlug);
+    res.send(roles);
+  } catch (e) {
+    logger.error('getCompanyGroupAction', e);
+    next(e);
+  }
+};
+
+const getCompanyByCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const companyIdOrSlug = get(req.params, 'companyId');
+    const roles = await authService.getRolesByCompany(companyIdOrSlug);
+    res.send(roles);
+  } catch (e) {
+    logger.error('getCompanyGroupAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createCompanyAction,
   fetchCompanyAction,
@@ -181,4 +215,7 @@ export default {
   deleteCompanyAction,
   getSimillarCompanyInfoAction,
   getAvailableCompanySlotAction,
+  createCompanyUserAction,
+  getCompanyGroupAction,
+  getCompanyByCategoryAction,
 };

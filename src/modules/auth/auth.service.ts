@@ -1,5 +1,5 @@
 import { DEFAULT_ROLES } from './constant';
-import { makeQuery } from '@app/core/database/query';
+import makeQuery from '@app/core/database/query';
 import { UnAuthenticated } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
 import jwtUtil from '@app/utils/jwt.util';
@@ -86,8 +86,15 @@ const setupDefaultRoles = async (companyId: string) => {
   return Promise.resolve();
 }
 
+
+// Auth service
+const getRolesByCompany = async (companyId: string) => {
+  return makeQuery(RoleCollection.find({companyId}).lean());
+}
+
 export default {
   authenticate,
   registerUser,
   setupDefaultRoles,
+  getRolesByCompany,
 };

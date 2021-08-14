@@ -8,7 +8,7 @@ import S3, { ManagedUpload } from 'aws-sdk/clients/s3';
 
 const IMAGE_UPLOAD_TIMEOUT = 2 * 60 * 1000;
 
-const uploadImage = async (file: any, resourcePath: string): Promise<any> => {
+const uploadImage = async (file: any, resourcePath: string): Promise<ManagedUpload.SendData> => {
 
   if (!file) {
     throw new Error('File is empty')

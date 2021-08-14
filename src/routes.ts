@@ -11,6 +11,7 @@ import serviceRoutes from './modules/services';
 import appointmentRoutes from './modules/appointment';
 import generalRoutes from './modules/general';
 import companyRoutes from './modules/company';
+import orderRoutes from './modules/orders';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -25,4 +26,5 @@ export default (app: express.Application): void => {
   appointmentRoutes(app);
   generalRoutes(app);
   companyRoutes(app);
+  orderRoutes(app);
 };
