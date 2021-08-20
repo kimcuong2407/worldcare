@@ -155,6 +155,8 @@ const registerAction = async (req: express.Request, res: express.Response, next:
       phoneNumber,
       email,
       password,
+      firstName,
+      lastName,
     } = req.body;
 
     if (!phoneNumber) {
@@ -171,19 +173,65 @@ const registerAction = async (req: express.Request, res: express.Response, next:
         }
       ]
     });
-  if (user && user.length > 0) {
-    throw new ValidationFailedError('Email hoặc số điện thoại đã được đăng ký với một tài khoản khác.');
+    if (user && user.length > 0) {
+      throw new ValidationFailedError('Email hoặc số điện thoại đã được đăng ký với một tài khoản khác.');
+    }
+    const auth = await authService.registerUser(
+      {
+        phoneNumber,
+        email,
+        password,
+        firstName,
+        lastName,
+      }
+    );
+    res.send(auth);
+  } catch (e) {
+    logger.error('registerAction', e);
+    next(e);
   }
-  const auth = await authService.registerUser(
-    phoneNumber,
-    email,
-    password,
-  );
-  res.send(auth);
-} catch (e) {
-  logger.error('registerAction', e);
-  next(e);
-}
+};
+
+
+const changePasswordAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const {
+      currentPassword,
+      newPassword,
+    } = req.body;
+
+    const userId = req.user.id;
+
+    if (!currentPassword) {
+      throw new ValidationFailedError('Vui lòng nhập vào mật khẩu hiện tại.');
+    }
+
+    if (!newPassword) {
+      throw new ValidationFailedError('Vui lòng nhập vào mật khẩu mới.');
+    }
+    const status = await authService.changePasswordByUserId(userId, currentPassword, newPassword);
+    res.send(status);
+  } catch (e) {
+    logger.error('changePasswordAction', e);
+    next(e);
+  }
+};
+
+
+const staffLoginAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const {
+      login, password, companyCode
+    } = req.body;
+    if (!login || !password) {
+      throw new ValidationFailedError('Vui lòng nhập vào tên đăng nhập và mật khẩu.');
+    }
+    const auth = await authService.authenticate(login, password)
+    res.send(auth);
+  } catch (e) {
+    logger.error('LoginAction', e);
+    next(e);
+  }
 };
 
 export default {
@@ -195,4 +243,6 @@ export default {
   assignUserToGroupAction,
   fetchPolicyAction,
   registerAction,
+  changePasswordAction,
+  staffLoginAction,
 };

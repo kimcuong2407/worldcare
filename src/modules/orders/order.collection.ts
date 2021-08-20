@@ -3,22 +3,23 @@ import mongooseIntl from 'mongoose-intl';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import autoIncrement from 'mongoose-auto-increment';
+import AutoIncrement from 'mongoose-sequence';
+import PrescriptionCollection from './prescription.collection';
 
 const { Schema } = mongoose;
 
 
 const OrderSchema = new Schema({
   orderNumber: {
-    type: String,
+    type: Number,
     uniqe: true,
   },
-  prescriptionId: String,
+  prescriptionId: { type: Schema.Types.ObjectId, ref: 'prescription' },
   userId: String,
   customerId: String,
   companyId: Number,
-  shippingAddressId: String,
-  billingAddressId: String,
+  shippingAddressId: { type: Schema.Types.ObjectId, ref: 'user_address'},
+  billingAddressId: { type: Schema.Types.ObjectId, ref: 'user_address' },
   productId: String,
   paymentMethod: {
     type: String,
@@ -49,16 +50,41 @@ const OrderSchema = new Schema({
   deletedAt: Date,
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (doc) => {
+
+    }
+  }
 });
 
-OrderSchema.plugin(autoIncrement.plugin, {
-  model: 'order',
-  field: 'orderNumber',
-  startAt: 40005,
-  incrementBy: 1
+OrderSchema.plugin(AutoIncrement(mongoose), {
+  inc_field: 'orderNumber',
 });
 OrderSchema.index({ orderNumber: 1 }, { unique: true })
 
+OrderSchema.virtual('shippingAddress', {
+  ref: 'user_address', // the collection/model name
+  localField: 'shippingAddressId',
+  foreignField: '_id',
+  justOne: true, // default is false
+});
+
+OrderSchema.virtual('shopInfo', {
+  ref: 'company', // the collection/model name
+  localField: 'companyId',
+  foreignField: 'companyId',
+  justOne: true, // default is false
+  options: { select: 'name -_id -id -companyId', projection: { name: 1, companyId: -1, _id: -1, id: -1} },
+});
+
+OrderSchema.virtual('prescription', {
+  ref: 'prescription', // the collection/model name
+  localField: 'prescriptionId',
+  foreignField: '_id',
+  justOne: true, // default is false
+  // options: { select: 'name -_id -id -companyId', projection: { name: 1, companyId: -1, _id: -1, id: -1} },
+});
 OrderSchema.plugin(mongoosePaginate);
 OrderSchema.plugin(mongooseAggregatePaginate);
 

@@ -9,8 +9,11 @@ import isNull from 'lodash/isNull';
 import moment from 'moment';
 import { Types } from 'mongoose';
 import AppointmentCollection from '../appointment/appointment.collection';
+import authService from '../auth/auth.service';
 import SpecialityCollection from '../configuration/speciality.collection';
+import employeeService from '../employee/employee.service';
 import StaffCollection from '../staff/staff.collection';
+import userService from '../user/user.service';
 import CompanyCollection from './company.collection';
 import { CompanyModel } from './company.model';
 
@@ -197,13 +200,67 @@ const fetchCompanyByType = async (companyType: string, keyword: string, language
   const query: any = {
     companyType: toUpper(companyType),
   }
-  if(keyword) {
+  if (keyword) {
     query['$text'] = { $search: keyword }
   }
   const result = await makeQuery(CompanyCollection.find(query).sort({ name: 1 }).limit(20).lean().exec());
   return map(result || [], (doc) => formatCompany(doc, language));
 }
 
+const createCompanyUser = async (staff: any, companyId: string) => {
+  const {
+    firstName,
+    lastName,
+    address,
+    description,
+    gender,
+    title,
+    degree,
+    speciality,
+    avatar,
+    employeeHistory,
+    phoneNumber,
+    password,
+    username,
+    employeeGroup,
+    certification,
+    email,
+    roles,
+  } = staff;
+
+  const user = {
+    username,
+    phoneNumber,
+    email,
+    password,
+    companyId,
+  };
+  const createdUser = await userService.createUserAccount(user);
+  const userId = get(createdUser, '_id');
+  await authService.assignUserToGroup(userId, roles, companyId);
+
+  const staffInfo: any = {
+    firstName,
+    lastName,
+    address,
+    companyId,
+    userId: get(createdUser, '_id'),
+    fullName: (firstName && lastName ? `${firstName} ${lastName}` : null),
+    description,
+    gender,
+    phoneNumber,
+    email,
+    title: title || [],
+    degree: degree || [],
+    speciality: speciality || [],
+    employeeGroup,
+    avatar,
+    employeeHistory,
+    certification,
+  };
+
+  return await employeeService.createStaff(staffInfo);
+}
 
 export default {
   createCompany,
@@ -216,4 +273,5 @@ export default {
   findCompanyByCode,
   formatCompany,
   fetchCompanyByType,
+  createCompanyUser,
 };

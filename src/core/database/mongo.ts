@@ -19,6 +19,7 @@ const connectWithRetry = (): void => {
 };
 
 
+
 var connection = mongoose.createConnection(MONGO_URL);
  
 autoIncrement.initialize(connection);

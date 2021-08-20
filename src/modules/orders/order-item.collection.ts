@@ -2,7 +2,6 @@ import mongooseIntl from 'mongoose-intl';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import autoIncrement from 'mongoose-auto-increment';
 
 const { Schema } = mongoose;
 
@@ -11,7 +10,7 @@ const OrderItemSchema = new Schema({
     type: String,
   },
   orderNumber: {
-    type: String,
+    type: Number,
   },
   productId: String,
   productName: String,

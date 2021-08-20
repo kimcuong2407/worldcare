@@ -2,7 +2,8 @@ import mongooseIntl from 'mongoose-intl';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import autoIncrement from 'mongoose-auto-increment';
+import { getPreSignedUrl } from '@app/core/s3';
+import { get, map } from 'lodash';
 
 const { Schema } = mongoose;
 const PrescriptionSchema = new Schema({
@@ -17,6 +18,17 @@ const PrescriptionSchema = new Schema({
   note: String,
 }, {
   timestamps: true,
+  toJSON: {
+    // transform: async(doc, ret) => {
+    //   const images = await Promise.all(map(get(ret, 'images', []), (image)=> getPreSignedUrl(image)));
+    //   // console.log()
+    //   console.log(images)
+    //   return {
+    //     ...ret,
+    //     images,
+    //   }
+    // }
+  }
 });
 
 PrescriptionSchema.plugin(mongoosePaginate);

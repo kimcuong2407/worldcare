@@ -3,7 +3,6 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseIntl from 'mongoose-intl';
-import autoIncrement from 'mongoose-auto-increment';
 
 const { Schema } = mongoose;
 

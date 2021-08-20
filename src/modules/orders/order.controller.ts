@@ -7,13 +7,15 @@ import get from 'lodash/get';
 import lowerCase from 'lodash/lowerCase';
 import trim from 'lodash/trim';
 import appUtil from '@app/utils/app.util';
-import { isNil, isString, isUndefined, omitBy } from 'lodash';
+import { isNil, isString, isUndefined, map, omit, omitBy, pick } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
 import moment from 'moment';
 import authService from '../auth/auth.service';
 import { uploadImage } from '../file/file.service';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import zalo from '@app/core/zalo';
+import PrescriptionCollection from './prescription.collection';
+import { getPreSignedUrl } from '@app/core/s3';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -63,7 +65,49 @@ const createPrescriptionAction = async (req: express.Request, res: express.Respo
   }
 };
 
+const getMyOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const { page, limit } = appUtil.getPaging(req);
+
+    const result = await orderService.findOrders({userId: userId}, page, limit);
+    res.send(result);
+  } catch (e) {
+    logger.error('getMyOrderAction', e);
+    next(e);
+  }
+};
+
+const getPrescriptionDetail = async (prescriptionId: string) => {
+  const prescription: any = await PrescriptionCollection.findById(prescriptionId).lean().exec();
+  const { images } = prescription;
+  const presignedImages = await Promise.all(map(images || [], (image: string)=> getPreSignedUrl(image)));
+  return {
+    ...prescription,
+    images: presignedImages,
+  }
+}
+
+const getMyOrderDetailAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const orderNumber = get(req.params, 'orderNumber');
+
+    const result: any = await orderService.findOrderDetail({userId: userId, orderNumber: orderNumber});
+    if(result.prescriptionId) {
+      const prescription = await getPrescriptionDetail(result.prescriptionId);
+      result.prescription = pick(prescription, ['_id','images']);
+    }
+    res.send(result);
+  } catch (e) {
+    logger.error('getMyOrderDetailAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createPrescriptionAction,
   createOrderAction,
+  getMyOrderAction,
+  getMyOrderDetailAction,
 };

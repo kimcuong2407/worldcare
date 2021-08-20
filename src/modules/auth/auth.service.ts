@@ -10,6 +10,7 @@ import userService from '../user/user.service';
 import RoleCollection from './roles.collection';
 import casbin from '@app/core/casbin';
 import { ROOT_COMPANY_ID } from '@app/core/constant';
+import { Types } from 'mongoose';
 
 // Auth service
 const authenticate = async (login: string, password: string) => {
@@ -44,8 +45,25 @@ const authenticate = async (login: string, password: string) => {
 }
 
 
+const changePasswordByUserId = async (userId: string, currentPassword: string, newPassword: string) => {
+  const user = await UserCollection.findOne({ _id: Types.ObjectId(userId)}).lean().exec();
+  if(!user) {
+    throw new UnAuthenticated();
+  }
+  const isPasswordMatched = await bcryptUtil.comparePassword(currentPassword, get(user, 'password'));
+  if(!isPasswordMatched) {
+    throw new UnAuthenticated();
+  }
+  const encryptedPassword = await bcryptUtil.generateHash(newPassword);
+
+  await UserCollection.updateOne({ _id: Types.ObjectId(userId)}, {$set: { password: encryptedPassword }})
+  return true;
+}
+
+
 // Auth service
-const registerUser = async (phoneNumber: string, email: string, password: string) => {
+const registerUser = async (inputUser: any) => {
+  const { phoneNumber, password, email, firstName, lastName } = inputUser;
   const sessionId = uuidv4();
   const encryptedPassword = await bcryptUtil.generateHash(password);
     const user = {
@@ -54,6 +72,8 @@ const registerUser = async (phoneNumber: string, email: string, password: string
       email: email,
       password: encryptedPassword,
       companyId: ROOT_COMPANY_ID,
+      firstName,
+      lastName,
     };
   const createdUser = await userService.createUser(user);
   const token = jwtUtil.issueToken(get(createdUser, '_id'), sessionId);
@@ -65,6 +85,10 @@ const registerUser = async (phoneNumber: string, email: string, password: string
   }
 }
 
+
+const assignUserToGroup = async (userId: string, roles: [string], domain: string) => {
+  return Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
+}
 
 // Auth service
 const setupDefaultRoles = async (companyId: string) => {
@@ -97,4 +121,6 @@ export default {
   registerUser,
   setupDefaultRoles,
   getRolesByCompany,
+  changePasswordByUserId,
+  assignUserToGroup,
 };

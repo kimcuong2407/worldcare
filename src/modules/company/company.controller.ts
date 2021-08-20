@@ -12,6 +12,9 @@ import { isNil, isString, isUndefined, map, omitBy, pick } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
 import moment from 'moment';
 import authService from '../auth/auth.service';
+import employeeService from '../employee/employee.service';
+import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import userService from '../user/user.service';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -178,11 +181,23 @@ const getAvailableCompanySlotAction = async (req: express.Request, res: express.
 
 const createCompanyUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const companyIdOrSlug = get(req.params, 'companyId');
-    const data = {};
+    const companyId = get(req.params, 'companyId');
+
+    const {
+      firstName, lastName, username,
+    } = req.body;
+    if (!firstName || !lastName ){
+      throw new ValidationFailedError('First name and last name are required.');
+    }
+
+    const createdUser = await userService.findUser({username: username, companyId: companyId || null});
+    if(createdUser) {
+      throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
+    }
+    const data = await companyService.createCompanyUser(req.body, companyId);
     res.send(data);
   } catch (e) {
-    logger.error('getAvailableCompanySlotAction', e);
+    logger.error('createCompanyUserAction', e);
     next(e);
   }
 };

@@ -2,7 +2,7 @@ import mongooseIntl from 'mongoose-intl';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import autoIncrement from 'mongoose-auto-increment';
+import AutoIncrement from 'mongoose-sequence';
 import { ENTITY_TYPE } from './constant';
 
 const { Schema } = mongoose;
@@ -24,7 +24,7 @@ const CompanySchema = new Schema({
     intl: true,
   },
   companyId: {
-    type: String,
+    type: Number,
     uniqe: true,
   },
   companyCode: {
@@ -81,11 +81,10 @@ const CompanySchema = new Schema({
   }
 });
 
-CompanySchema.plugin(autoIncrement.plugin, {
-  model: 'company',
-  field: 'companyId',
-  startAt: 10005,
-  incrementBy: 1
+CompanySchema.plugin(AutoIncrement(mongoose), {
+  inc_field: 'companyId',
+  // startAt: 10005,
+  // incrementBy: 1
 });
 CompanySchema.index({ companyCode: 1 }, { unique: true })
 

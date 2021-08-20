@@ -13,6 +13,8 @@ const UserSchema = new Schema({
   name: {
     type: String
   },
+  firstName: String,
+  lastName: String,
   gender: Boolean,
   phoneNumber: {
     type: String,

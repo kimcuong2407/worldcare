@@ -4,6 +4,8 @@ import mongoose, { Types } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import get from 'lodash/get';
 import last from 'lodash/last';
+import addressUtil from '@app/utils/address.util';
+import { forEach, map } from 'lodash';
 
 const { Schema } = mongoose;
 
@@ -21,6 +23,11 @@ const UserAddressSchema = new Schema({
   wardId: String,
 }, {
   timestamps: true,
+  toJSON: {
+    transform: (doc, ret) => {
+      return addressUtil.formatAddressV2(ret);
+    }
+  }
 });
 
 UserAddressSchema.plugin(mongoosePaginate);

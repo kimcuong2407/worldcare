@@ -39,8 +39,8 @@ const addNewAddress = async (address: {
 
 // Auth service
 const fetchAddressesByUserId = async (userId: string) => {
-  const addresses = await makeQuery(UserAddressCollection.find({ userId: Types.ObjectId(userId) }).lean().exec());
-  return map(addresses, addressUtil.formatAddressV2);
+  const addresses = await makeQuery(UserAddressCollection.find({ userId: Types.ObjectId(userId) }).exec());
+  return addresses;
 };
 
 const updateAddress = async (userId: string, addressId: string, address: any) => {
@@ -60,6 +60,19 @@ const findUser = async (query: any) => {
   return makeQuery(UserCollection.find(query).lean().exec());
 }
 
+const createUserAccount = async (user: any) => {
+  const { phoneNumber, email, companyId, password} = user;
+  const encryptedPassword = await bcryptUtil.generateHash(password);
+    const userInfo = {
+      username: phoneNumber,
+      phoneNumber: phoneNumber,
+      email: email,
+      password: encryptedPassword,
+      companyId: companyId,
+    };
+  return createUser(userInfo);
+}
+
 const createUser = async (user: any) => {
   return makeQuery(UserCollection.create(user));
 }
@@ -70,4 +83,5 @@ export default {
   updateAddress,
   findUser,
   createUser,
+  createUserAccount,
 };

@@ -16,7 +16,7 @@ RUN npm install && \
 ############# Runner image #############
 FROM node:12.22.1-stretch-slim
 
-WORKDIR /opt/idlogiq/rpm-backend
+WORKDIR /opt/worldcare/backend
 
 COPY --from=builder /source.tmp/dist .
 
