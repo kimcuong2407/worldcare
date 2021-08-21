@@ -64,16 +64,19 @@ const assignPermissionToRoleAction = async (
   next: express.NextFunction
 ) => {
   try {
-
     const {
-      role,
       action,
       resource,
-      domain,
     } = req.body;
-
-    const policy = await casbin.enforcer.addPolicy(role, domain, resource, action);
-    res.send(policy);
+    const companyId = req.isRoot ? null : req.companyId;
+    const roleId = get(req.params, 'groupId');
+    const role = await authService.findOneRole(roleId, companyId);
+    if(!role) {
+      throw new ValidationFailedError('Không tìm thấy nhóm người dùng.');
+    }
+    await casbin.enforcer.addPolicy(...[roleId, String(get(role, 'companyId')), resource, action]);
+    await casbin.enforcer.loadPolicy();
+    return res.send(true);
   } catch (e) {
     logger.error('assignPermissionToRoleAction', e);
     next(e);
@@ -223,6 +226,7 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
     const {
       login, password, companyId
     } = req.body;
+    await casbin.enforcer.addPolicy(...['612040c0a5095a27dcb7f124','888888','company','write' ])
     if (!login || !password) {
       throw new ValidationFailedError('Vui lòng nhập vào tên đăng nhập và mật khẩu.');
     }

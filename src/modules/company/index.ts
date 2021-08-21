@@ -9,6 +9,7 @@ const companyRoutes = (app: express.Application): void => {
   app.post('/api/v1/company/:companyId/employee', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.createCompanyUserAction);
   app.get('/api/v1/company/:companyId/employee', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.getCompanyUserAction);
   app.get('/api/v1/company/:companyId/group', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.getCompanyGroupAction);
+  app.get('/api/v1/company/:companyId/group/:groupId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.getCompanyGroupDetailAction);
   app.get('/api/v1/company', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.read), companyActions.fetchCompanyAction);
   app.get('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.read),companyActions.fetchCompanyInfoAction);
   app.put('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.update), companyActions.updateCompanyInfoAction);

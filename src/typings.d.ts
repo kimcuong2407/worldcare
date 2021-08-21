@@ -1,5 +1,5 @@
-
 declare module 'casbin-mongoose-adapter';
+
 declare namespace Express {
   export interface Request {
     span?: any,
@@ -8,6 +8,7 @@ declare namespace Express {
     hospitalId?: string,
     companyId?: string,
     language?: string,
+    isRoot: boolean,
   }
 }
 declare module 'sub-vn' {

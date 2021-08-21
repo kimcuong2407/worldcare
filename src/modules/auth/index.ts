@@ -11,7 +11,8 @@ const authRoutes = (app: express.Application): void => {
   app.get('/api/v1/user-policy', middleware.authenticate, authActions.fetchPolicyAction);
   app.post('/api/v1/role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/assign-role', authActions.assignUserToGroupAction);
-  app.post('/api/v1/assign-permission', authActions.assignPermissionToRoleAction);
+  app.put('/api/v1/user-group/:groupId/assign-permission', authActions.assignPermissionToRoleAction);
+  app.put('/api/v1/user-group/:groupId/remove-permission', authActions.assignPermissionToRoleAction);
   app.post('/api/v1/authorization', authActions.authorizationAction);
   app.post('/api/v1/assign-role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/unassign-role', middleware.authenticate, authActions.createHospitalRolesAction);

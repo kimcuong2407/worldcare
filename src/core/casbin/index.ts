@@ -3,8 +3,6 @@ import path from 'path';
 
 import { newEnforcer, Model, Enforcer } from 'casbin';
 import MongooseAdapter from 'casbin-mongoose-adapter';
-
-
 import loggerHelper from '@utils/logger.util';
 
 

@@ -113,7 +113,32 @@ const setupDefaultRoles = async (companyId: string) => {
 
 // Auth service
 const getRolesByCompany = async (companyId: string) => {
-  return makeQuery(RoleCollection.find({companyId}).lean());
+  return makeQuery(RoleCollection.find({companyId}).lean().exec());
+}
+
+const findOneRole = async (roleId: string, companyId: string) => {
+  const query: any = {
+    _id: Types.ObjectId(roleId),
+  }
+  if(companyId) {
+    query.companyId = companyId;
+  }
+  return makeQuery(RoleCollection.findOne(query).lean().exec());
+}
+
+// Auth service
+const getRolesDetailByCompanyAndId = async (companyId: string, roleId: string) => {
+  const role = await makeQuery(RoleCollection.find({companyId, _id: Types.ObjectId(roleId)}).lean().exec());
+  const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, companyId);
+  const formattedPolicies = policies.filter(policy => policy[1] === companyId).map((policy) => {
+    return policy.slice(2)
+  });
+  const groupedPolicies: any = {};
+  formattedPolicies.forEach((policy) => {
+    groupedPolicies[get(policy, '0')] = groupedPolicies[get(policy, '0')] || []
+    groupedPolicies[get(policy, '0')].push(get(policy, '1'));
+  });
+  return groupedPolicies;
 }
 
 const getRolesByCompanyAndUserId = async (userId: string) => {
@@ -162,7 +187,9 @@ export default {
   registerUser,
   setupDefaultRoles,
   getRolesByCompany,
+  getRolesDetailByCompanyAndId,
   changePasswordByUserId,
   assignUserToGroup,
   staffLogin,
+  findOneRole,
 };

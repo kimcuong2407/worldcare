@@ -63,6 +63,7 @@
     "typescript": "^3.9.3"
   },
   "dependencies": {
+    "@aws-sdk/s3-request-presigner": "^3.27.0",
     "@types/cors": "^2.8.6",
     "@types/elasticsearch": "^5.0.36",
     "@types/express-http-proxy": "^1.6.1",
@@ -78,7 +79,7 @@
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",
     "casbin": "^5.11.0",
-    "casbin-mongoose-adapter": "^2.2.3",
+    "casbin-mongoose-adapter": "3.1.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

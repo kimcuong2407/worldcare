@@ -213,6 +213,19 @@ const getCompanyGroupAction = async (req: express.Request, res: express.Response
   }
 };
 
+const getCompanyGroupDetailAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const companyIdOrSlug = get(req.params, 'companyId');
+    const groupId = get(req.params, 'groupId');
+    const roles = await authService.getRolesDetailByCompanyAndId(companyIdOrSlug, groupId);
+    res.send(roles);
+  } catch (e) {
+    logger.error('getCompanyGroupDetailAction', e);
+    next(e);
+  }
+};
+
+
 const getCompanyByCategoryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const companyType = get(req.params, 'companyType');
@@ -254,4 +267,5 @@ export default {
   getCompanyUserAction,
   getCompanyGroupAction,
   getCompanyByCategoryAction,
+  getCompanyGroupDetailAction,
 };

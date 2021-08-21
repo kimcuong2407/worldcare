@@ -8,6 +8,7 @@ import jwtUtil from '@app/utils/jwt.util';
 import { ForbiddenError, UnauthorizedError } from '../types/ErrorTypes';
 import casbin from '../casbin';
 import { Enforcer } from 'casbin';
+import { ROOT_COMPANY_ID } from '../constant';
 
 const logger = loggerHelper.getLogger('middleware.authorization');
 
@@ -30,6 +31,8 @@ const authorizationMiddleware = (resource: string, action: string) => async (req
     if (!isPermitted) {
       throw new ForbiddenError();
     }
+    req.isRoot = req.companyId === ROOT_COMPANY_ID;
+    req.companyId = companyId;
     req.token = token;
     req.user = {
       id: get(user, 'id'),
