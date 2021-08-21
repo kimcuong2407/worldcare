@@ -13,7 +13,7 @@ const RoleSchema = new Schema({
     type: String,
   },
   companyId: {
-    type: String,
+    type: Number,
   },
 }, {
   timestamps: true,

@@ -61,14 +61,15 @@ const findUser = async (query: any) => {
 }
 
 const createUserAccount = async (user: any) => {
-  const { phoneNumber, email, companyId, password} = user;
+  const { username, phoneNumber, email, companyId, password, groups} = user;
   const encryptedPassword = await bcryptUtil.generateHash(password);
     const userInfo = {
-      username: phoneNumber,
+      username: username || phoneNumber,
       phoneNumber: phoneNumber,
       email: email,
       password: encryptedPassword,
       companyId: companyId,
+      groups,
     };
   return createUser(userInfo);
 }

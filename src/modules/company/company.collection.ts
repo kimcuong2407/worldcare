@@ -23,10 +23,6 @@ const CompanySchema = new Schema({
     type: String,
     intl: true,
   },
-  companyId: {
-    type: Number,
-    uniqe: true,
-  },
   companyCode: {
     type: String,
     uniqe: true,
@@ -75,6 +71,7 @@ const CompanySchema = new Schema({
   },
   deletedAt: Date,
 }, {
+  _id: false,
   timestamps: true,
   toJSON: {
     virtuals: true,
@@ -82,7 +79,8 @@ const CompanySchema = new Schema({
 });
 
 CompanySchema.plugin(AutoIncrement(mongoose), {
-  inc_field: 'companyId',
+  inc_field: '_id',
+  id: 'company_id',
   // startAt: 10005,
   // incrementBy: 1
 });

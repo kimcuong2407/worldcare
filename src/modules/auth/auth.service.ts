@@ -1,6 +1,6 @@
 import { DEFAULT_ROLES } from './constant';
 import makeQuery from '@app/core/database/query';
-import { UnAuthenticated } from '@app/core/types/ErrorTypes';
+import { UnAuthenticated, UnauthorizedError } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
 import jwtUtil from '@app/utils/jwt.util';
 import { get } from 'lodash';
@@ -116,6 +116,47 @@ const getRolesByCompany = async (companyId: string) => {
   return makeQuery(RoleCollection.find({companyId}).lean());
 }
 
+const getRolesByCompanyAndUserId = async (userId: string) => {
+  return casbin.enforcer.getRolesForUser(String(userId));
+}
+
+// Auth service
+const staffLogin = async (login: string, password: string, companyId: Number) => {
+
+  const sessionId = uuidv4();
+  const query: any = {
+    $or: [
+      {
+        username: login
+      }
+    ],
+  };
+  if(companyId) {
+    query.companyId = companyId;
+  }
+  const user = await UserCollection.findOne(query).lean().exec();
+  if(!user) {
+    throw new UnAuthenticated();
+  }
+  const isPasswordMatched = await bcryptUtil.comparePassword(password, get(user, 'password'));
+  if(!isPasswordMatched) {
+    throw new UnAuthenticated();
+  }
+  const userCompany = get(user, 'companyId');
+  const groups = await getRolesByCompanyAndUserId(get(user,'_id'));
+  if (!groups || groups.length < 1) {
+    throw new UnauthorizedError('Bạn không có quyền truy cập vào trang này.');
+  }
+
+  const token = jwtUtil.issueToken(get(user, '_id'), sessionId);
+
+  return {
+    userId: get(user, '_id'),
+    sessionId,
+    token,
+    companyId: userCompany,
+  }
+}
 export default {
   authenticate,
   registerUser,
@@ -123,4 +164,5 @@ export default {
   getRolesByCompany,
   changePasswordByUserId,
   assignUserToGroup,
+  staffLogin,
 };

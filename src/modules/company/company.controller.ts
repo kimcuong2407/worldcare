@@ -67,7 +67,7 @@ const createCompanyAction = async (req: express.Request, res: express.Response, 
         isString(name) ? name : get(name, 'vi', ''))))),
     };
     const data = await companyService.createCompany(companyInfo);
-    await authService.setupDefaultRoles(get(data, 'companyId'));
+    await authService.setupDefaultRoles(get(data, '_id'));
     res.send(data);
   } catch (e) {
     logger.error('createCompanyAction', e);
@@ -191,7 +191,7 @@ const createCompanyUserAction = async (req: express.Request, res: express.Respon
     }
 
     const createdUser = await userService.findUser({username: username, companyId: companyId || null});
-    if(createdUser) {
+    if(createdUser && createdUser.length > 0) {
       throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
     }
     const data = await companyService.createCompanyUser(req.body, companyId);
@@ -227,6 +227,21 @@ const getCompanyByCategoryAction = async (req: express.Request, res: express.Res
   }
 };
 
+const getCompanyUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const options = appUtil.getPaging(req);
+    const companyId = get(req.params, 'companyId');
+    const keyword = get(req.query, 'keyword');
+    const language: string = get(req, 'language');
+
+    const users = await companyService.getCompanyUsers(companyId, options);
+    res.send(users);
+  } catch (e) {
+    logger.error('getCompanyGroupAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createCompanyAction,
   fetchCompanyAction,
@@ -236,6 +251,7 @@ export default {
   getSimillarCompanyInfoAction,
   getAvailableCompanySlotAction,
   createCompanyUserAction,
+  getCompanyUserAction,
   getCompanyGroupAction,
   getCompanyByCategoryAction,
 };

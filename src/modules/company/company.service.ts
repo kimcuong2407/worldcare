@@ -175,7 +175,7 @@ const deleteCompany = async (companyId: string) => {
 };
 
 const findCompanyByCode = async (companyCode: string) => {
-  return CompanyCollection.exists({
+  return CompanyCollection.findOne({
     companyCode: companyCode
   });
 }
@@ -225,7 +225,7 @@ const createCompanyUser = async (staff: any, companyId: string) => {
     employeeGroup,
     certification,
     email,
-    roles,
+    groups,
   } = staff;
 
   const user = {
@@ -234,10 +234,11 @@ const createCompanyUser = async (staff: any, companyId: string) => {
     email,
     password,
     companyId,
+    groups,
   };
   const createdUser = await userService.createUserAccount(user);
   const userId = get(createdUser, '_id');
-  await authService.assignUserToGroup(userId, roles, companyId);
+  await authService.assignUserToGroup(userId, groups || [], companyId);
 
   const staffInfo: any = {
     firstName,
@@ -262,6 +263,10 @@ const createCompanyUser = async (staff: any, companyId: string) => {
   return await employeeService.createStaff(staffInfo);
 }
 
+const getCompanyUsers = async (companyId: string, options: any) => {
+  return employeeService.getEmployeeByCompanyId(companyId, options)
+}
+
 export default {
   createCompany,
   fetchCompany,
@@ -274,4 +279,5 @@ export default {
   formatCompany,
   fetchCompanyByType,
   createCompanyUser,
+  getCompanyUsers,
 };

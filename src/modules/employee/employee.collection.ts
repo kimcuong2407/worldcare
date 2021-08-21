@@ -2,8 +2,9 @@
 /* eslint-disable func-names */
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import mongooseIntl from 'mongoose-intl';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
+import addressUtil from '@app/utils/address.util';
 
 const { Schema } = mongoose;
 
@@ -14,19 +15,18 @@ const EmployeeSchema = new Schema({
   lastName: {
     type: String
   },
-  userId: String,
+  userId: { type: Schema.Types.ObjectId, ref: 'user' },
   fullName: String,
   companyId: String,
   employeeNumber: Number,
   description: {
     type: String,
-    intl: true
   },
   address: {
     street: String,
-    ward: String,
-    district: String,
-    city: String,
+    wardId: String,
+    districtId: String,
+    cityId: String,
   },
   gender: String,
   phoneNumber: String,
@@ -59,6 +59,15 @@ const EmployeeSchema = new Schema({
   ]
 }, {
   timestamps: true,
+  toJSON: {
+    transform: (doc, ret) => {
+      const {address, ...rest} = ret;
+      return {
+        ...ret,
+        address: addressUtil.formatAddressV2(ret),
+      };
+    },
+  }
 });
 
 EmployeeSchema.plugin(AutoIncrement(mongoose), {
@@ -70,6 +79,7 @@ EmployeeSchema.plugin(AutoIncrement(mongoose), {
 });
 
 EmployeeSchema.plugin(mongoosePaginate);
+EmployeeSchema.plugin(mongooseAggregatePaginate);
 
 const EmployeeCollection = mongoose.model('employee', EmployeeSchema, 'employee');
 

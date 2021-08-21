@@ -6,6 +6,7 @@ import { setResponse } from '@app/utils/response.util';
 import casbin from '@app/core/casbin';
 import { get, groupBy, map } from 'lodash';
 import userService from '../user/user.service';
+import companyService from '../company/company.service';
 
 const logger = loggerHelper.getLogger('server.controller');
 
@@ -34,8 +35,8 @@ const fetchHospitalRolesAction = async (
   try {
     const userId = get(req.user, 'id');
     const companyId: string = get(req, 'companyId');
-
-    const roles = await casbin.enforcer.getFilteredGroupingPolicy(userId, companyId);
+    console.log(userId)
+    const roles = await casbin.enforcer.getRolesForUser(userId, companyId);
     res.send(roles);
   } catch (e) {
     logger.error('fetchHospitalRolesAction', e);
@@ -131,7 +132,6 @@ const fetchPolicyAction = async (
     const userId = get(req.user, 'id');
     const companyId: string = get(req, 'companyId');
 
-    await casbin.enforcer.addRoleForUser(userId, 'admin', companyId);
     const policies = await casbin.enforcer.getImplicitPermissionsForUser(userId);
     const formattedPolicies = policies.filter(policy => policy[1] === companyId).map((policy) => {
       return policy.slice(2)
@@ -221,12 +221,12 @@ const changePasswordAction = async (req: express.Request, res: express.Response,
 const staffLoginAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
-      login, password, companyCode
+      login, password, companyId
     } = req.body;
     if (!login || !password) {
       throw new ValidationFailedError('Vui lòng nhập vào tên đăng nhập và mật khẩu.');
     }
-    const auth = await authService.authenticate(login, password)
+    const auth = await authService.staffLogin(login, password, companyId)
     res.send(auth);
   } catch (e) {
     logger.error('LoginAction', e);

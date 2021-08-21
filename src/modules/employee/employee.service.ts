@@ -133,10 +133,95 @@ const deleteStaff = async (staffId: string) => {
   return true;
 };
 
+
+const getEmployeeByCompanyId = async(companyId: string, options: any) => {
+  const aggregation: any = [
+    {
+      '$match': {
+        'companyId': '1000023'
+      }
+    }, {
+      '$lookup': {
+        'from': 'user', 
+        'let': {
+          'userId': '$userId'
+        }, 
+        'pipeline': [
+          {
+            '$match': {
+              '$expr': {
+                '$eq': [
+                  '$_id', '$$userId'
+                ]
+              }
+            }
+          }, {
+            '$project': {
+              'username': 1, 
+              'groups': 1
+            }
+          }
+        ], 
+        'as': 'user'
+      }
+    }, {
+      '$addFields': {
+        'user': {
+          '$arrayElemAt': [
+            '$user', 0
+          ]
+        }
+      }
+    }, {
+      '$addFields': {
+        'username': '$user.username', 
+        'groups': '$user.groups'
+      }
+    }, {
+      '$lookup': {
+        'from': 'role', 
+        'let': {
+          'groups': '$groups'
+        }, 
+        'pipeline': [
+          {
+            '$match': {
+              '$expr': {
+                '$in': [
+                  '$_id', '$$groups'
+                ]
+              }
+            }
+          }, {
+            '$project': {
+              'name': 1
+            }
+          }
+        ], 
+        'as': 'groups'
+      }
+    }, {
+      '$unset': [
+        'user'
+      ]
+    }
+  ];
+
+  const employees = await EmployeeCollection.aggregatePaginate(EmployeeCollection.aggregate(aggregation), {
+    ...options
+  });
+  const { docs, ...rest } = employees;
+  return {
+    ...rest,
+    docs: map(docs || [], ({ address, ...rest}) => ({...rest, address: addressUtil.formatAddressV2(address)}))
+  };
+}
+
 export default {
   createStaff,
   fetchStaff,
   getStaffInfo,
   updateStaffInfo,
   deleteStaff,
+  getEmployeeByCompanyId,
 };
