@@ -84,9 +84,11 @@ const fetchCompanyAction = async (req: express.Request, res: express.Response, n
     const specialityId: string = get(req.query, 'specialityId');
     const city: string = get(req.query, 'city');
     const companyId: string = get(req.query, 'companyId');
+    const companyType: string = get(req.query, 'companyType');
+    
     const language: string = get(req, 'language');
     const keyword = get(req, 'query.keyword', '');
-    const data = await companyService.fetchCompany({specialityId, keyword, options, city, companyId}, language);
+    const data = await companyService.fetchCompany({specialityId, keyword, options, city, companyId, companyType}, language);
     res.send(data);
   } catch (e) {
     logger.error('fetchCompanyInfoAction', e);
@@ -98,7 +100,7 @@ const fetchCompanyInfoAction = async (req: express.Request, res: express.Respons
   try {
     const companyIdOrSlug = get(req.params, 'companyId');
     const language: string = get(req, 'language');
-    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const raw: boolean = !isUndefined(get(req.query, 'isRaw'));
     const data = await companyService.fetchCompanyInfo(companyIdOrSlug, language, raw);
     res.send(data);
   } catch (e) {
@@ -111,8 +113,17 @@ const updateCompanyInfoAction = async (req: express.Request, res: express.Respon
   try {
     const companyId = get(req.params, 'companyId');
     const {
-      name, description, email, phoneNumber,
-      speciality, address, workingHours, companySettings, logo, photos, slug,
+      name,
+      description,
+      email,
+      phoneNumber,
+      speciality,
+      address,
+      workingHours,
+      companySettings,
+      logo,
+      photos,
+      slug,
       diseases,
       services,
     } = req.body;

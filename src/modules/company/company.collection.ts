@@ -9,8 +9,12 @@ const { Schema } = mongoose;
 
 const CompanyWorkingHoursSchema = new Schema({
   isOpen: Boolean,
-  startTime: String,
-  endTime: String,
+  openingHours: [
+    {
+      startTime: String,
+      endTime: String,
+    }
+  ]
 }, {
   id: false,
   toJSON: {
@@ -53,12 +57,12 @@ const CompanySchema = new Schema({
   speciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   address: {
     street: String,
-    ward: String,
-    district: String,
-    city: String,
+    wardId: String,
+    districtId: String,
+    cityId: String,
   },
   workingHours: [Object],
-  hospitalSettings: {
+  companySettings: {
     slotTime: Number,
     capacityPerSlot: Number,
   },

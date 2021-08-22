@@ -7,6 +7,7 @@ import casbin from '@app/core/casbin';
 import { get, groupBy, map } from 'lodash';
 import userService from '../user/user.service';
 import companyService from '../company/company.service';
+import { ACTIONS, RESOURCES } from '@app/core/permissions';
 
 const logger = loggerHelper.getLogger('server.controller');
 
@@ -79,6 +80,32 @@ const assignPermissionToRoleAction = async (
     return res.send(true);
   } catch (e) {
     logger.error('assignPermissionToRoleAction', e);
+    next(e);
+  }
+};
+
+
+const removePermissionToRoleAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const {
+      action,
+      resource,
+    } = req.body;
+    const companyId = req.isRoot ? null : req.companyId;
+    const roleId = get(req.params, 'groupId');
+    const role = await authService.findOneRole(roleId, companyId);
+    if(!role) {
+      throw new ValidationFailedError('Không tìm thấy nhóm người dùng.');
+    }
+    await casbin.enforcer.removePolicy(...[roleId, String(get(role, 'companyId')), resource, action]);
+    await casbin.enforcer.loadPolicy();
+    return res.send(true);
+  } catch (e) {
+    logger.error('removePermissionToRoleAction', e);
     next(e);
   }
 };
@@ -238,6 +265,20 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
   }
 };
 
+
+const getResourcePermissionAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+
+    res.send({
+      resources: RESOURCES,
+      actions: ACTIONS,
+    });
+  } catch (e) {
+    logger.error('getResourcePermissionAction', e);
+    next(e);
+  }
+};
+
 export default {
   loginAction,
   fetchHospitalRolesAction,
@@ -249,4 +290,6 @@ export default {
   registerAction,
   changePasswordAction,
   staffLoginAction,
+  getResourcePermissionAction,
+  removePermissionToRoleAction,
 };

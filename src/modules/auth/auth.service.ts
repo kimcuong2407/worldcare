@@ -128,7 +128,7 @@ const findOneRole = async (roleId: string, companyId: string) => {
 
 // Auth service
 const getRolesDetailByCompanyAndId = async (companyId: string, roleId: string) => {
-  const role = await makeQuery(RoleCollection.find({companyId, _id: Types.ObjectId(roleId)}).lean().exec());
+  const role = await makeQuery(RoleCollection.findOne({companyId, _id: Types.ObjectId(roleId)}).lean().exec());
   const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, companyId);
   const formattedPolicies = policies.filter(policy => policy[1] === companyId).map((policy) => {
     return policy.slice(2)
@@ -138,7 +138,10 @@ const getRolesDetailByCompanyAndId = async (companyId: string, roleId: string) =
     groupedPolicies[get(policy, '0')] = groupedPolicies[get(policy, '0')] || []
     groupedPolicies[get(policy, '0')].push(get(policy, '1'));
   });
-  return groupedPolicies;
+  return {
+    ...role,
+    policies: groupedPolicies,
+  };
 }
 
 const getRolesByCompanyAndUserId = async (userId: string) => {

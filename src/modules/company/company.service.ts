@@ -63,7 +63,7 @@ const fetchCompany = async (params: any, language = 'vi') => {
   SpecialityCollection.setDefaultLanguage(language);
 
   const {
-    specialityId, keyword, options, city, companyId,
+    specialityId, keyword, options, city, companyId, companyType,
   } = params;
   const query: any = {
     deletedAt: null,
@@ -83,6 +83,9 @@ const fetchCompany = async (params: any, language = 'vi') => {
   if (city) {
     query['address.city'] = city;
   }
+  if(companyType) {
+    query['companyType'] = companyType;
+  }
   const aggregate = CompanyCollection.aggregate([
     {
       $match: query
@@ -91,33 +94,28 @@ const fetchCompany = async (params: any, language = 'vi') => {
 
   const result = await CompanyCollection.aggregatePaginate(aggregate, { ...options });
 
-  const data = await CompanyCollection.find({
-    _id: { $in: map(result.docs, '_id') }
-  }).populate({ path: 'speciality', select: 'name', ref: 'speciality' })
-
+  // const data = await CompanyCollection.find({
+  //   _id: { $in: map(result.docs, '_id') }
+  // }).populate({ path: 'speciality', select: 'name', ref: 'speciality' })
+  const { docs, ...rest } = result;
   return {
-    ...result,
-    docs: map(data, (doc) => formatCompany(doc, language))
-  }
+    ...rest,
+    docs: map(docs, (doc) => formatCompany(doc, language)),
+  };
 }
 
 const fetchCompanyInfo = async (companyIdOrSlug: string, language = 'vi', isRaw = false) => {
   let company = null;
-  let query: any = { slug: companyIdOrSlug };
-  if (Types.ObjectId.isValid(companyIdOrSlug)) {
-    query = { _id: Types.ObjectId(companyIdOrSlug) };
-  }
+  let query: any = { $or: [{_id: companyIdOrSlug},{ slug: companyIdOrSlug }] };
 
   if (isRaw) {
     return CompanyCollection.findOne(query).lean();
   }
 
-  CompanyCollection.setDefaultLanguage(language);
-  SpecialityCollection.setDefaultLanguage(language);
-  company = await CompanyCollection.findOne(query).populate('speciality', 'name');
+  company = await CompanyCollection.findOne(query).populate('speciality', 'name').lean();
   const doctor = await StaffCollection.findOne({ company: get(company, '_id') });
 
-  const formatted = formatCompany(company);
+  const formatted = formatCompany(company, language);
   return {
     ...formatted,
     doctor: doctor,
