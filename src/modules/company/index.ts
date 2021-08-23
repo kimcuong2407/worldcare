@@ -12,7 +12,7 @@ const companyRoutes = (app: express.Application): void => {
   app.get('/api/v1/company/:companyId/group/:groupId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.getCompanyGroupDetailAction);
   app.get('/api/v1/company', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.read), companyActions.fetchCompanyAction);
   app.get('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.read),companyActions.fetchCompanyInfoAction);
-  app.put('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.update), companyActions.updateCompanyInfoAction);
+  app.put('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), companyActions.updateCompanyInfoAction);
   app.delete('/api/v1/company/:companyId', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.delete), companyActions.deleteCompanyAction);
 };
 

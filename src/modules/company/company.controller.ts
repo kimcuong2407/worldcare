@@ -100,7 +100,7 @@ const fetchCompanyInfoAction = async (req: express.Request, res: express.Respons
   try {
     const companyIdOrSlug = get(req.params, 'companyId');
     const language: string = get(req, 'language');
-    const raw: boolean = !isUndefined(get(req.query, 'isRaw'));
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const data = await companyService.fetchCompanyInfo(companyIdOrSlug, language, raw);
     res.send(data);
   } catch (e) {
