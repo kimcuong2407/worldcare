@@ -50,7 +50,7 @@ const createCompany = async (companyInfo: CompanyModel, language = 'vi') => {
 
 const formatCompany = (company: any, preferLang = 'vi') => {
   // company = company.toJSON();
-  const address = addressUtil.formatAddress(get(company, 'address'));
+  const address = addressUtil.formatAddressV2(get(company, 'address'));
   return {
     ...appUtil.mapLanguage(company, preferLang),
     address,
