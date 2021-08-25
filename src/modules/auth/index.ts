@@ -1,3 +1,4 @@
+import { ACTIONS, CORE_ACTIONS, CORE_RESOURCES } from './../../core/permissions/index';
 import middleware from '@app/core/middleware';
 import express from 'express';
 import authActions from './auth.controller';
@@ -10,9 +11,31 @@ const authRoutes = (app: express.Application): void => {
   app.get('/api/v1/role', middleware.authenticate, authActions.fetchHospitalRolesAction);
   app.get('/api/v1/resource-permission', middleware.authenticate, authActions.getResourcePermissionAction);
   app.get('/api/v1/user-policy', middleware.authenticate, authActions.fetchPolicyAction);
-  app.post('/api/v1/role', middleware.authenticate, authActions.createHospitalRolesAction);
+  // app.post('/api/v1/role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/assign-role', authActions.assignUserToGroupAction);
   app.put('/api/v1/user-group/:groupId/permission', authActions.assignPermissionToRoleAction);
+
+  app.post('/api/v1/user-group',
+    middleware.authorization([
+      [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
+      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+    ]),
+    authActions.createUserGroupAction);
+
+  app.put('/api/v1/user-group/:groupId',
+    middleware.authorization([
+      [CORE_RESOURCES.userGroup, CORE_ACTIONS.update],
+      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+    ]),
+    authActions.updateUserGroupAction);
+
+  app.delete('/api/v1/user-group/:groupId',
+    middleware.authorization([
+      [CORE_RESOURCES.userGroup, CORE_ACTIONS.delete],
+      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+    ]),
+    authActions.deleteUserGroupAction);
+
   app.delete('/api/v1/user-group/:groupId/permission', authActions.removePermissionToRoleAction);
   app.post('/api/v1/authorization', authActions.authorizationAction);
   app.post('/api/v1/assign-role', middleware.authenticate, authActions.createHospitalRolesAction);

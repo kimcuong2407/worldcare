@@ -3,7 +3,7 @@ import makeQuery from '@app/core/database/query';
 import { UnAuthenticated, UnauthorizedError } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
 import jwtUtil from '@app/utils/jwt.util';
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from '../user/user.collection';
 import userService from '../user/user.service';
@@ -90,7 +90,29 @@ const assignUserToGroup = async (userId: string, roles: [string], domain: string
   return Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
 }
 
-// Auth service
+const createRole = async (companyId: string, roleName: string, description: string) => {
+  return makeQuery(RoleCollection.create({
+    name: roleName,
+    companyId,
+    description,
+  }));
+}
+
+const updateRole = async (roleId: string, name: string, description: string) => {
+  const query: any = {
+    _id: Types.ObjectId(roleId),
+  }
+  return makeQuery(RoleCollection.findOneAndUpdate(query, {$set: { name, description }}).exec());
+}
+
+const removeRole = async (roleId: string, companyId: string) => {
+  await makeQuery(RoleCollection.findByIdAndDelete(roleId).exec());
+  console.log(companyId)
+  await casbin.enforcer.deleteRole(roleId);
+  // await casbin.enforcer.removeNamedGroupingPolicy('g', ...[roleId, companyId]);
+}
+
+
 const setupDefaultRoles = async (companyId: string) => {
   await Promise.all(DEFAULT_ROLES.map( async role => {
     const { name, permissions, } = role;
@@ -195,4 +217,7 @@ export default {
   assignUserToGroup,
   staffLogin,
   findOneRole,
+  createRole,
+  updateRole,
+  removeRole,
 };

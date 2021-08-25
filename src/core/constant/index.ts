@@ -6,4 +6,4 @@ export const MEDICAL_SERVICE = {
   'MEDICAL_TEST': 'MEDICAL_TEST'
 }
 
-export const ROOT_COMPANY_ID = '888888'
+export const ROOT_COMPANY_ID = 888888;

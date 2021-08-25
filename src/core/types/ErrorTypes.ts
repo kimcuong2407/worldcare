@@ -47,7 +47,7 @@ export class UnAuthenticated extends ErrorBase {
 export class NotFoundError extends ErrorBase {
   constructor(msg?: string, code?: string, httpCode?: number, type?: string, additionalProperties?: any) {
     super(
-      msg || 'Item not found',
+      msg || 'Dữ liệu không tồn tại.',
       type || 'not_found',
       code || 'not_found',
       httpCode || 404,

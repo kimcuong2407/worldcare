@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import loggerHelper from '@utils/logger.util';
 import express from 'express';
-import { get } from 'lodash';
+import { find, get, map, reduce } from 'lodash';
 import jsonwebtoken from 'jsonwebtoken';
 import authService from '@modules/auth/auth.service';
 import jwtUtil from '@app/utils/jwt.util';
@@ -12,7 +12,7 @@ import { ROOT_COMPANY_ID } from '../constant';
 
 const logger = loggerHelper.getLogger('middleware.authorization');
 
-const authorizationMiddleware = (resource: string, action: string) => async (req: express.Request,
+const authorizationMiddleware = (rules: Array<[string, string]>) => async (req: express.Request,
   res: express.Response,
   next: express.NextFunction) => {
   const token: string = get(req, 'headers.authorization');
@@ -26,13 +26,16 @@ const authorizationMiddleware = (resource: string, action: string) => async (req
       throw new UnauthorizedError();
     }
 
-    const isPermitted = await casbin.enforcer.enforce(get(user, 'id'), companyId, resource, action);
-
+    const isEnforced = await Promise.all(map(rules, rule => {
+      return casbin.enforcer.enforce(get(user, 'id'), companyId, rule[0], rule[1]);
+    }));
+    const isPermitted = find(isEnforced, (val) => val == true);
     if (!isPermitted) {
       throw new ForbiddenError();
     }
-    req.isRoot = req.companyId === ROOT_COMPANY_ID;
     req.companyId = companyId;
+
+    req.isRoot = Number(companyId) === ROOT_COMPANY_ID;
     req.token = token;
     req.user = {
       id: get(user, 'id'),

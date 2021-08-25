@@ -1,7 +1,7 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
 import authService from './auth.service';
-import { InternalServerError, ValidationFailedError } from '@app/core/types/ErrorTypes';
+import { InternalServerError, NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { setResponse } from '@app/utils/response.util';
 import casbin from '@app/core/casbin';
 import { get, groupBy, map } from 'lodash';
@@ -278,6 +278,79 @@ const getResourcePermissionAction = async (req: express.Request, res: express.Re
     next(e);
   }
 };
+const createUserGroupAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    let entityId = req.companyId;
+    const { name, description, companyId } = req.body;
+    console.log(req.isRoot)
+    if(req.isRoot) {
+      entityId = companyId || entityId;
+    }
+
+    const role = await authService.createRole(entityId, name, description);
+    res.send(role);
+  } catch (e) {
+    logger.error('createUserGroupAction', e);
+    next(e);
+  }
+};
+
+const updateUserGroupAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    let entityId = req.companyId;
+    const { groupId } = req.params;
+    const { name, description } = req.body;
+
+    if(req.isRoot) {
+      entityId = null;
+    }
+    const role = await authService.findOneRole(groupId, entityId);
+    if (!role) {
+      throw new NotFoundError()
+    }
+
+    const newRole = await authService.updateRole(groupId, name, description);
+    res.send(setResponse(newRole, true));
+  } catch (e) {
+    logger.error('updateUserGroupAction', e);
+    next(e);
+  }
+};
+
+
+const deleteUserGroupAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    let entityId = req.companyId;
+    const { groupId } = req.params;
+    const { name, description } = req.body;
+
+    if(req.isRoot) {
+      entityId = null;
+    }
+    const role = await authService.findOneRole(groupId, entityId);
+    if (!role) {
+      throw new NotFoundError()
+    }
+
+    await authService.removeRole(groupId, get(role, 'companyId'));
+    res.send(setResponse(null, true));
+  } catch (e) {
+    logger.error('updateUserGroupAction', e);
+    next(e);
+  }
+};
 
 export default {
   loginAction,
@@ -292,4 +365,7 @@ export default {
   staffLoginAction,
   getResourcePermissionAction,
   removePermissionToRoleAction,
+  createUserGroupAction,
+  updateUserGroupAction,
+  deleteUserGroupAction,
 };

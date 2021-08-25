@@ -15,6 +15,7 @@ const RoleSchema = new Schema({
   companyId: {
     type: Number,
   },
+  deletedAt: Date,
 }, {
   timestamps: true,
 });
