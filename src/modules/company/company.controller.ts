@@ -258,7 +258,7 @@ const getCompanyUserAction = async (req: express.Request, res: express.Response,
     const keyword = get(req.query, 'keyword');
     const language: string = get(req, 'language');
 
-    const users = await companyService.getCompanyUsers(companyId, options);
+    const users = await companyService.getCompanyUsers(Number(companyId), options);
     res.send(users);
   } catch (e) {
     logger.error('getCompanyGroupAction', e);

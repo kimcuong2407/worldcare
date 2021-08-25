@@ -261,7 +261,7 @@ const createCompanyUser = async (staff: any, companyId: string) => {
   return await employeeService.createStaff(staffInfo);
 }
 
-const getCompanyUsers = async (companyId: string, options: any) => {
+const getCompanyUsers = async (companyId: number, options: any) => {
   return employeeService.getEmployeeByCompanyId(companyId, options)
 }
 

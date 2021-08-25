@@ -134,11 +134,11 @@ const deleteStaff = async (staffId: string) => {
 };
 
 
-const getEmployeeByCompanyId = async(companyId: string, options: any) => {
+const getEmployeeByCompanyId = async(companyId: number, options: any) => {
   const aggregation: any = [
     {
       '$match': {
-        'companyId': '1000023'
+        'companyId': Number(companyId)
       }
     }, {
       '$lookup': {
