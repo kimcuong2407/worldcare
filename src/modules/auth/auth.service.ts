@@ -161,9 +161,9 @@ const getRolesDetailByCompanyAndId = async (roleId: string, branchId: string) =>
     query.branchId = branchId;
   }
   const role = await makeQuery(RoleCollection.findOne(query).lean().exec());
-  const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, branchId);
-  const formattedPolicies = policies.filter(policy => policy[1] === branchId).map((policy) => {
-    return policy.slice(2)
+  const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, String(get(role, 'branchId')));
+  const formattedPolicies = policies.filter(policy => policy[1] === String(get(role, 'branchId'))).map((policy) => {
+    return policy.slice(2);
   });
   const groupedPolicies: any = {};
   formattedPolicies.forEach((policy) => {

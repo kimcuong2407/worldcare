@@ -13,7 +13,7 @@ export const DEFAULT_ROLES = [
         action: Object.values(CORE_ACTIONS)
       },
       {
-        resource: CORE_RESOURCES.user,
+        resource: CORE_RESOURCES.employee,
         action: Object.values(CORE_ACTIONS)
       }
     ]
