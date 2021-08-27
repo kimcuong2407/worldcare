@@ -107,7 +107,7 @@ const updateRole = async (roleId: string, name: string, description: string) => 
   const query: any = {
     _id: Types.ObjectId(roleId),
   }
-  return makeQuery(RoleCollection.findOneAndUpdate(query, {$set: { name, description }}).exec());
+  return makeQuery(RoleCollection.findOneAndUpdate(query, {$set: { name, description }}, { new: true}).exec());
 }
 
 const removeRole = async (roleId: string, branchId: string) => {
@@ -153,8 +153,14 @@ const findOneRole = async (roleId: string, branchId: string) => {
 }
 
 // Auth service
-const getRolesDetailByCompanyAndId = async (branchId: string, roleId: string) => {
-  const role = await makeQuery(RoleCollection.findOne({branchId, _id: Types.ObjectId(roleId)}).lean().exec());
+const getRolesDetailByCompanyAndId = async (roleId: string, branchId: string) => {
+  const query: any = {
+    _id: Types.ObjectId(roleId)
+  };
+  if(branchId) {
+    query.branchId = branchId;
+  }
+  const role = await makeQuery(RoleCollection.findOne(query).lean().exec());
   const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, branchId);
   const formattedPolicies = policies.filter(policy => policy[1] === branchId).map((policy) => {
     return policy.slice(2)

@@ -199,14 +199,63 @@ const isBranch = async (branchIdOrSlug: string) => {
 
 
 const fetchBranchByType = async (branchType: string, keyword: string, language = 'vi') => {
+  let aggs: any[] = [];
   const query: any = {
-    branchType: toUpper(branchType),
   }
   if (keyword) {
     query['$text'] = { $search: keyword }
   }
-  const result = await makeQuery(BranchCollection.find(query).sort({ name: 1 }).limit(20).lean().exec());
-  return map(result || [], (doc) => formatBranch(doc, language));
+  aggs.push({
+    $match: query
+  });
+
+  aggs = aggs.concat([
+    {
+      '$lookup': {
+        'from': 'partner', 
+        'localField': 'partnerId', 
+        'foreignField': '_id', 
+        'as': 'partner'
+      }
+    }, {
+      '$addFields': {
+        'partner': {
+          '$arrayElemAt': [
+            '$partner', 0
+          ]
+        }
+      }
+    }, {
+      '$addFields': {
+        'type': {
+          '$cond': [
+            {
+              '$isArray': '$partner.modules'
+            }, '$partner.modules', []
+          ]
+        }
+      }
+    }, {
+      '$project': {
+        'partner': 0
+      }
+    }, 
+    {
+      $match: {
+        type: toUpper(branchType),
+      }
+    },
+    {
+      '$sort': {
+        'name': 1
+      }
+    }, {
+      '$limit': 20
+    }
+  ]);
+
+  const result: any[] = await makeQuery(BranchCollection.aggregate(aggs).exec());
+  return map((result || []), (doc) => formatBranch(doc, language));
 }
 
 const createBranchUser = async (staff: any, branchId: string) => {

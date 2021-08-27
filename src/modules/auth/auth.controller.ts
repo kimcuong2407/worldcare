@@ -284,7 +284,8 @@ const fetchUserGroupAction = async (
   next: express.NextFunction
 ) => {
   try {
-    let entityId = get(req.query, 'branchId');
+    let entityId = get(req.query, 'branchId') || req.companyId;
+
     if(!req.isRoot) {
       entityId = req.companyId;
     }
@@ -303,8 +304,8 @@ const createUserGroupAction = async (
   next: express.NextFunction
 ) => {
   try {
-    const { name, description, companyId } = req.body;
-    let entityId = companyId;
+    const { name, description, branchId } = req.body;
+    let entityId = branchId || req.companyId;
     if(!req.isRoot) {
       entityId = req.companyId;
     }
@@ -370,6 +371,27 @@ const deleteUserGroupAction = async (
   }
 };
 
+const getUserGroupDetailAction = async(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try{
+  let branchId = get(req.query, 'branchId');
+
+  if(!req.isRoot) {
+    branchId = req.companyId;
+  }
+  const groupId = get(req.params, 'groupId');
+
+  const role = await authService.getRolesDetailByCompanyAndId(groupId, branchId);
+  res.send(role);
+} catch (e) {
+  logger.error('getUserGroupDetailAction', e);
+  next(e);
+}
+}
+
 export default {
   loginAction,
   fetchHospitalRolesAction,
@@ -387,4 +409,5 @@ export default {
   updateUserGroupAction,
   deleteUserGroupAction,
   fetchUserGroupAction,
+  getUserGroupDetailAction,
 };

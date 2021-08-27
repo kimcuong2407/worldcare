@@ -13,7 +13,9 @@ const authRoutes = (app: express.Application): void => {
   app.get('/api/v1/user-policy', middleware.authenticate, authActions.fetchPolicyAction);
   // app.post('/api/v1/role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/assign-role', authActions.assignUserToGroupAction);
+
   app.put('/api/v1/user-group/:groupId/permission', authActions.assignPermissionToRoleAction);
+  app.delete('/api/v1/user-group/:groupId/permission', authActions.removePermissionToRoleAction);
 
   app.get('/api/v1/user-group',
   middleware.authorization([
@@ -43,7 +45,13 @@ const authRoutes = (app: express.Application): void => {
     ]),
     authActions.deleteUserGroupAction);
 
-  app.delete('/api/v1/user-group/:groupId/permission', authActions.removePermissionToRoleAction);
+  app.get('/api/v1/user-group/:groupId',
+    middleware.authorization([
+      [CORE_RESOURCES.userGroup, CORE_ACTIONS.read],
+      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+    ]),
+    authActions.getUserGroupDetailAction);
+    
   app.post('/api/v1/authorization', authActions.authorizationAction);
   app.post('/api/v1/assign-role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/unassign-role', middleware.authenticate, authActions.createHospitalRolesAction);
