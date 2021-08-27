@@ -275,7 +275,13 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
     const language: string = get(req, 'language');
 
     const companies = await branchService.fetchBranchByType(branchType, keyword, language);
-    res.send(map(companies, (comp) => pick(comp, ['address', 'branchId', 'name', '_id'])));
+    res.send(map(companies, (comp) => {
+      const { _id, ...rest } = comp;
+      return {
+        companyId: _id,
+        ...pick(rest, ['address', 'branchId', 'name', '_id']),
+      }
+    }));
   } catch (e) {
     logger.error('getBranchGroupAction', e);
     next(e);
