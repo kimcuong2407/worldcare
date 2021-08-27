@@ -6,7 +6,7 @@ import { setResponse } from '@app/utils/response.util';
 import casbin from '@app/core/casbin';
 import { get, groupBy, map } from 'lodash';
 import userService from '../user/user.service';
-import companyService from '../company/company.service';
+import companyService from '../branch/branch.service';
 import { ACTIONS, RESOURCES } from '@app/core/permissions';
 
 const logger = loggerHelper.getLogger('server.controller');

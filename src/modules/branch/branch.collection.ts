@@ -7,7 +7,7 @@ import { ENTITY_TYPE } from './constant';
 
 const { Schema } = mongoose;
 
-const CompanyWorkingHoursSchema = new Schema({
+const BranchWorkingHoursSchema = new Schema({
   isOpen: Boolean,
   openingHours: [
     {
@@ -22,19 +22,13 @@ const CompanyWorkingHoursSchema = new Schema({
   }
 });
 
-const CompanySchema = new Schema({
+const BranchSchema = new Schema({
   name: {
     type: String,
     intl: true,
   },
-  companyCode: {
-    type: String,
-    uniqe: true,
-  },
-  companyType: {
-    type: String,
-    enum: Object.values(ENTITY_TYPE),
-  },
+  parentId: Number,
+  partnerId: Number,
   description: {
     type: String,
     intl: true,
@@ -52,7 +46,7 @@ const CompanySchema = new Schema({
     _id: false
   }],
   diseases: [String],
-  modules: [String],
+  branchType: [String],
   entityType: String,
   speciality: [{ type: Schema.Types.ObjectId, ref: 'speciality' }],
   address: {
@@ -62,13 +56,12 @@ const CompanySchema = new Schema({
     cityId: String,
   },
   workingHours: [Object],
-  companySettings: {
+  branchSettings: {
     slotTime: Number,
     capacityPerSlot: Number,
   },
   logo: String,
   photos: [String],
-  lastActivity: Date,
   slug: {
     type: String,
     unique: true,
@@ -82,18 +75,17 @@ const CompanySchema = new Schema({
   }
 });
 
-CompanySchema.plugin(AutoIncrement(mongoose), {
+BranchSchema.plugin(AutoIncrement(mongoose), {
   inc_field: '_id',
-  id: 'company_id',
+  id: 'branch_id_by_company',
   // startAt: 10005,
   // incrementBy: 1
 });
-CompanySchema.index({ companyCode: 1 }, { unique: true })
 
-CompanySchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
-CompanySchema.plugin(mongoosePaginate);
-CompanySchema.plugin(mongooseAggregatePaginate);
+BranchSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });
+BranchSchema.plugin(mongoosePaginate);
+BranchSchema.plugin(mongooseAggregatePaginate);
 
-const CompanyCollection = mongoose.model('company', CompanySchema, 'company');
+const BranchCollection = mongoose.model('branch', BranchSchema, 'branch');
 
-export default CompanyCollection;
+export default BranchCollection;

@@ -1,6 +1,7 @@
 export const CORE_RESOURCES = {
-  company: 'company',
-  user: 'user',
+  partner: 'partner',
+  branch: 'branch',
+  employee: 'employee',
   userGroup: 'userGroup',
   appointment: 'appointment',
   order: 'order',
@@ -42,7 +43,7 @@ export const ACTIONS = [
 
 export const RESOURCES = [
   {
-    key: CORE_RESOURCES.company,
+    key: CORE_RESOURCES.partner,
     name: 'Quản lý công ty',
   },
   {
@@ -50,7 +51,7 @@ export const RESOURCES = [
     name: 'Quản lý nhóm người dùng',
   },
   {
-    key: CORE_RESOURCES.user,
+    key: CORE_RESOURCES.employee,
     name: 'Quản lý người dùng',
   },
   {

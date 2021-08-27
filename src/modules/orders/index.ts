@@ -8,9 +8,19 @@ const upload = multer({ storage: storage });
 
 const orderRoutes = (app: express.Application): void => {
   app.post('/api/v1/medicine-order', middleware.jwt, orderActions.createOrderAction);
+
+  app.get('/api/v1/order', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.read]
+  ]), orderActions.getOrderAction);
+
+  app.get('/api/v1/order/:orderNumber', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.read]
+  ]), orderActions.getOrderAction);
+
   app.post('/api/v1/prescription', upload.single('file'), orderActions.createPrescriptionAction);
   app.get('/api/v1/me/order', middleware.authenticate, orderActions.getMyOrderAction);
   app.get('/api/v1/me/order/:orderNumber', middleware.authenticate, orderActions.getMyOrderDetailAction);
 };
 
 export default orderRoutes;
+

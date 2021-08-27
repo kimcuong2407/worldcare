@@ -10,8 +10,9 @@ import categoryRoutes from './modules/news';
 import serviceRoutes from './modules/services';
 import appointmentRoutes from './modules/appointment';
 import generalRoutes from './modules/general';
-import companyRoutes from './modules/company';
+import companyRoutes from './modules/branch';
 import orderRoutes from './modules/orders';
+import partnerRoutes from './modules/partner';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -27,4 +28,5 @@ export default (app: express.Application): void => {
   generalRoutes(app);
   companyRoutes(app);
   orderRoutes(app);
+  partnerRoutes(app);
 };

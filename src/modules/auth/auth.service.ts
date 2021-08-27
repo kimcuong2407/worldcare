@@ -31,6 +31,7 @@ const authenticate = async (login: string, password: string) => {
   if(!user) {
     throw new UnAuthenticated();
   }
+  // const partnerId = branchService.findBranchById(get(user, 'branchId'));
   const isPasswordMatched = await bcryptUtil.comparePassword(password, get(user, 'password'));
   if(!isPasswordMatched) {
     throw new UnAuthenticated();
@@ -170,6 +171,15 @@ const getRolesByCompanyAndUserId = async (userId: string) => {
   return casbin.enforcer.getRolesForUser(String(userId));
 }
 
+const assignParentBranch = async (childBranchId: number, parentBranchId: number) => {
+  return casbin.enforcer.addNamedGroupingPolicy('g2', String(childBranchId), String(parentBranchId));
+}
+
+
+const updateParentBranch = async (branchId: number, oldParentBranchId: number, newParentBranchId: number) => {
+  await casbin.enforcer.removeNamedGroupingPolicy('g2', String(branchId), String(oldParentBranchId))
+  return assignParentBranch(branchId, newParentBranchId);
+}
 // Auth service
 const staffLogin = async (login: string, password: string, companyId: Number) => {
 
@@ -220,4 +230,6 @@ export default {
   createRole,
   updateRole,
   removeRole,
+  assignParentBranch,
+  updateParentBranch,
 };

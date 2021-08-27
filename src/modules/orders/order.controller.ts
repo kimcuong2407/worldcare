@@ -105,9 +105,48 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
   }
 };
 
+const getOrderDetailAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let companyId = req.companyId;
+    const orderNumber = get(req.params, 'orderNumber');
+
+    const result: any = await orderService.findOrderDetail({userId: userId, orderNumber: orderNumber});
+    if(result.prescriptionId) {
+      const prescription = await getPrescriptionDetail(result.prescriptionId);
+      result.prescription = pick(prescription, ['_id','images']);
+    }
+    res.send(result);
+  } catch (e) {
+    logger.error('getOrderDetailAction', e);
+    next(e);
+  }
+};
+
+const getOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const { page, limit } = appUtil.getPaging(req);
+    const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
+    const entityId = companyId;
+
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+    const result = await orderService.findOrders({
+      status, branchId: entityId, startTime, endTime, sortBy, sortDirection,
+
+    }, page, limit);
+    res.send(result);
+  } catch (e) {
+    logger.error('getOrderAction', e);
+    next(e);
+  }
+};
 export default { 
   createPrescriptionAction,
   createOrderAction,
   getMyOrderAction,
   getMyOrderDetailAction,
+  getOrderAction,
+  getOrderDetailAction,
 };

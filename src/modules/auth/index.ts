@@ -18,21 +18,21 @@ const authRoutes = (app: express.Application): void => {
   app.post('/api/v1/user-group',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
-      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.createUserGroupAction);
 
   app.put('/api/v1/user-group/:groupId',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.update],
-      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.updateUserGroupAction);
 
   app.delete('/api/v1/user-group/:groupId',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.delete],
-      [CORE_RESOURCES.company, CORE_ACTIONS.write],
+      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.deleteUserGroupAction);
 

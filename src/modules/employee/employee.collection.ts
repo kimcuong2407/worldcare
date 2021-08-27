@@ -18,6 +18,7 @@ const EmployeeSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'user' },
   fullName: String,
   companyId: Number,
+  entityId: Number,
   employeeNumber: Number,
   description: {
     type: String,
@@ -73,13 +74,14 @@ const EmployeeSchema = new Schema({
 EmployeeSchema.plugin(AutoIncrement(mongoose), {
   id: 'employee_number_by_company',
   inc_field: 'employeeNumber',
-  reference_fields: ['companyId'],
+  reference_fields: ['entityId'],
   // startAt: 10005,
   // incrementBy: 1
 });
 
 EmployeeSchema.plugin(mongoosePaginate);
 EmployeeSchema.plugin(mongooseAggregatePaginate);
+EmployeeSchema.index({ employeeNumber: 1 })
 
 const EmployeeCollection = mongoose.model('employee', EmployeeSchema, 'employee');
 

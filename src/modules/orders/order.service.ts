@@ -22,6 +22,7 @@ const createOrder = async (order: any) => {
     address,
     prescriptionId,
     companyId,
+    branchId,
   } = order;
   let addressId = get(order, 'addressId', null);
   let userId = get(order, 'userId', null);
@@ -42,7 +43,7 @@ const createOrder = async (order: any) => {
     userId,
     shippingAddressId: addressId,
     customerId,
-    companyId,
+    branchId: companyId || branchId,
   }
 
   return makeQuery(OrderCollection.create(createdOrder));

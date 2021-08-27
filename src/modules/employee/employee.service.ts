@@ -134,7 +134,7 @@ const deleteStaff = async (staffId: string) => {
 };
 
 
-const getEmployeeByCompanyId = async(companyId: number, options: any) => {
+const getEmployeeByBranchId = async(companyId: number, options: any) => {
   const aggregation: any = [
     {
       '$match': {
@@ -223,5 +223,5 @@ export default {
   getStaffInfo,
   updateStaffInfo,
   deleteStaff,
-  getEmployeeByCompanyId,
+  getEmployeeByBranchId,
 };
