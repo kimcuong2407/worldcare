@@ -15,7 +15,20 @@ const orderRoutes = (app: express.Application): void => {
 
   app.get('/api/v1/order/:orderNumber', middleware.authorization([
     [CORE_RESOURCES.order, CORE_ACTIONS.read]
-  ]), orderActions.getOrderAction);
+  ]), orderActions.getOrderDetailAction);
+
+  app.put('/api/v1/order/:orderNumber/:action(assign|confirm)', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.admin]
+  ]), orderActions.handleOrderAction);
+
+  app.put('/api/v1/order/:orderNumber/:action(process|update-item|complete-order|shipping|package)', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.update]
+  ]), orderActions.handleOrderAction);
+
+  app.put('/api/v1/order/:orderNumber/:action(cancel|complete)', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.update],
+    [CORE_RESOURCES.order, CORE_ACTIONS.admin]
+  ]), orderActions.handleOrderAction);
 
   app.post('/api/v1/prescription', upload.single('file'), orderActions.createPrescriptionAction);
   app.get('/api/v1/me/order', middleware.authenticate, orderActions.getMyOrderAction);

@@ -1,21 +1,16 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
 import orderService from './order.service';
-import slugify from 'slugify';
-import { normalizeText } from 'normalize-text';
 import get from 'lodash/get';
-import lowerCase from 'lodash/lowerCase';
-import trim from 'lodash/trim';
 import appUtil from '@app/utils/app.util';
 import { isNil, isString, isUndefined, map, omit, omitBy, pick } from 'lodash';
-import { setResponse } from '@app/utils/response.util';
-import moment from 'moment';
-import authService from '../auth/auth.service';
 import { uploadImage } from '../file/file.service';
-import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import zalo from '@app/core/zalo';
 import PrescriptionCollection from './prescription.collection';
 import { getPreSignedUrl } from '@app/core/s3';
+import orderActions from './actions';
+import { setResponse } from '@app/utils/response.util';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -107,10 +102,19 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
 
 const getOrderDetailAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    let companyId = req.companyId;
     const orderNumber = get(req.params, 'orderNumber');
+    let entityId = get(req.query, 'branchId');
 
-    const result: any = await orderService.findOrderDetail({userId: userId, orderNumber: orderNumber});
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+    const query: any = {orderNumber: orderNumber};
+
+    if(entityId) {
+      query.branchId = entityId;
+    }
+
+    const result: any = await orderService.findOrderDetail(query);
     if(result.prescriptionId) {
       const prescription = await getPrescriptionDetail(result.prescriptionId);
       result.prescription = pick(prescription, ['_id','images']);
@@ -132,16 +136,51 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
     if(!req.isRoot) {
       entityId = req.companyId;
     }
-    const result = await orderService.findOrders({
+    const result = await orderService.findOrders(omitBy({
       status, branchId: entityId, startTime, endTime, sortBy, sortDirection,
-
-    }, page, limit);
+    }, isNil), page, limit);
     res.send(result);
   } catch (e) {
     logger.error('getOrderAction', e);
     next(e);
   }
 };
+
+
+const handleOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const action = get(req.params, 'action');
+    const orderNumber = get(req.params, 'orderNumber');
+    const data = req.body;
+    let entityId = null;
+    const query: any = {
+      orderNumber,
+    }
+    if(!req.isRoot) {
+      entityId = req.companyId;
+      query.branchId = entityId;
+    }
+    
+    const order = await orderService.findOrderDetail(query);
+    if(!order) {
+      throw new NotFoundError();
+    }
+
+    const handler = orderActions.getOrderActionHandler(action, get(order, 'status'));
+    await handler.handle(order, {
+      data,
+      userId,
+    });
+    const newOrder = await orderService.findOrderDetail(query);
+
+    res.send(setResponse(newOrder, true));
+  } catch (e) {
+    logger.error('handleOrderAction', e);
+    next(e);
+  }
+};
+
 export default { 
   createPrescriptionAction,
   createOrderAction,
@@ -149,4 +188,5 @@ export default {
   getMyOrderDetailAction,
   getOrderAction,
   getOrderDetailAction,
+  handleOrderAction,
 };

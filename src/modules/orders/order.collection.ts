@@ -5,6 +5,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 import PrescriptionCollection from './prescription.collection';
+import OrderItemCollection from './order-item.collection';
 
 const { Schema } = mongoose;
 
@@ -35,11 +36,24 @@ const OrderSchema = new Schema({
     enum: Object.values(ORDER_STATUS),
     default: ORDER_STATUS.NEW,
   },
-  subTotal: Number,
-  grandTotal: Number,
+  subTotal: {
+    type: Number,
+    default: 0
+  },
+  grandTotal: {
+    type: Number,
+    default: 0
+  },
+  shippingInfo: {
+    'shippingVendor': String,
+    'shipperName':  String,
+    'shipperPhoneNumber':  String,
+    'trackingId':  String,
+  },
   deliveryMethod: String,
   deliveryId: String,
   customerNote: String,
+  cancelReason: String,
   history: [
     {
       action: String,
@@ -71,19 +85,27 @@ OrderSchema.virtual('shippingAddress', {
 });
 
 OrderSchema.virtual('shopInfo', {
-  ref: 'company', // the collection/model name
-  localField: 'companyId',
-  foreignField: 'companyId',
+  ref: 'branch', // the collection/model name
+  localField: 'branchId',
+  foreignField: 'branchId',
   justOne: true, // default is false
-  options: { select: 'name -_id -id -companyId', projection: { name: 1, companyId: -1, _id: -1, id: -1} },
+  options: { select: 'name -_id -id -branchId', projection: { name: 1, branchId: -1, _id: -1, id: -1} },
 });
+
+OrderSchema.virtual('items', {
+  ref: OrderItemCollection, // the collection/model name
+  localField: 'orderNumber',
+  foreignField: 'orderNumber',
+  options: {},
+});
+
 
 OrderSchema.virtual('prescription', {
   ref: 'prescription', // the collection/model name
   localField: 'prescriptionId',
   foreignField: '_id',
   justOne: true, // default is false
-  // options: { select: 'name -_id -id -companyId', projection: { name: 1, companyId: -1, _id: -1, id: -1} },
+  // options: { select: 'name -_id -id -branchId', projection: { name: 1, branchId: -1, _id: -1, id: -1} },
 });
 OrderSchema.plugin(mongoosePaginate);
 OrderSchema.plugin(mongooseAggregatePaginate);

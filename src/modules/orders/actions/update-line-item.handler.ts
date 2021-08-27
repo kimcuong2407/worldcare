@@ -1,0 +1,32 @@
+import { Types } from 'mongoose';
+import makeQuery from '@app/core/database/query';
+import { get } from 'lodash';
+import OrderAbstractHandler from './order-handler.abstract';
+import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
+import OrderCollection from '../order.collection';
+import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import OrderItemCollection from '../order-item.collection';
+
+class UpdateItemOrderHandler extends OrderAbstractHandler {
+  // eslint-disable-next-line class-methods-use-this
+  async handle(order: any, payload: any): Promise<void> {
+    const { data } = payload;
+    const { item } = data;
+    const id = get(item, '_id');
+    const query: any = {};
+    if (id) {
+      query._id = Types.ObjectId(id)
+    };
+    await makeQuery(OrderItemCollection.updateOne(query, {
+      ...item,
+      orderNumber: get(order, 'orderNumber'),
+    }, { upsert: true}).exec());
+    return Promise.resolve(order);
+  }
+
+  async validate (order: any, payload: any) {
+    return Promise.resolve(true);
+  }
+}
+
+export default UpdateItemOrderHandler;

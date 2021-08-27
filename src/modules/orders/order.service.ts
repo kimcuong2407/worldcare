@@ -2,8 +2,9 @@ import makeQuery from '@app/core/database/query'
 import { get } from 'lodash';
 import CustomerCollection from '../appointment/customer.collection';
 import userService from '../user/user.service';
+import OrderItemCollection from './order-item.collection';
 import OrderCollection from './order.collection';
-import PrescriptionCollection from './prescription.collection'
+import PrescriptionCollection from './prescription.collection';
 
 const createPrescription = async (fileId: string) => {
   return makeQuery(PrescriptionCollection.create({
@@ -50,11 +51,37 @@ const createOrder = async (order: any) => {
 }
 
 
-const findOrders = async (query: any, page: number, limit: number) => {
+const findOrders = async (params: any, page: number, limit: number) => {
+  const { status, branchId, startTime, endTime, sortBy, sortDirection, } = params;
+  const sort: any = {};
+  if(sortBy) {
+    sort[sortBy] = sortDirection || -1;
+  }
+  const query: any = {};
+  if(branchId) {
+    query.branchId = branchId;
+  }
+
+  if(status) {
+    query.status = status;
+  }
+
+  if(startTime) {
+    query.createdAt = {
+      $gte: startTime,
+    };
+  }
+
+  if(endTime) {
+    query.createdAt = {
+      $lte: endTime,
+    };
+  }
   const orders = await makeQuery(OrderCollection.paginate(query, {
     populate: [{ path: 'shippingAddress' }, { path: 'shopInfo' }],
     page,
     limit,
+    sort: sort
   }));
 
   return orders;
@@ -62,7 +89,7 @@ const findOrders = async (query: any, page: number, limit: number) => {
 
 const findOrderDetail = async (query: any) => {
   const order = await makeQuery(OrderCollection.findOne(query, '', {
-    populate: ['shippingAddress', 'prescription', 'shopInfo']
+    populate: ['shippingAddress', 'prescription', 'shopInfo', 'items']
   }));
 
   return order;
