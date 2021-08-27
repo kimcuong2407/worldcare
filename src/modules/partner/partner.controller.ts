@@ -77,7 +77,7 @@ const fetchPartnerAction = async (req: express.Request, res: express.Response, n
     const sortDirection = get(req, 'query.sortDirection', '');
     
     const data = await partnerService.fetchPartner({
-      modules: String(modules).split(','), keyword, cityId,
+      modules: modules ? String(modules || '').split(',')  : [], keyword, cityId,
       partnerId,
       sortBy,
       sortDirection,

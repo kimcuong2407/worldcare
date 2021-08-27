@@ -17,7 +17,7 @@ const EmployeeSchema = new Schema({
   },
   userId: { type: Schema.Types.ObjectId, ref: 'user' },
   fullName: String,
-  companyId: Number,
+  branchId: Number,
   entityId: Number,
   employeeNumber: Number,
   description: {

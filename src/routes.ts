@@ -13,6 +13,7 @@ import generalRoutes from './modules/general';
 import companyRoutes from './modules/branch';
 import orderRoutes from './modules/orders';
 import partnerRoutes from './modules/partner';
+import employeeRoutes from './modules/employee';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -29,4 +30,5 @@ export default (app: express.Application): void => {
   companyRoutes(app);
   orderRoutes(app);
   partnerRoutes(app);
+  employeeRoutes(app);
 };

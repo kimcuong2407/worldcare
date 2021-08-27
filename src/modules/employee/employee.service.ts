@@ -1,18 +1,20 @@
 import addressUtil from '@app/utils/address.util';
 import loggerHelper from '@utils/logger.util';
-import { map } from 'lodash';
+import { map, pick } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
+import authService from '../auth/auth.service';
 import HospitalCollection from '../hospital/hospital.collection';
 import hospitalService from '../hospital/hospital.service';
+import userService from '../user/user.service';
 import EmployeeCollection from './employee.collection';
 import { EmployeeModel } from './employee.model';
 
 const logger = loggerHelper.getLogger('staff.service');
 
-const createStaff = async (staffInfo: EmployeeModel) => {
+const createEmployee = async (staffInfo: any) => {
   const staff = await EmployeeCollection.create(staffInfo);
   const { createdAt, updatedAt, ...rest } = get(staff, '_doc', {});
   return {
@@ -20,51 +22,49 @@ const createStaff = async (staffInfo: EmployeeModel) => {
   };
 };
 
-const formatStaff = (staff: any) => {
-  staff = staff.toJSON();
-  const { hospital } = staff;
-  const { address: hospitalAddress } = hospital || {};
-
-  const address = addressUtil.formatAddress(get(staff, 'address'));
+const formatEmployee = (staff: any) => {
+  // staff = staff.toJSON();
+  if(!staff) {
+    return {};
+  }
+  const { userId, ...rest } = staff || {};
+  const address = addressUtil.formatAddressV2(get(staff, 'address'));
   return {
-    ...staff,
-    hospital: {
-      ...hospital,
-      address: addressUtil.formatAddress(hospitalAddress),
-    },
+    ...pick(userId, ['groups', 'username']),
+    ...rest,
     address,
   }
 }
 
-const fetchStaff = async (params: any, language= 'vi') => {
+const fetchEmployee = async (params: any, language = 'vi') => {
   const {
     keyword, options, hospitalId, title, degree, speciality, employeeGroup
   } = params;
   const query: any = {
   };
 
-  if(hospitalId) {
+  if (hospitalId) {
     query.hospital = hospitalId;
   }
-  if(degree) {
+  if (degree) {
     query.degree = degree;
   }
-  if(title) {
+  if (title) {
     query.title = title;
   }
-  if(title) {
+  if (title) {
     query.degree = title;
   }
-  if(speciality) {
+  if (speciality) {
     query.speciality = speciality;
   }
-  if(employeeGroup) {
+  if (employeeGroup) {
     query.employeeGroup = employeeGroup;
   }
-  
-  if(keyword) {
+
+  if (keyword) {
     query['$text'] = { $search: keyword }
-  } 
+  }
   EmployeeCollection.setDefaultLanguage(language);
   let data = await EmployeeCollection.paginate(query, {
     ...options,
@@ -76,44 +76,40 @@ const fetchStaff = async (params: any, language= 'vi') => {
       { path: 'employee_group', select: 'name' },
     ],
   });
-  const {docs, ...rest} = data
+  const { docs, ...rest } = data
   return {
-    docs: map(docs, formatStaff),
+    docs: map(docs, formatEmployee),
     ...rest
   };
 }
 
-const getStaffInfo = async (staffIdOrSlug: string, language= 'vi', isRaw = false) => {
-  EmployeeCollection.setDefaultLanguage(language);
-  HospitalCollection.setDefaultLanguage(language);
-  let query: any = {slug: staffIdOrSlug}
-
+const getEmployeeInfo = async (query: any, isRaw = false) => {
+  // EmployeeCollection.setDefaultLanguage(language);
   let staff;
-  if( Types.ObjectId.isValid(staffIdOrSlug)) {
-    query = {
-      _id: Types.ObjectId(staffIdOrSlug)
-    };
-  } 
 
-  if(isRaw) {
-    return EmployeeCollection.findOne(query);
+  if (isRaw) {
+    const employee = await EmployeeCollection.findOne(query).populate('userId').lean().exec();
+    return formatEmployee(employee);
   }
 
   staff = await EmployeeCollection.findOne(query)
-  .populate('hospital', ['hospitalName', 'address', 'workingHours'] )
-  .populate('degree.degreeId', 'name')
-  .populate('title', 'name')
-  .populate('speciality', 'name')
-  .populate('employeeGroup', 'name').exec();
-  return formatStaff(staff);
+    .populate('degree.degreeId', 'name')
+    .populate('title', 'name')
+    .populate('speciality', 'name')
+    .populate('employeeGroup', 'name')
+    .populate('userId').exec();
+  return formatEmployee(staff);
 };
 
-const updateStaffInfo = async (params: any) => {
-  const { staffId, staffInfo } = params;
-  const staff = await EmployeeCollection.findByIdAndUpdate(staffId, staffInfo, { new: true });
-  if (!staff) {
-    throw new Error('There is no staffId!');
-  }
+const updateEmployeeGroups = async(userId: string, groups: [string], branchId: string) =>{
+  await authService.removeRoleForUser(userId, branchId);
+  return authService.assignUserToGroup(userId, groups, branchId);
+}
+
+const updateEmployeeInfo = async (query: any, staffInfo: any) => {
+  const { username, groups, userId, ...info } = staffInfo;
+  const staff = await EmployeeCollection.findOneAndUpdate(query, info, { new: true });
+  
   const { createdAt, updatedAt, ...rest } = get(staff, '_doc', {});
   return {
     ...rest,
@@ -122,9 +118,9 @@ const updateStaffInfo = async (params: any) => {
   };
 };
 
-const deleteStaff = async (staffId: string) => {
+const deleteEmployee = async (staffId: string) => {
   const data = await EmployeeCollection.findByIdAndDelete(staffId);
-  if (isNull(data)){
+  if (isNull(data)) {
     const data = await EmployeeCollection.findById(staffId);
     if (!data) {
       throw new Error('There is no staffId!');
@@ -134,18 +130,75 @@ const deleteStaff = async (staffId: string) => {
 };
 
 
-const getEmployeeByBranchId = async(companyId: number, options: any) => {
+const createBranchUser = async (staff: any, branchId: string) => {
+  const {
+    firstName,
+    lastName,
+    address,
+    description,
+    gender,
+    title,
+    degree,
+    speciality,
+    avatar,
+    employeeHistory,
+    phoneNumber,
+    password,
+    username,
+    employeeGroup,
+    certification,
+    email,
+    groups,
+  } = staff;
+
+  const user = {
+    username,
+    phoneNumber,
+    email,
+    password,
+    branchId,
+    groups,
+  };
+  const createdUser = await userService.createUserAccount(user);
+  const userId = get(createdUser, '_id');
+  await authService.assignUserToGroup(userId, groups || [], branchId);
+
+  const staffInfo: any = {
+    firstName,
+    lastName,
+    address,
+    branchId,
+    userId: get(createdUser, '_id'),
+    fullName: (firstName && lastName ? `${firstName} ${lastName}` : null),
+    description,
+    gender,
+    phoneNumber,
+    email,
+    title: title || [],
+    degree: degree || [],
+    speciality: speciality || [],
+    employeeGroup,
+    avatar,
+    employeeHistory,
+    certification,
+  };
+
+  return await createEmployee(staffInfo);
+}
+
+const getEmployeeByBranchId = async (query: any, options: any) => {
+  const { branchId, ...matchQuery } = query;
   const aggregation: any = [
     {
       '$match': {
-        'companyId': Number(companyId)
+        'branchId': Number(branchId)
       }
     }, {
       '$lookup': {
-        'from': 'user', 
+        'from': 'user',
         'let': {
           'userId': '$userId'
-        }, 
+        },
         'pipeline': [
           {
             '$match': {
@@ -157,11 +210,11 @@ const getEmployeeByBranchId = async(companyId: number, options: any) => {
             }
           }, {
             '$project': {
-              'username': 1, 
+              'username': 1,
               'groups': 1
             }
           }
-        ], 
+        ],
         'as': 'user'
       }
     }, {
@@ -174,15 +227,21 @@ const getEmployeeByBranchId = async(companyId: number, options: any) => {
       }
     }, {
       '$addFields': {
-        'username': '$user.username', 
-        'groups': '$user.groups'
+        'username': '$user.username',
+        'groups': {
+          '$cond': [
+            { '$isArray': "$user.groups" },
+            "$user.groups",
+            []
+          ]
+        }
       }
     }, {
       '$lookup': {
-        'from': 'role', 
+        'from': 'role',
         'let': {
           'groups': '$groups'
-        }, 
+        },
         'pipeline': [
           {
             '$match': {
@@ -197,13 +256,17 @@ const getEmployeeByBranchId = async(companyId: number, options: any) => {
               'name': 1
             }
           }
-        ], 
+        ],
         'as': 'groups'
       }
     }, {
       '$unset': [
         'user'
       ]
+    }, {
+      '$match': {
+        ...matchQuery,
+      }
     }
   ];
 
@@ -213,15 +276,17 @@ const getEmployeeByBranchId = async(companyId: number, options: any) => {
   const { docs, ...rest } = employees;
   return {
     ...rest,
-    docs: map(docs || [], ({ address, ...rest}) => ({...rest, address: addressUtil.formatAddressV2(address)}))
+    docs: map(docs || [], ({ address, ...rest }) => ({ ...rest, address: addressUtil.formatAddressV2(address) }))
   };
 }
 
 export default {
-  createStaff,
-  fetchStaff,
-  getStaffInfo,
-  updateStaffInfo,
-  deleteStaff,
+  createEmployee,
+  fetchEmployee,
+  getEmployeeInfo,
+  updateEmployeeInfo,
+  deleteEmployee,
   getEmployeeByBranchId,
+  createBranchUser,
+  updateEmployeeGroups,
 };

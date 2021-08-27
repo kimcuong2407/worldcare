@@ -278,17 +278,35 @@ const getResourcePermissionAction = async (req: express.Request, res: express.Re
     next(e);
   }
 };
+const fetchUserGroupAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    let entityId = get(req.query, 'branchId');
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+
+    const role = await authService.getRolesByCompany(entityId);
+    res.send(role);
+  } catch (e) {
+    logger.error('createUserGroupAction', e);
+    next(e);
+  }
+};
+
 const createUserGroupAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) => {
   try {
-    let entityId = req.companyId;
     const { name, description, companyId } = req.body;
-    console.log(req.isRoot)
-    if(req.isRoot) {
-      entityId = companyId || entityId;
+    let entityId = companyId;
+    if(!req.isRoot) {
+      entityId = req.companyId;
     }
 
     const role = await authService.createRole(entityId, name, description);
@@ -368,4 +386,5 @@ export default {
   createUserGroupAction,
   updateUserGroupAction,
   deleteUserGroupAction,
+  fetchUserGroupAction,
 };

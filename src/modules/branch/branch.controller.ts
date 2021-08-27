@@ -106,11 +106,10 @@ const fetchBranchAction = async (req: express.Request, res: express.Response, ne
     
     const language: string = get(req, 'language');
     const keyword = get(req, 'query.keyword', '');
-    const data = await branchService.findBranchAndChild(partnerId, branchId, {
+    const data = await branchService.findBranchAndChild(partnerId, branchId, omitBy({
       specialityId,
-      cityId,
-
-    });
+      'address.cityId': cityId,
+    }, isNil));
     res.send(data);
   } catch (e) {
     logger.error('fetchBranchAction', e);
@@ -286,10 +285,11 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
 const getBranchUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const options = appUtil.getPaging(req);
-    const branchId = get(req.params, 'branchId');
+    let branchId = get(req.query, 'branchId');
     const keyword = get(req.query, 'keyword');
-    const language: string = get(req, 'language');
-
+    if(!req.isRoot) {
+      branchId = req.companyId;
+    }
     const users = await branchService.getBranchUsers(Number(branchId), options);
     res.send(users);
   } catch (e) {

@@ -9,7 +9,6 @@ const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   __v: { type: Number, select: false },
-
   name: {
     type: String
   },

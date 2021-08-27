@@ -8,7 +8,7 @@ export interface EmployeeModel extends mongoose.Document {
   gender: boolean;
   phoneNumber: string;
   email: string;
-  hospital: string;
+  branchId: number;
   title: [string];
   degree: [string];
   speciality: [string];

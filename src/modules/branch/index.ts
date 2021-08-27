@@ -38,10 +38,10 @@ const branchRoutes = (app: express.Application): void => {
     ]
   ), branchActions.createBranchUserAction);
   
-  app.get('/api/v1/branch/:branchId/employee', middleware.authorization([
-    [CORE_RESOURCES.branch, CORE_ACTIONS.write],
-    [CORE_RESOURCES.partner, CORE_ACTIONS.write]
-  ]), branchActions.getBranchUserAction);
+  // app.get('/api/v1/employee', middleware.authorization([
+  //   [CORE_RESOURCES.branch, CORE_ACTIONS.write],
+  //   [CORE_RESOURCES.partner, CORE_ACTIONS.write]
+  // ]), branchActions.getBranchUserAction);
 
   app.get('/api/v1/branch/:branchId/group', middleware.authorization([
     [CORE_RESOURCES.branch, CORE_ACTIONS.write]

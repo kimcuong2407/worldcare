@@ -15,6 +15,13 @@ const authRoutes = (app: express.Application): void => {
   app.post('/api/v1/assign-role', authActions.assignUserToGroupAction);
   app.put('/api/v1/user-group/:groupId/permission', authActions.assignPermissionToRoleAction);
 
+  app.get('/api/v1/user-group',
+  middleware.authorization([
+    [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
+    [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+  ]),
+  authActions.fetchUserGroupAction);
+
   app.post('/api/v1/user-group',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],

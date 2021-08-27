@@ -11,19 +11,28 @@ import UserAddressCollection from './user-address.collection';
 import addressUtil from '@utils/address.util';
 import branchService from '../branch/branch.service';
 import appUtil from '@app/utils/app.util';
+import employeeService from '../employee/employee.service';
 
 // Auth service
 const getUserProfileById = async (userId: string) => {
   const profile = await UserCollection.findOne({ _id: userId }).lean().exec();
   // const roles = await casbin.enforcer.getRolesForUser(userId);
-  const queryBranches: any = await branchService.findBranchAndChild(null, get(profile, 'branchId'));
+  const employee = await employeeService.getEmployeeInfo({ userId: userId }, true);
+  const queryBranches: any = await branchService.findBranchAndChild(null, get(profile, 'branchId'), {});
   return {
     ...profile,
+    ...pick(employee, ['firstName', 'lastName']),
     branches: map(queryBranches, (branch) => pick(branch, ['_id', 'name', 'address']) ),
     // roles,
   }
 };
 
+// Auth service
+const updateUserProfile = async (userId: string, profile: any) => {
+  await UserCollection.findByIdAndUpdate(userId,profile).lean().exec();
+  // const roles = await casbin.enforcer.getRolesForUser(userId);
+  return true;
+};
 // Auth service
 const addNewAddress = async (address: {
   userId: string,
@@ -65,14 +74,14 @@ const findUser = async (query: any) => {
 }
 
 const createUserAccount = async (user: any) => {
-  const { username, phoneNumber, email, companyId, password, groups} = user;
+  const { username, phoneNumber, email, branchId, password, groups} = user;
   const encryptedPassword = await bcryptUtil.generateHash(password);
     const userInfo = {
       username: username || phoneNumber,
       phoneNumber: phoneNumber,
       email: email,
       password: encryptedPassword,
-      companyId: companyId,
+      branchId: branchId,
       groups,
     };
   return createUser(userInfo);
@@ -81,6 +90,15 @@ const createUserAccount = async (user: any) => {
 const createUser = async (user: any) => {
   return makeQuery(UserCollection.create(user));
 }
+
+const findUserById = async (userId: string) => {
+  return makeQuery(UserCollection.findById(userId).exec());
+}
+
+const updateUser = async (userId: string, userInfo) => {
+  return makeQuery(UserCollection.findById(userId).exec());
+}
+
 export default {
   getUserProfileById,
   addNewAddress,
@@ -89,4 +107,6 @@ export default {
   findUser,
   createUser,
   createUserAccount,
+  findUserById,
+  updateUserProfile,
 };

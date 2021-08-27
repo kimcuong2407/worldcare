@@ -72,7 +72,7 @@ const registerUser = async (inputUser: any) => {
       phoneNumber: phoneNumber,
       email: email,
       password: encryptedPassword,
-      companyId: ROOT_COMPANY_ID,
+      branchId: ROOT_COMPANY_ID,
       firstName,
       lastName,
     };
@@ -91,10 +91,14 @@ const assignUserToGroup = async (userId: string, roles: [string], domain: string
   return Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
 }
 
-const createRole = async (companyId: string, roleName: string, description: string) => {
+const removeRoleForUser = async (userId: string, domain: string) => {
+  return casbin.enforcer.deleteRolesForUser(userId, domain);
+}
+
+const createRole = async (branchId: string, roleName: string, description: string) => {
   return makeQuery(RoleCollection.create({
     name: roleName,
-    companyId,
+    branchId,
     description,
   }));
 }
@@ -106,24 +110,23 @@ const updateRole = async (roleId: string, name: string, description: string) => 
   return makeQuery(RoleCollection.findOneAndUpdate(query, {$set: { name, description }}).exec());
 }
 
-const removeRole = async (roleId: string, companyId: string) => {
+const removeRole = async (roleId: string, branchId: string) => {
   await makeQuery(RoleCollection.findByIdAndDelete(roleId).exec());
-  console.log(companyId)
   await casbin.enforcer.deleteRole(roleId);
-  // await casbin.enforcer.removeNamedGroupingPolicy('g', ...[roleId, companyId]);
+  // await casbin.enforcer.removeNamedGroupingPolicy('g', ...[roleId, branchId]);
 }
 
 
-const setupDefaultRoles = async (companyId: string) => {
+const setupDefaultRoles = async (branchId: string) => {
   await Promise.all(DEFAULT_ROLES.map( async role => {
     const { name, permissions, } = role;
     const createdRole = await RoleCollection.create({
       name,
-      companyId,
+      branchId,
     });
     await Promise.all(permissions.map(async per => {
       const { resource, action } = per;
-      const policies = action.map(act => ([get(createdRole, '_id'), companyId, resource, act]))
+      const policies = action.map(act => ([get(createdRole, '_id'), branchId, resource, act]))
       return Promise.all(policies.map((pol: any) => casbin.enforcer.addPolicy(...pol)));
     }))
 
@@ -135,25 +138,25 @@ const setupDefaultRoles = async (companyId: string) => {
 
 
 // Auth service
-const getRolesByCompany = async (companyId: string) => {
-  return makeQuery(RoleCollection.find({companyId}).lean().exec());
+const getRolesByCompany = async (branchId: string) => {
+  return makeQuery(RoleCollection.find({branchId}).lean().exec());
 }
 
-const findOneRole = async (roleId: string, companyId: string) => {
+const findOneRole = async (roleId: string, branchId: string) => {
   const query: any = {
     _id: Types.ObjectId(roleId),
   }
-  if(companyId) {
-    query.companyId = companyId;
+  if(branchId) {
+    query.branchId = branchId;
   }
   return makeQuery(RoleCollection.findOne(query).lean().exec());
 }
 
 // Auth service
-const getRolesDetailByCompanyAndId = async (companyId: string, roleId: string) => {
-  const role = await makeQuery(RoleCollection.findOne({companyId, _id: Types.ObjectId(roleId)}).lean().exec());
-  const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, companyId);
-  const formattedPolicies = policies.filter(policy => policy[1] === companyId).map((policy) => {
+const getRolesDetailByCompanyAndId = async (branchId: string, roleId: string) => {
+  const role = await makeQuery(RoleCollection.findOne({branchId, _id: Types.ObjectId(roleId)}).lean().exec());
+  const policies = await casbin.enforcer.getFilteredPolicy(0, roleId, branchId);
+  const formattedPolicies = policies.filter(policy => policy[1] === branchId).map((policy) => {
     return policy.slice(2)
   });
   const groupedPolicies: any = {};
@@ -175,13 +178,12 @@ const assignParentBranch = async (childBranchId: number, parentBranchId: number)
   return casbin.enforcer.addNamedGroupingPolicy('g2', String(childBranchId), String(parentBranchId));
 }
 
-
 const updateParentBranch = async (branchId: number, oldParentBranchId: number, newParentBranchId: number) => {
   await casbin.enforcer.removeNamedGroupingPolicy('g2', String(branchId), String(oldParentBranchId))
   return assignParentBranch(branchId, newParentBranchId);
 }
 // Auth service
-const staffLogin = async (login: string, password: string, companyId: Number) => {
+const staffLogin = async (login: string, password: string, branchId: Number) => {
 
   const sessionId = uuidv4();
   const query: any = {
@@ -191,8 +193,8 @@ const staffLogin = async (login: string, password: string, companyId: Number) =>
       }
     ],
   };
-  if(companyId) {
-    query.companyId = companyId;
+  if(branchId) {
+    query.branchId = branchId;
   }
   const user = await UserCollection.findOne(query).lean().exec();
   if(!user) {
@@ -202,7 +204,7 @@ const staffLogin = async (login: string, password: string, companyId: Number) =>
   if(!isPasswordMatched) {
     throw new UnAuthenticated();
   }
-  const userCompany = get(user, 'companyId');
+  const userCompany = get(user, 'branchId');
   const groups = await getRolesByCompanyAndUserId(get(user,'_id'));
   if (!groups || groups.length < 1) {
     throw new UnauthorizedError('Bạn không có quyền truy cập vào trang này.');
@@ -214,7 +216,7 @@ const staffLogin = async (login: string, password: string, companyId: Number) =>
     userId: get(user, '_id'),
     sessionId,
     token,
-    companyId: userCompany,
+    branchId: userCompany,
   }
 }
 export default {
@@ -232,4 +234,5 @@ export default {
   removeRole,
   assignParentBranch,
   updateParentBranch,
+  removeRoleForUser,
 };

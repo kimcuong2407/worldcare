@@ -1,6 +1,6 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
-import staffService from './staff.service';
+import employeeService from './employee.service';
 import slugify from 'slugify';
 import { normalizeText } from 'normalize-text';
 import get from 'lodash/get';
@@ -12,172 +12,208 @@ import appUtil from '@app/utils/app.util';
 import { Types } from 'mongoose';
 import hospitalService from '@app/modules/hospital/hospital.service';
 import configurationService from '@app/modules/configuration/configuration.service';
-import { isNil, isUndefined, map, omitBy } from 'lodash';
-import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import { isNil, isUndefined, map, omitBy, xor } from 'lodash';
+import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
+import userService from '../user/user.service';
 
-const logger = loggerHelper.getLogger('staff.controller');
+const logger = loggerHelper.getLogger('employee.controller');
 
-const createStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const createEmployeeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
-      firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospital, title, degree, speciality, employeeGroup,
-      avatar, employeeHistory, certification, slug, lang, address
+      firstName,
+      lastName,
+      address,
+      description,
+      gender,
+      title,
+      degree,
+      speciality,
+      avatar,
+      employeeHistory,
+      phoneNumber,
+      password,
+      employeeGroup,
+      certification,
+      email,
+      groups,
+      username,
+      branchId,
     } = req.body;
     if (!firstName || !lastName ){
       throw new ValidationFailedError('First name and last name are required.');
     }
-    
-    if (hospital && (!Types.ObjectId.isValid(hospital) || (!(await hospitalService.isHospital(hospital))))) {
-      throw new ValidationFailedError('There is no hospital');
+    let entityId = branchId || req.companyId;
+    if(!req.isRoot) {
+      entityId = req.companyId;
     }
-    title && map(title, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
-        throw new ValidationFailedError('There is no titleId');
-      }
-    });
-    degree && map(degree, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getDegreeById(id))))) {
-        throw new ValidationFailedError('There is no degreeId');
-      }
-    });
-    speciality && map(speciality, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getSpecialityById(id))))) {
-        throw new ValidationFailedError('There is no sepcialityId');
-      }
-    });
-    // if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
-    //   throw new ValidationFailedError('There is no employeeGroupId');
-    // }
+    const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
+    console.log(createdUser)
+    if(createdUser && createdUser.length > 0) {
+      throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
+    }
 
-    const staffInfo: any = {
+    const employeeInfo: any = {
       firstName,
       lastName,
       address,
-      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
       description,
       gender,
-      phoneNumber,
-      email,
-      hospital: hospital,
-      title: title || [],
-      degree: degree || [],
-      speciality: speciality || [],
-      employeeGroup,
+      title,
+      degree,
+      speciality,
       avatar,
       employeeHistory,
+      phoneNumber,
+      password,
+      username,
+      employeeGroup,
       certification,
-      lang,
-      slug: slug || slugify(trim(lowerCase(normalizeText(`${lastName}-${firstName}-${new Date().getTime()}`))))
-      // createdBy,
-      // updatedBy,
+      email,
+      groups,
+      branchId: entityId,
     };
-    const data = await staffService.createStaff(staffInfo);
+    const data = await employeeService.createBranchUser(employeeInfo, entityId);
     res.send(data);
   } catch (e) {
-    logger.error('createStaffAction', e);
+    logger.error('createEmployeeAction', e);
     next(e);
   }
 };
 
-const fetchStaffAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const fetchEmployeeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const { hospitalId, degree, title, speciality, employeeGroup } = req.query;
+    // const { hospitalId, degree, title, speciality, employeeGroup } = req.query;
     const { page, limit } = appUtil.getPaging(req);
     const options = {
       page,
       limit,
     }
-    const keyword = get(req, 'query.keyword', '');
-    const language: string = get(req, 'language');
-    const raw: boolean = !isUndefined(get(req.query, 'raw'));
-    const data = await staffService.fetchStaff({keyword, hospitalId, degree, title, speciality, employeeGroup, options}, language, raw);
-    res.send(data);
-  } catch (e) {
-    logger.error('fetchStaffAction', e);
-    next(e);
-  }
-};
-
-const getStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-    const staffId = get(req.params, 'staffId');
-    const language: string = get(req, 'language');
-    const raw: boolean = !isUndefined(get(req.query, 'raw'));
-    const data = await staffService.getStaffInfo(staffId, language, raw);
-    res.send(data);
-  } catch (e) {
-    logger.error('getStaffInfoAction', e);
-    next(e);
-  }
-};
-
-const updateStaffInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-    const staffId = get(req.params, 'staffId');
-    const {
-      firstName, lastName, fullName, gender, description,
-      phoneNumber, email, hospitalId, title, degree, speciality, employeeGroup,
-      avatar, employeeHistory, certification, slug, lang
-    } = req.body;
-
-    if (hospitalId && (!Types.ObjectId.isValid(hospitalId) || (!(await hospitalService.isHospital(hospitalId))))) {
-      throw new Error('There is no hospitalId');
+    let branchId = get(req.query, 'branchId') || req.companyId;
+    const keyword = get(req.query, 'keyword');
+    if(!req.isRoot) {
+      branchId = req.companyId;
     }
-    map(title, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getTitleById(id))))) {
-        throw new Error('There is no titleId');
-      }
-    });
-    map(degree, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getDegreeById(id))))) {
-        throw new Error('There is no degreeId');
-      }
-    });
-    map(speciality, async (id) => {
-      if (id && (!Types.ObjectId.isValid(id) || (!(await configurationService.getSpecialityById(id))))) {
-        throw new Error('There is no sepcialityId');
-      }
-    });
-    // if(employeeGroup && (!Types.ObjectId.isValid(employeeGroup) || (!(await configurationService.getEmployeeGroupById(employeeGroup))))) {
-    //   throw new Error('There is no employeeGroupId');
-    // }
-    const staffInfo: any = omitBy({
+    console.log(branchId, req.companyId)
+    const data = await employeeService.getEmployeeByBranchId({ branchId },options);
+    res.send(data);
+  } catch (e) {
+    logger.error('fetchEmployeeAction', e);
+    next(e);
+  }
+};
+
+const getEmployeeInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const employeeId = get(req.params, 'employeeId');
+    const language: string = get(req, 'language');
+    let branchId = get(req.query, 'branchId') || req.companyId;
+    if(!req.isRoot) {
+      branchId = req.companyId;
+    }
+
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const data = await employeeService.getEmployeeInfo({
+      employeeNumber: employeeId,
+      branchId: branchId,
+    }, raw);
+    res.send(data);
+  } catch (e) {
+    logger.error('getEmployeeInfoAction', e);
+    next(e);
+  }
+};
+
+const updateEmployeeInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const {
       firstName,
       lastName,
-      fullName: fullName || (firstName && lastName ? `${firstName} ${lastName}` : null),
+      address,
       description,
       gender,
-      phoneNumber,
-      email,
-      hospital: hospitalId,
       title,
       degree,
       speciality,
-      employeeGroup,
       avatar,
       employeeHistory,
+      phoneNumber,
+      password,
+      employeeGroup,
       certification,
-      lang,
-      slug,
-      // createdBy,
-      // updatedBy,
+      email,
+      groups,
+      username,
+      branchId,
+    } = req.body;
+    if (!firstName || !lastName ){
+      throw new ValidationFailedError('First name and last name are required.');
+    }
+    const employeeId = get(req.params, 'employeeId');
+    let entityId = branchId || req.companyId;
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+    const employee = await employeeService.getEmployeeInfo({
+      employeeNumber: employeeId,
+      branchId: branchId,
+    }, true);
+
+    if(!employee) {
+      throw new NotFoundError();
+    }
+    const user = await userService.findUserById(get(employee, 'userId'));
+    if(username) {
+      const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
+
+      if(createdUser && createdUser.length > 0 && get(createdUser, '_id') !== get(employee, 'userId') ) {
+        throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
+      }
+    }
+
+    const employeeInfo: any =  omitBy({
+      firstName,
+      lastName,
+      address,
+      description,
+      gender,
+      title,
+      degree,
+      speciality,
+      avatar,
+      employeeHistory,
+      phoneNumber,
+      password,
+      username,
+      employeeGroup,
+      certification,
+      email,
+      groups,
+      branchId: entityId,
     }, isNil);
-  
-    const params = { staffId, staffInfo };
-    const data = await staffService.updateStaffInfo(params);
+    const data = await employeeService.updateEmployeeInfo(employeeId, employeeInfo);
+    if(username || groups) {
+      await userService.updateUserProfile(get(user, '_id'), omitBy({ username, groups }, isNil));
+      if(xor(groups, get(user, 'groups'))) {
+        await employeeService.updateEmployeeGroups(get(user, '_id'), groups, branchId);
+      }
+    }
     res.send(data);
   } catch (e) {
-    logger.error('updateStaffInfoAction', e);
+    logger.error('updateEmployeeInfoAction', e);
     next(e);
   }
 };
 
+const deleteEmployeeAction = async() => {
+
+}
+
 
 export default { 
-  createStaffAction,
-  fetchStaffAction,
-  getStaffInfoAction,
-  updateStaffInfoAction,
-  deleteStaffAction,
+  createEmployeeAction,
+  fetchEmployeeAction,
+  getEmployeeInfoAction,
+  updateEmployeeInfoAction,
+  deleteEmployeeAction,
 };

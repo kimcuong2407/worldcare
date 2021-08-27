@@ -7,7 +7,6 @@ import authService from '@modules/auth/auth.service';
 import jwtUtil from '@app/utils/jwt.util';
 import { ForbiddenError, UnauthorizedError } from '../types/ErrorTypes';
 import casbin from '../casbin';
-import { Enforcer } from 'casbin';
 import { ROOT_COMPANY_ID } from '../constant';
 
 const logger = loggerHelper.getLogger('middleware.authorization');

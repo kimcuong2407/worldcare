@@ -12,7 +12,7 @@ const RoleSchema = new Schema({
   description: {
     type: String,
   },
-  companyId: {
+  branchId: {
     type: Number,
   },
   deletedAt: Date,

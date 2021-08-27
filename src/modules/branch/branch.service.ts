@@ -287,7 +287,7 @@ const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, f
   if (partnerId) {
     aggs.push({
       $match: {
-        partnerId: partnerId,
+        partnerId: Number(partnerId),
       }
     })
   }
@@ -329,7 +329,10 @@ const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, f
       }
     }])
   }
-  // console.log()
+  aggs.push({
+    $match: filter
+  })
+  console.log(JSON.stringify(aggs))
   // const aggregation = await BranchCollection.aggregate(aggs).exec();
   const result: any = await makeQuery(BranchCollection.aggregate(aggs).exec());
 

@@ -95,7 +95,7 @@ const fetchPartner = async (params: any, options: any) => {
     query['address.cityId'] = cityId;
   }
 
-  if (modules) {
+  if (modules && modules.length > 0) {
     query['modules'] = {
       $in: modules
     };
@@ -105,6 +105,7 @@ const fetchPartner = async (params: any, options: any) => {
       $match: query
     }
   ]);
+  console.log(query)
 
   const sort: any = {};
 
