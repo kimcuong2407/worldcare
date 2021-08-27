@@ -87,7 +87,7 @@ OrderSchema.virtual('shippingAddress', {
 OrderSchema.virtual('shopInfo', {
   ref: 'branch', // the collection/model name
   localField: 'branchId',
-  foreignField: 'branchId',
+  foreignField: '_id',
   justOne: true, // default is false
   options: { select: 'name -_id -id -branchId', projection: { name: 1, branchId: -1, _id: -1, id: -1} },
 });

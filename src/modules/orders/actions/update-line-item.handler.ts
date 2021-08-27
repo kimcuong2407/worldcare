@@ -21,6 +21,32 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
       ...item,
       orderNumber: get(order, 'orderNumber'),
     }, { upsert: true}).exec());
+    const aggLineItem = await OrderItemCollection.aggregate([
+      {
+        $match: { orderNumber: Number(get(order, 'orderNumber') )}
+      },
+      {
+        '$addFields': {
+          'subTotalPerItem': {
+            '$multiply': [
+              '$price', '$saleQuantity'
+            ]
+          }
+        }
+      }, {
+        '$group': {
+          '_id': '$orderNumber', 
+          'subTotal': {
+            '$sum': '$subTotalPerItem'
+          }
+        }
+      }
+    ]);
+    const subTotalPerItem = get(aggLineItem, '0.subTotalPerItem');
+  
+    await OrderCollection.findOneAndUpdate( { orderNumber: get(order, 'orderNumber') }, {
+        subTotal: subTotalPerItem,
+    })
     return Promise.resolve(order);
   }
 

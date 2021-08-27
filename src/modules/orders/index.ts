@@ -10,6 +10,11 @@ const orderRoutes = (app: express.Application): void => {
   app.post('/api/v1/medicine-order', middleware.jwt, orderActions.createOrderAction);
 
   app.get('/api/v1/order', middleware.authorization([
+    [CORE_RESOURCES.order, CORE_ACTIONS.read],
+    [CORE_RESOURCES.order, CORE_ACTIONS.admin]
+  ]), orderActions.getOrderAction);
+
+  app.get('/api/v1/order/pending', middleware.authorization([
     [CORE_RESOURCES.order, CORE_ACTIONS.read]
   ]), orderActions.getOrderAction);
 
