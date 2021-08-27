@@ -13,14 +13,19 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     const { data } = payload;
     const { item } = data;
     const id = get(item, '_id');
+    const isDeleted = get(item, 'isDeleted', false);
     const query: any = {};
     if (id) {
       query._id = Types.ObjectId(id)
     };
+    if(isDeleted) {
+      await makeQuery(OrderItemCollection.deleteOne(query).exec());
+    } else {
     await makeQuery(OrderItemCollection.updateOne(query, {
       ...item,
       orderNumber: get(order, 'orderNumber'),
     }, { upsert: true}).exec());
+  }
     const aggLineItem = await OrderItemCollection.aggregate([
       {
         $match: { orderNumber: Number(get(order, 'orderNumber') )}
