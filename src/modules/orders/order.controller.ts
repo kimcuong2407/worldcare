@@ -137,8 +137,9 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
     if(!req.isRoot) {
       entityId = req.companyId;
     }
+    const orderStatus = status ? String(status).split(',') : null;
     const result = await orderService.findOrders(omitBy({
-      status, branchId: entityId, startTime, endTime, sortBy, sortDirection,
+      status: orderStatus && orderStatus.length > 0 ? orderStatus : null, branchId: entityId, startTime, endTime, sortBy, sortDirection,
     }, isNil), page, limit);
     res.send(result);
   } catch (e) {
