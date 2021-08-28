@@ -16,7 +16,7 @@ const orderRoutes = (app: express.Application): void => {
 
   app.get('/api/v1/order/pending', middleware.authorization([
     [CORE_RESOURCES.order, CORE_ACTIONS.read]
-  ]), orderActions.getOrderAction);
+  ]), orderActions.getPendingOrderAction);
 
   app.get('/api/v1/order/:orderNumber', middleware.authorization([
     [CORE_RESOURCES.order, CORE_ACTIONS.read]

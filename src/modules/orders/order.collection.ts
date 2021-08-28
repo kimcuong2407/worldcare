@@ -44,6 +44,14 @@ const OrderSchema = new Schema({
     type: Number,
     default: 0
   },
+  shippingFee: {
+    type: Number,
+    default: 0
+  },
+  serviceFee: {
+    type: Number,
+    default: 0
+  },
   shippingInfo: {
     'shippingVendor': String,
     'shipperName':  String,

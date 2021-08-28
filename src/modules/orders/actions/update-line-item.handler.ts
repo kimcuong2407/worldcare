@@ -51,8 +51,8 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
           }
         }
       }
-    ]);
-    const subTotalPerItem = get(aggLineItem, '0.subTotalPerItem');
+    ]).exec();
+    const subTotalPerItem = get(aggLineItem, '0.subTotal');
 
     await OrderCollection.findOneAndUpdate({ orderNumber: get(order, 'orderNumber') }, {
       subTotal: subTotalPerItem,

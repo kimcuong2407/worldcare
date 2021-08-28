@@ -11,6 +11,7 @@ import PrescriptionCollection from './prescription.collection';
 import { getPreSignedUrl } from '@app/core/s3';
 import orderActions from './actions';
 import { setResponse } from '@app/utils/response.util';
+import { ORDER_STATUS } from './constant';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -147,6 +148,36 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
 };
 
 
+const getPendingOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const { page, limit } = appUtil.getPaging(req);
+    const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
+    const entityId = companyId;
+
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+    const result = await orderService.findOrders(omitBy({
+      branchId: entityId, startTime, endTime, sortBy, sortDirection,
+      status: [
+        ORDER_STATUS.NEW,
+        ORDER_STATUS.RECEIVED,
+        ORDER_STATUS.CONFIRMED,
+        ORDER_STATUS.PACKAGED,
+        ORDER_STATUS.PROCESSED,
+        ORDER_STATUS.PROCESSING,
+        ORDER_STATUS.SHIPPING,
+      ]
+    }, isNil), page, limit);
+    res.send(result);
+  } catch (e) {
+    logger.error('getOrderAction', e);
+    next(e);
+  }
+};
+
+
 const handleOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const userId = req.user.id;
@@ -187,6 +218,8 @@ export default {
   getMyOrderAction,
   getMyOrderDetailAction,
   getOrderAction,
+  getPendingOrderAction,
   getOrderDetailAction,
   handleOrderAction,
 };
+
