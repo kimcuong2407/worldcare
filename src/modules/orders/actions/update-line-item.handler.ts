@@ -15,20 +15,25 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     const id = get(item, '_id');
     const isDeleted = get(item, 'isDeleted', false);
     const query: any = {};
-    if (id) {
-      query._id = Types.ObjectId(id)
-    };
-    if(isDeleted) {
+
+    if (isDeleted) {
       await makeQuery(OrderItemCollection.deleteOne(query).exec());
+    } else if (id) {
+      query._id = Types.ObjectId(id)
+
+      await makeQuery(OrderItemCollection.updateOne(query, {
+        ...item,
+        orderNumber: get(order, 'orderNumber'),
+      }, { upsert: true }).exec());
     } else {
-    await makeQuery(OrderItemCollection.updateOne(query, {
-      ...item,
-      orderNumber: get(order, 'orderNumber'),
-    }, { upsert: true}).exec());
-  }
+      await makeQuery(OrderItemCollection.create({
+        ...item,
+        orderNumber: get(order, 'orderNumber'),
+      }));
+    }
     const aggLineItem = await OrderItemCollection.aggregate([
       {
-        $match: { orderNumber: Number(get(order, 'orderNumber') )}
+        $match: { orderNumber: Number(get(order, 'orderNumber')) }
       },
       {
         '$addFields': {
@@ -40,7 +45,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         }
       }, {
         '$group': {
-          '_id': '$orderNumber', 
+          '_id': '$orderNumber',
           'subTotal': {
             '$sum': '$subTotalPerItem'
           }
@@ -48,14 +53,14 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
       }
     ]);
     const subTotalPerItem = get(aggLineItem, '0.subTotalPerItem');
-  
-    await OrderCollection.findOneAndUpdate( { orderNumber: get(order, 'orderNumber') }, {
-        subTotal: subTotalPerItem,
+
+    await OrderCollection.findOneAndUpdate({ orderNumber: get(order, 'orderNumber') }, {
+      subTotal: subTotalPerItem,
     })
     return Promise.resolve(order);
   }
 
-  async validate (order: any, payload: any) {
+  async validate(order: any, payload: any) {
     return Promise.resolve(true);
   }
 }
