@@ -211,7 +211,7 @@ const staffLogin = async (login: string, password: string, branchId: Number) => 
     throw new UnAuthenticated();
   }
   const userCompany = get(user, 'branchId');
-  const groups = await getRolesByCompanyAndUserId(get(user,'_id'));
+  const groups = get(user, 'groups', []);
   if (!groups || groups.length < 1) {
     throw new UnauthorizedError('Bạn không có quyền truy cập vào trang này.');
   }
@@ -224,6 +224,10 @@ const staffLogin = async (login: string, password: string, branchId: Number) => 
     token,
     branchId: userCompany,
   }
+}
+
+const getResourcesForPartner = async (branchId: number) => {
+  // const partner = aait 
 }
 export default {
   authenticate,
@@ -241,4 +245,5 @@ export default {
   assignParentBranch,
   updateParentBranch,
   removeRoleForUser,
+  getResourcesForPartner,
 };
