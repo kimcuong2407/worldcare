@@ -113,7 +113,9 @@ const fetchPartner = async (params: any, options: any) => {
     sort[sortBy] = sortDirection || -1;
   }
 
-  const result = await PartnerCollection.aggregatePaginate(aggregate, { ...options, sort: isEmpty(sort) ? null : sort });
+  const result = await PartnerCollection.aggregatePaginate(aggregate, { ...options, sort: isEmpty(sort) ? {
+    createdAt: -1,
+  } : sort });
 
   // const data = await PartnerCollection.find({
   //   _id: { $in: map(result.docs, '_id') }
