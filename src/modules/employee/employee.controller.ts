@@ -94,7 +94,6 @@ const fetchEmployeeAction = async (req: express.Request, res: express.Response, 
     if(!req.isRoot) {
       branchId = req.companyId;
     }
-    console.log(branchId, req.companyId)
     const data = await employeeService.getEmployeeByBranchId({ branchId },options);
     res.send(data);
   } catch (e) {
@@ -154,10 +153,13 @@ const updateEmployeeInfoAction = async (req: express.Request, res: express.Respo
     if(!req.isRoot) {
       entityId = req.companyId;
     }
-    const employee = await employeeService.getEmployeeInfo({
+    const query: any = {
       employeeNumber: employeeId,
-      branchId: branchId,
-    }, true);
+    }
+    if(entityId) {
+      query.branchId = branchId;
+    }
+    const employee = await employeeService.getEmployeeInfo(query, true);
 
     if(!employee) {
       throw new NotFoundError();
@@ -191,7 +193,7 @@ const updateEmployeeInfoAction = async (req: express.Request, res: express.Respo
       groups,
       branchId: entityId,
     }, isNil);
-    const data = await employeeService.updateEmployeeInfo(employeeId, employeeInfo);
+    const data = await employeeService.updateEmployeeInfo(query, employeeInfo);
     if(username || groups) {
       await userService.updateUserProfile(get(user, '_id'), omitBy({ username, groups }, isNil));
       if(xor(groups, get(user, 'groups'))) {

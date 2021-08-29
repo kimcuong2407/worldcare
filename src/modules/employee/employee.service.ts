@@ -108,7 +108,7 @@ const updateEmployeeGroups = async(userId: string, groups: [string], branchId: s
 
 const updateEmployeeInfo = async (query: any, staffInfo: any) => {
   const { username, groups, userId, ...info } = staffInfo;
-  const staff = await EmployeeCollection.findOneAndUpdate(query, info, { new: true });
+  const staff = await EmployeeCollection.findOneAndUpdate(query, { $set: info}, { new: true });
   
   const { createdAt, updatedAt, ...rest } = get(staff, '_doc', {});
   return {
