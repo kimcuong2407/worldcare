@@ -13,7 +13,7 @@ import { ENTITY_TYPE, ROOT_COMPANY_ID } from '@app/core/constant';
 import { Types } from 'mongoose';
 import branchService from '../branch/branch.service';
 import partnerService from '../partner/partner.service';
-import { CLINIC_RESOURCES, PHARMACY_RESOURCES, RESOURCES, CORE_ACTIONS, ROOT_ACTIONS, ACTIONS } from '@app/core/permissions';
+import { CLINIC_RESOURCES, PHARMACY_RESOURCES, RESOURCES, CORE_ACTIONS, ROOT_ACTIONS, ACTIONS, CORE_RESOURCES } from '@app/core/permissions';
 
 // Auth service
 const authenticate = async (login: string, password: string) => {
@@ -251,6 +251,11 @@ const getResourcesForBranch = async (branchId: number) => {
   });
 
   const actions: any = branchId == ROOT_COMPANY_ID ? ROOT_ACTIONS : CORE_ACTIONS;
+  resources = branchId == ROOT_COMPANY_ID ? {
+    ...CORE_RESOURCES,
+    ...PHARMACY_RESOURCES,
+    ...CLINIC_RESOURCES
+  } : resources;
   return {
     resources,
     actions,
