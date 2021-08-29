@@ -6,7 +6,7 @@ declare namespace Express {
     user?: any,
     token?: string,
     hospitalId?: string,
-    companyId?: string,
+    companyId?: number,
     language?: string,
     isRoot: boolean,
   }
