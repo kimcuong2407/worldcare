@@ -160,13 +160,7 @@ const updatePartnerInfo = async (partnerId: Number, partnerInfo: any) => {
 };
 
 const deletePartner = async (partnerId: string) => {
-  const data = await PartnerCollection.findByIdAndDelete(partnerId);
-  if (isNull(data)) {
-    const data = await PartnerCollection.findById(partnerId);
-    if (!data) {
-      throw new Error('There is no partnerId!');
-    }
-  }
+  await PartnerCollection.findByIdAndUpdate(partnerId, {$set: {deletedAt: new Date()}});
   return true;
 };
 
