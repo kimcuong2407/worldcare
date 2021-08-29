@@ -32,8 +32,8 @@ const createPartnerAction = async (req: express.Request, res: express.Response, 
       photos,
       modules,
     } = req.body;
-    if (!name || !description ){
-      throw new ValidationFailedError('Vui lòng nhập vào tên và mô tả.');
+    if (!name ){
+      throw new ValidationFailedError('Vui lòng nhập vào tên đối tác.');
     }
     if (!partnerCode ){
       throw new ValidationFailedError('Vui lòng nhập vào partnerCode.');
@@ -41,7 +41,7 @@ const createPartnerAction = async (req: express.Request, res: express.Response, 
 
     const existingPartner = await partnerService.findPartnerByCode(partnerCode);
     if (existingPartner ){
-      throw new ValidationFailedError('Partner code đã được sử dụng bởi một công ty khác.');
+      throw new ValidationFailedError('Mã đối tác đã được sử dụng bởi một công ty khác.');
     }
     const partnerInfo: any = {
       name,
