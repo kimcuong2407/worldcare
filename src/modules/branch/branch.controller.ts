@@ -98,7 +98,7 @@ const fetchBranchAction = async (req: express.Request, res: express.Response, ne
     const cityId: string = get(req.query, 'cityId');
     const branchType: string = get(req.query, 'branchType');
     let partnerId: string = get(req.query, 'partnerId');
-    let branchId: string = null;
+    let branchId: string = req.companyId;
 
     if(!req.isRoot) {
       branchId = req.companyId;
