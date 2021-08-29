@@ -71,11 +71,11 @@ const assignPermissionToRoleAction = async (
     } = req.body;
     const companyId = req.isRoot ? null : req.companyId;
     const roleId = get(req.params, 'groupId');
-    const role = await authService.findOneRole(roleId, companyId);
+    const role = await authService.findOneRole(roleId);
     if(!role) {
       throw new ValidationFailedError('Không tìm thấy nhóm người dùng.');
     }
-    await casbin.enforcer.addPolicy(...[roleId, String(get(role, 'companyId')), resource, action]);
+    await casbin.enforcer.addPolicy(...[roleId, String(get(role, 'branchId')), resource, action]);
     await casbin.enforcer.loadPolicy();
     return res.send(true);
   } catch (e) {
@@ -268,7 +268,7 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
 
 const getResourcePermissionAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-
+    // const resources = await 
     res.send({
       resources: RESOURCES,
       actions: ACTIONS,
