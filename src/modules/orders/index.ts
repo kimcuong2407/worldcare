@@ -26,7 +26,7 @@ const orderRoutes = (app: express.Application): void => {
     [CORE_RESOURCES.order, CORE_ACTIONS.admin]
   ]), orderActions.handleOrderAction);
 
-  app.put('/api/v1/order/:orderNumber/:action(process|update-item|complete-order|shipping|package)', middleware.authorization([
+  app.put('/api/v1/order/:orderNumber/:action(process|update-item|complete-order|shipping|package|reject)', middleware.authorization([
     [CORE_RESOURCES.order, CORE_ACTIONS.update]
   ]), orderActions.handleOrderAction);
 

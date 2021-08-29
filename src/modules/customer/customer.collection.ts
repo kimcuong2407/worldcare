@@ -13,6 +13,19 @@ const CustomerSchema = new Schema({
   name: String,
   phoneNumber: String,
   email: String,
+  gender: String,
+  source: String,
+  dateOfBirth: Date,
+  customerGroup: Number,
+  idNumber: String,
+  branchId: Number,
+  note: String,
+  address: {
+    street: String,
+    wardId: String,
+    districtId: String,
+    cityId: String,
+  }
 }, {
   timestamps: true,
 });

@@ -6,4 +6,12 @@ export const MEDICAL_SERVICE = {
   'MEDICAL_TEST': 'MEDICAL_TEST'
 }
 
+
+export const ENTITY_TYPE = {
+  'PHARMACY': 'PHARMACY',
+  'CLINIC': 'CLINIC',
+  'HOSPITAL': 'HOSPITAL',
+  'LAB': 'LAB'
+}
+
 export const ROOT_COMPANY_ID = 888888;

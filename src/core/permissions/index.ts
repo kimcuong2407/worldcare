@@ -1,20 +1,35 @@
 export const CORE_RESOURCES = {
   partner: 'partner',
   branch: 'branch',
+  companyInfo: 'companyInfo',
   employee: 'employee',
+  user: 'user',
   userGroup: 'userGroup',
-  appointment: 'appointment',
-  order: 'order',
+  // order: 'order',
   customer: 'customer',
   patient: 'patient',
-
 }
+
+export const PHARMACY_RESOURCES = {
+  ...CORE_RESOURCES,
+  order: 'order',
+};
+
+export const CLINIC_RESOURCES = {
+  ...CORE_RESOURCES,
+  appointment: 'appointment',
+};
+
 
 export const CORE_ACTIONS = {
   read: 'read',
   write: 'write',
   delete: 'delete',
   update: 'update',
+}
+
+export const ROOT_ACTIONS = {
+  ...CORE_ACTIONS,
   admin: 'admin',
 }
 
@@ -35,10 +50,10 @@ export const ACTIONS = [
     key: CORE_ACTIONS.update,
     name: 'Chỉnh sửa',
   },
-  // {
-  //   key: CORE_ACTIONS.admin,
-  //   name: 'Quản trị',
-  // },
+  {
+    key: ROOT_ACTIONS.admin,
+    name: 'Quản trị',
+  },
 ];
 
 export const RESOURCES = [
@@ -55,11 +70,11 @@ export const RESOURCES = [
     name: 'Quản lý người dùng',
   },
   {
-    key: CORE_RESOURCES.appointment,
+    key: CLINIC_RESOURCES.appointment,
     name: 'Quản lý đặt lịch',
   },
   {
-    key: CORE_RESOURCES.order,
+    key: PHARMACY_RESOURCES.order,
     name: 'Quản lý đơn hàng',
   },
   {

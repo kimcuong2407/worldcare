@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import SpecialityCollection from '../configuration/speciality.collection';
 import hospitalService from '../hospital/hospital.service';
 import AppointmentCollection from './appointment.collection';
-import CustomerCollection from './customer.collection';
+import CustomerCollection from '../customer/customer.collection';
 
 // DEGREE
 const createAppointment = async (appointment: any) => {

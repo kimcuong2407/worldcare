@@ -1,6 +1,6 @@
 import makeQuery from '@app/core/database/query'
 import { get } from 'lodash';
-import CustomerCollection from '../appointment/customer.collection';
+import CustomerCollection from '../customer/customer.collection';
 import userService from '../user/user.service';
 import { ORDER_STATUS } from './constant';
 import OrderItemCollection from './order-item.collection';

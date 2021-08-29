@@ -4,7 +4,7 @@ import authService from './auth.service';
 import { InternalServerError, NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { setResponse } from '@app/utils/response.util';
 import casbin from '@app/core/casbin';
-import { get, groupBy, map } from 'lodash';
+import { find, get, groupBy, map } from 'lodash';
 import userService from '../user/user.service';
 import companyService from '../branch/branch.service';
 import { ACTIONS, RESOURCES } from '@app/core/permissions';
@@ -75,6 +75,14 @@ const assignPermissionToRoleAction = async (
     if(!role) {
       throw new ValidationFailedError('Không tìm thấy nhóm người dùng.');
     }
+    const {  actions, resources } = await authService.getResourcesForBranch(get(role, 'branchId'));
+    if(!resources[resource]) {
+      throw new ValidationFailedError('Dữ liệu không được phép cập nhật.');
+    }
+
+    if(!actions[action]) {
+      throw new ValidationFailedError('Dữ liệu không được phép cập nhật.');
+    }
     await casbin.enforcer.addPolicy(...[roleId, String(get(role, 'branchId')), resource, action]);
     await casbin.enforcer.loadPolicy();
     return res.send(true);
@@ -95,13 +103,13 @@ const removePermissionToRoleAction = async (
       action,
       resource,
     } = req.body;
-    const companyId = req.isRoot ? null : req.companyId;
+    const branchId = req.isRoot ? null : req.companyId;
     const roleId = get(req.params, 'groupId');
-    const role = await authService.findOneRole(roleId, companyId);
+    const role = await authService.findOneRole(roleId, branchId);
     if(!role) {
       throw new ValidationFailedError('Không tìm thấy nhóm người dùng.');
     }
-    await casbin.enforcer.removePolicy(...[roleId, String(get(role, 'companyId')), resource, action]);
+    await casbin.enforcer.removePolicy(...[roleId, String(get(role, 'branchId')), resource, action]);
     await casbin.enforcer.loadPolicy();
     return res.send(true);
   } catch (e) {
@@ -268,11 +276,8 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
 
 const getResourcePermissionAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // const resources = await 
-    res.send({
-      resources: RESOURCES,
-      actions: ACTIONS,
-    });
+    const resources = await authService.getTranslatedResourcesAndActionsForBranch(req.companyId);
+    res.send(resources);
   } catch (e) {
     logger.error('getResourcePermissionAction', e);
     next(e);

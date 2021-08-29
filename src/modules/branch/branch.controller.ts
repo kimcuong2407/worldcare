@@ -6,7 +6,7 @@ import { normalizeText } from 'normalize-text';
 import get from 'lodash/get';
 import lowerCase from 'lodash/lowerCase';
 import trim from 'lodash/trim';
-import { ENTITY_TYPE, WORKING_HOURS } from './constant';
+import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
 import { isNil, isString, isUndefined, map, omitBy, pick } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
