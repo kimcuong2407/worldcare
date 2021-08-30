@@ -186,51 +186,6 @@ const fetchPolicyAction = async (
   }
 };
 
-
-const registerAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-    const {
-      phoneNumber,
-      email,
-      password,
-      firstName,
-      lastName,
-    } = req.body;
-
-    if (!phoneNumber) {
-      throw new ValidationFailedError('Vui lòng nhập vào số điện thoại.');
-    }
-
-    if (!password) {
-      throw new ValidationFailedError('Vui lòng nhập vào mật khẩu.');
-    }
-    const user = await userService.findUser({
-      $or: [
-        {
-          phoneNumber
-        }
-      ]
-    });
-    if (user && user.length > 0) {
-      throw new ValidationFailedError('Email hoặc số điện thoại đã được đăng ký với một tài khoản khác.');
-    }
-    const auth = await authService.registerUser(
-      {
-        phoneNumber,
-        email,
-        password,
-        firstName,
-        lastName,
-      }
-    );
-    res.send(auth);
-  } catch (e) {
-    logger.error('registerAction', e);
-    next(e);
-  }
-};
-
-
 const changePasswordAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
@@ -405,7 +360,6 @@ export default {
   authorizationAction,
   assignUserToGroupAction,
   fetchPolicyAction,
-  registerAction,
   changePasswordAction,
   staffLoginAction,
   getResourcePermissionAction,

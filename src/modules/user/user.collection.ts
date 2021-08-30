@@ -8,18 +8,18 @@ import last from 'lodash/last';
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  __v: { type: Number, select: false },
-  name: {
+  fullName: {
     type: String
   },
   firstName: String,
   lastName: String,
-  gender: Boolean,
+  gender: String,
   phoneNumber: {
     type: String,
     index: true
   },
   branchId: Number,
+  employeeNumber: Number,
   username: String,
   email: {
     type: String,
@@ -27,9 +27,11 @@ const UserSchema = new Schema({
   },
   groups: [{ type: Schema.Types.ObjectId, ref: 'role' }],
   password: String,
-  address: String,
+  address: Object,
   avatar: String,
   dob: String,
+  note: String,
+  deletedAt: Date,
   createdBy: String,
   updatedBy: String,
   lastActivity: Date,
@@ -39,7 +41,6 @@ const UserSchema = new Schema({
 });
 
 UserSchema.plugin(mongoosePaginate);
-// UserSchema.index({ phoneNumber: 1, companyId: 1 }, { unique: true })
 UserSchema.index({ username: 1, branchId: 1 }, { unique: true })
 
 const UserCollection = mongoose.model('user', UserSchema, 'user');

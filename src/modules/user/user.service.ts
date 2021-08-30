@@ -3,7 +3,7 @@ import makeQuery from '@app/core/database/query';
 import { UnAuthenticated } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
 import jwtUtil from '@app/utils/jwt.util';
-import { get, map, pick } from 'lodash';
+import { get, isNil, map, omitBy, pick } from 'lodash';
 import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from '../user/user.collection';
@@ -12,6 +12,8 @@ import addressUtil from '@utils/address.util';
 import branchService from '../branch/branch.service';
 import appUtil from '@app/utils/app.util';
 import employeeService from '../employee/employee.service';
+import authService from '../auth/auth.service';
+import { ROOT_COMPANY_ID } from '@app/core/constant';
 
 // Auth service
 const getUserProfileById = async (userId: string) => {
@@ -22,14 +24,14 @@ const getUserProfileById = async (userId: string) => {
   return {
     ...profile,
     ...pick(employee, ['firstName', 'lastName']),
-    branches: map(queryBranches, (branch) => pick(branch, ['_id', 'name', 'address']) ),
+    branches: map(queryBranches, (branch) => pick(branch, ['_id', 'name', 'address'])),
     // roles,
   }
 };
 
 // Auth service
 const updateUserProfile = async (userId: string, profile: any) => {
-  await UserCollection.findByIdAndUpdate(userId,profile).lean().exec();
+  await UserCollection.findByIdAndUpdate(userId, profile).lean().exec();
   // const roles = await casbin.enforcer.getRolesForUser(userId);
   return true;
 };
@@ -74,16 +76,16 @@ const findUser = async (query: any) => {
 }
 
 const createUserAccount = async (user: any) => {
-  const { username, phoneNumber, email, branchId, password, groups} = user;
+  const { username, phoneNumber, email, branchId, password, groups } = user;
   const encryptedPassword = await bcryptUtil.generateHash(password);
-    const userInfo = {
-      username: username || phoneNumber,
-      phoneNumber: phoneNumber,
-      email: email,
-      password: encryptedPassword,
-      branchId: branchId,
-      groups,
-    };
+  const userInfo = {
+    username: username || phoneNumber,
+    phoneNumber: phoneNumber,
+    email: email,
+    password: encryptedPassword,
+    branchId: branchId,
+    groups,
+  };
   return createUser(userInfo);
 }
 
@@ -95,9 +97,184 @@ const findUserById = async (userId: string) => {
   return makeQuery(UserCollection.findById(userId).exec());
 }
 
-const updateUser = async (userId: string, userInfo) => {
-  return makeQuery(UserCollection.findById(userId).exec());
+
+const getUserInfo = async (params: any) => {
+  const {
+    userId, branchId
+  } = params;
+  const query: any = {
+    _id: Types.ObjectId(userId),
+  };
+
+  if (branchId) {
+    query['branchId'] = branchId;
+  }
+  let data = await UserCollection.findOne(query, ['-password'], {
+    'populate': [
+      { path: 'groups', select: '_id name' },
+    ],
+  });
+  return data;
 }
+
+const fetchUser = async (params: any, options: any) => {
+  const {
+    keyword, branchId, groups
+  } = params;
+  const query: any = {
+  };
+  if (keyword) {
+    query['$text'] = { $search: keyword }
+  }
+  if (branchId) {
+    query['branchId'] = branchId;
+  }
+  if (groups) {
+    query['groups'] = {
+      $in: groups,
+    }
+  }
+  let data = await UserCollection.paginate(query, {
+    ...options,
+    projection: ['-password'],
+    'populate': [
+      { path: 'groups', select: '_id name' },
+    ],
+  });
+  return data;
+}
+
+
+const createStaffAccount = async (inputUser: any) => {
+  const {
+    phoneNumber,
+    password,
+    email,
+    firstName,
+    lastName,
+    fullName,
+    gender,
+    avatar,
+    employeeNumber,
+    username,
+    groups,
+    branchId,
+    address } = inputUser;
+  const encryptedPassword = await bcryptUtil.generateHash(password);
+  const user = {
+    username: username || phoneNumber,
+    phoneNumber: phoneNumber,
+    email: email,
+    password: encryptedPassword,
+    branchId: branchId,
+    firstName,
+    lastName,
+    fullName: fullName || `${lastName || ''} ${firstName || ''}`,
+    gender,
+    avatar,
+    employeeNumber,
+    groups,
+    address
+  };
+  const createdUser = await createUser(user);
+  return createdUser;
+}
+
+
+const updateStaffAccount = async (userId: string, inputUser: any) => {
+  const {
+    phoneNumber,
+    password,
+    email,
+    firstName,
+    lastName,
+    fullName,
+    gender,
+    avatar,
+    employeeNumber,
+    username,
+    groups,
+    branchId,
+    address } = inputUser;
+  const user = omitBy({
+    username: username || phoneNumber,
+    phoneNumber: phoneNumber,
+    email: email,
+    branchId: branchId,
+    firstName,
+    lastName,
+    fullName: fullName || `${lastName || ''} ${firstName || ''}`,
+    gender,
+    avatar,
+    employeeNumber,
+    groups,
+    address
+  }, isNil);
+
+  if (password) {
+    const encryptedPassword = await bcryptUtil.generateHash(password);
+    user.password = encryptedPassword;
+  }
+
+  const createdUser = await UserCollection.findByIdAndUpdate(userId, { $set: user }, { new: true });
+  return createdUser;
+}
+
+const registerUser = async (inputUser: any) => {
+  const {
+    phoneNumber,
+    password,
+    email,
+    firstName,
+    lastName,
+    fullName,
+    gender,
+    avatar,
+    employeeNumber,
+    username,
+    groups,
+    address } = inputUser;
+  const encryptedPassword = await bcryptUtil.generateHash(password);
+  const user = {
+    username: username || phoneNumber,
+    phoneNumber: phoneNumber,
+    email: email,
+    password: encryptedPassword,
+    branchId: ROOT_COMPANY_ID,
+    firstName,
+    lastName,
+    fullName: fullName || `${lastName || ''} ${firstName || ''}`,
+    gender,
+    avatar,
+    employeeNumber,
+    groups,
+    address
+  };
+  const createdUser = await createUser(user);
+  return createdUser;
+}
+
+const updateUserGroups = async (userId: string, groups: [string], branchId: string) => {
+  await authService.removeRoleForUser(userId, branchId);
+  return authService.assignUserToGroup(userId, groups, branchId);
+}
+
+const updateUserInfo = async (query: any, userInfo: any) => {
+  const { username, groups, userId, ...info } = userInfo;
+  const user = await UserCollection.findOneAndUpdate(query, { $set: info }, { new: true });
+
+  const { createdAt, updatedAt, ...rest } = get(user, '_doc', {});
+  return {
+    ...rest,
+    createdAt: new Date(createdAt).getTime(),
+    updatedAt: new Date(updatedAt).getTime(),
+  };
+};
+
+const deleteUser = async (userId: string) => {
+  const data = await UserCollection.findByIdAndUpdate(userId, { $set: { deletedAt: new Date() } });
+  return true;
+};
 
 export default {
   getUserProfileById,
@@ -109,4 +286,11 @@ export default {
   createUserAccount,
   findUserById,
   updateUserProfile,
+  deleteUser,
+  registerUser,
+  fetchUser,
+  updateUserGroups,
+  createStaffAccount,
+  updateStaffAccount,
+  getUserInfo,
 };

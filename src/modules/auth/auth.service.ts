@@ -1,4 +1,4 @@
-import { DEFAULT_ROLES } from './constant';
+import { CLINIC_DEFAULT_ROLES, DEFAULT_ROLES, PHARMACY_DEFAULT_ROLES } from './constant';
 import makeQuery from '@app/core/database/query';
 import { UnAuthenticated, UnauthorizedError } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
@@ -6,7 +6,6 @@ import jwtUtil from '@app/utils/jwt.util';
 import { filter, forEach, get, omit } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 import UserCollection from '../user/user.collection';
-import userService from '../user/user.service';
 import RoleCollection from './roles.collection';
 import casbin from '@app/core/casbin';
 import { ENTITY_TYPE, ROOT_COMPANY_ID } from '@app/core/constant';
@@ -64,32 +63,6 @@ const changePasswordByUserId = async (userId: string, currentPassword: string, n
   return true;
 }
 
-
-// Auth service
-const registerUser = async (inputUser: any) => {
-  const { phoneNumber, password, email, firstName, lastName } = inputUser;
-  const sessionId = uuidv4();
-  const encryptedPassword = await bcryptUtil.generateHash(password);
-  const user = {
-    username: phoneNumber,
-    phoneNumber: phoneNumber,
-    email: email,
-    password: encryptedPassword,
-    branchId: ROOT_COMPANY_ID,
-    firstName,
-    lastName,
-  };
-  const createdUser = await userService.createUser(user);
-  const token = jwtUtil.issueToken(get(createdUser, '_id'), sessionId);
-
-  return {
-    userId: get(user, '_id'),
-    sessionId,
-    token
-  }
-}
-
-
 const assignUserToGroup = async (userId: string, roles: [string], domain: string) => {
   return Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
 }
@@ -121,15 +94,22 @@ const removeRole = async (roleId: string, branchId: string) => {
 
 
 const setupDefaultRoles = async (branchId: string, modules: string[]) => {
-  await Promise.all(DEFAULT_ROLES.map(async role => {
+  let roles: any = []
+  if (modules.includes(ENTITY_TYPE.PHARMACY)) {
+    roles = PHARMACY_DEFAULT_ROLES;
+  }
+  if (modules.includes(ENTITY_TYPE.CLINIC)) {
+    roles = CLINIC_DEFAULT_ROLES;
+  }
+  await Promise.all(roles.map(async (role: { name: any; permissions: any; }) => {
     const { name, permissions, } = role;
     const createdRole = await RoleCollection.create({
       name,
       branchId,
     });
-    await Promise.all(permissions.map(async per => {
+    await Promise.all(permissions.map(async (per: { resource: any; action: any; }) => {
       const { resource, action } = per;
-      const policies = action.map(act => ([get(createdRole, '_id'), branchId, resource, act]))
+      const policies = action.map((act: any) => ([get(createdRole, '_id'), branchId, resource, act]))
       return Promise.all(policies.map((pol: any) => casbin.enforcer.addPolicy(...pol)));
     }))
 
@@ -276,7 +256,6 @@ const getTranslatedResourcesAndActionsForBranch = async(branchId: number) => {
 }
 export default {
   authenticate,
-  registerUser,
   setupDefaultRoles,
   getRolesByCompany,
   getRolesDetailByCompanyAndId,

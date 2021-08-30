@@ -17,6 +17,7 @@ export const PHARMACY_RESOURCES = {
 
 export const CLINIC_RESOURCES = {
   ...CORE_RESOURCES,
+  order: 'order',
   appointment: 'appointment',
 };
 
