@@ -18,8 +18,8 @@ const createAppointment = async (appointment: any) => {
   const speciality = await SpecialityCollection.findById(specialityId).lean();
 
   const customerInfo = await CustomerCollection.findOneAndUpdate(
-    { phoneNumber, name },
-    { phoneNumber, name, email },
+    { phoneNumber, fullName: name },
+    { phoneNumber, fullName: name, email },
     { upsert: true, new: true }).exec();
   const hospital = await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
@@ -27,6 +27,7 @@ const createAppointment = async (appointment: any) => {
     time,
     service: serviceId,
     hospital: hospitalId,
+    branchId: hospitalId,
     message,
     source,
     speciality: specialityId,

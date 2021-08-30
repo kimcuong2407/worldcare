@@ -17,6 +17,7 @@ const AppointmentSchema = new Schema({
   },
   speciality: { type: Schema.Types.ObjectId, ref: 'speciality' },
   hospital: { type: Schema.Types.ObjectId, ref: 'hospital' },
+  branchId: { type: Number, ref: 'branch' },
   service: { type: Schema.Types.ObjectId, ref: 'service' },
   source: {
     type: String,

@@ -62,6 +62,7 @@ const OrderSchema = new Schema({
   deliveryId: String,
   customerNote: String,
   cancelReason: String,
+  rejectReason: String,
   history: [
     {
       action: String,

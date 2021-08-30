@@ -10,7 +10,7 @@ const { Schema } = mongoose;
 
 const CustomerSchema = new Schema({
   __v: { type: Number, select: false },
-  name: String,
+  fullName: String,
   phoneNumber: String,
   email: String,
   gender: String,
