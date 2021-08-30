@@ -132,7 +132,7 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
     const userId = req.user.id;
     const { page, limit } = appUtil.getPaging(req);
     const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
-    const entityId = companyId;
+    let entityId = companyId;
 
     if(!req.isRoot) {
       entityId = req.companyId;
@@ -154,7 +154,7 @@ const getPendingOrderAction = async (req: express.Request, res: express.Response
     const userId = req.user.id;
     const { page, limit } = appUtil.getPaging(req);
     const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
-    const entityId = companyId;
+    let entityId = companyId;
 
     if(!req.isRoot) {
       entityId = req.companyId;
