@@ -231,7 +231,12 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
 
 const getResourcePermissionAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const resources = await authService.getTranslatedResourcesAndActionsForBranch(req.companyId);
+    let entityId = get(req.query, 'branchId') || req.companyId;
+
+    if(!req.isRoot) {
+      entityId = req.companyId;
+    }
+    const resources = await authService.getTranslatedResourcesAndActionsForBranch(Number(entityId));
     res.send(resources);
   } catch (e) {
     logger.error('getResourcePermissionAction', e);
