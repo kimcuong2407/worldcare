@@ -30,7 +30,7 @@ const orderRoutes = (app: express.Application): void => {
     [PHARMACY_RESOURCES.order, CORE_ACTIONS.update]
   ]), orderActions.handleOrderAction);
 
-  app.put('/api/v1/order/:orderNumber/:action(cancel|complete)', middleware.authorization([
+  app.put('/api/v1/order/:orderNumber/:action(cancel|complete|reject)', middleware.authorization([
     [PHARMACY_RESOURCES.order, CORE_ACTIONS.update],
     [PHARMACY_RESOURCES.order, ROOT_ACTIONS.admin]
   ]), orderActions.handleOrderAction);

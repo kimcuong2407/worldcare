@@ -22,6 +22,18 @@ export default (initState: string) => new StateMachine({
       from: ORDER_STATUS.RECEIVED,
       to: ORDER_STATUS.PROCESSED,
     },
+    // t2
+    {
+      name: ORDER_ACTIONS.REJECT,
+      from: ORDER_STATUS.RECEIVED,
+      to: ORDER_STATUS.NEW,
+    },
+    // t2
+    {
+      name: ORDER_ACTIONS.PROCESS,
+      from: ORDER_STATUS.RECEIVED,
+      to: ORDER_STATUS.PROCESSED,
+    },
     {
       name: ORDER_ACTIONS.UPDATE_LINE_ITEM,
       from: ORDER_STATUS.RECEIVED,
@@ -33,14 +45,34 @@ export default (initState: string) => new StateMachine({
       to: ORDER_STATUS.CONFIRMED,
     },
     {
+      name: ORDER_ACTIONS.REJECT,
+      from: ORDER_STATUS.PROCESSED,
+      to: ORDER_STATUS.NEW,
+    },
+    {
       name: ORDER_ACTIONS.PACKAGE,
       from: ORDER_STATUS.CONFIRMED,
       to: ORDER_STATUS.PACKAGED,
     },
     {
+      name: ORDER_ACTIONS.REJECT,
+      from: ORDER_STATUS.CONFIRMED,
+      to: ORDER_STATUS.NEW,
+    },
+    {
       name: ORDER_ACTIONS.SHIPPING,
       from: ORDER_STATUS.PACKAGED,
       to: ORDER_STATUS.SHIPPING,
+    },
+    {
+      name: ORDER_ACTIONS.REJECT,
+      from: ORDER_STATUS.PACKAGED,
+      to: ORDER_STATUS.NEW,
+    },
+    {
+      name: ORDER_ACTIONS.REJECT,
+      from: ORDER_STATUS.SHIPPING,
+      to: ORDER_STATUS.NEW,
     },
     {
       name: ORDER_ACTIONS.ORDER_COMPLETION,
