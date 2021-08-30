@@ -159,16 +159,16 @@ const createBranchUser = async (staff: any, branchId: string) => {
     branchId,
     groups,
   };
-  const createdUser = await userService.createUserAccount(user);
-  const userId = get(createdUser, '_id');
-  await authService.assignUserToGroup(userId, groups || [], branchId);
+  // const createdUser = await userService.createUserAccount(user);
+  // const userId = get(createdUser, '_id');
+  // await authService.assignUserToGroup(userId, groups || [], branchId);
 
   const staffInfo: any = {
     firstName,
     lastName,
     address,
     branchId,
-    userId: get(createdUser, '_id'),
+    // userId: get(createdUser, '_id'),
     fullName: (firstName && lastName ? `${firstName} ${lastName}` : null),
     description,
     gender,

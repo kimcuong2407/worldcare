@@ -47,11 +47,11 @@ const createEmployeeAction = async (req: express.Request, res: express.Response,
     if(!req.isRoot) {
       entityId = req.companyId;
     }
-    const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
-    console.log(createdUser)
-    if(createdUser && createdUser.length > 0) {
-      throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
-    }
+    // const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
+    // console.log(createdUser)
+    // if(createdUser && createdUser.length > 0) {
+    //   throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
+    // }
 
     const employeeInfo: any = {
       firstName,
@@ -164,14 +164,14 @@ const updateEmployeeInfoAction = async (req: express.Request, res: express.Respo
     if(!employee) {
       throw new NotFoundError();
     }
-    const user = await userService.findUserById(get(employee, 'userId'));
-    if(username) {
-      const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
+    // const user = await userService.findUserById(get(employee, 'userId'));
+    // if(username) {
+    //   const createdUser = await userService.findUser({username: username, branchId: Number(entityId)});
 
-      if(createdUser && createdUser.length > 0 && get(createdUser, '_id') !== get(employee, 'userId') ) {
-        throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
-      }
-    }
+    //   if(createdUser && createdUser.length > 0 && get(createdUser, '_id') !== get(employee, 'userId') ) {
+    //     throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
+    //   }
+    // }
 
     const employeeInfo: any =  omitBy({
       firstName,
@@ -194,12 +194,12 @@ const updateEmployeeInfoAction = async (req: express.Request, res: express.Respo
       branchId: entityId,
     }, isNil);
     const data = await employeeService.updateEmployeeInfo(query, employeeInfo);
-    if(username || groups) {
-      await userService.updateUserProfile(get(user, '_id'), omitBy({ username, groups }, isNil));
-      if(xor(groups, get(user, 'groups'))) {
-        await employeeService.updateEmployeeGroups(get(user, '_id'), groups, branchId);
-      }
-    }
+    // if(username || groups) {
+    //   await userService.updateUserProfile(get(user, '_id'), omitBy({ username, groups }, isNil));
+    //   if(xor(groups, get(user, 'groups'))) {
+    //     await employeeService.updateEmployeeGroups(get(user, '_id'), groups, branchId);
+    //   }
+    // }
     res.send(data);
   } catch (e) {
     logger.error('updateEmployeeInfoAction', e);

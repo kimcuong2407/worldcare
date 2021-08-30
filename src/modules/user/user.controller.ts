@@ -9,6 +9,7 @@ import appUtil from '@app/utils/app.util';
 import jwtUtil from '@app/utils/jwt.util';
 import { v4 as uuidv4 } from 'uuid';
 import { Types } from 'mongoose';
+import { xor } from 'lodash';
 
 const logger = loggerHelper.getLogger('user.controller');
 
@@ -337,7 +338,11 @@ const updateUserAction = async (req: express.Request, res: express.Response, nex
         branchId,
       }
     );
-    await userService.updateUserGroups(userId, groups, branchId);
+    if(groups) {
+      if(xor(groups, get(user, 'groups'))) {
+        await userService.updateUserGroups(userId, groups, branchId);
+      }
+    }
     res.send(setResponse(updatedUser, true, 'Tài khoản đã được tạo thành công.'));
   } catch (e) {
     logger.error('updateUserAction', e);
