@@ -371,6 +371,31 @@ const getUserDetailAction  = async (req: express.Request, res: express.Response,
 }
 
 
+const deleteUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let branchId = get(req.body, 'branchId') || req.companyId;
+    let userId = get(req.params, 'userId');
+
+    if (!req.isRoot) {
+      branchId = req.companyId;
+    }
+
+    const user: any = await userService.findUser({
+      _id: Types.ObjectId(userId),
+      branchId: Number(branchId),
+    });
+
+    if (!user) {
+      throw new NotFoundError();
+    }
+    await userService.deleteUser(userId)
+    res.send(setResponse({}, true, 'Tài khoản đã được xóa thành công.'));
+  } catch (e) {
+    logger.error('deleteUserAction', e);
+    next(e);
+  }
+}
+
 
 export default {
   getProfileAction,
@@ -382,4 +407,5 @@ export default {
   createUserAction,
   updateUserAction,
   getUserDetailAction,
+  deleteUserAction,
 };

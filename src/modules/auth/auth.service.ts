@@ -176,6 +176,7 @@ const staffLogin = async (login: string, password: string, branchId: Number) => 
 
   const sessionId = uuidv4();
   const query: any = {
+    deletedAt: null,
     $or: [
       {
         username: login

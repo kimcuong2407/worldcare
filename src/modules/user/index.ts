@@ -26,6 +26,11 @@ const userRoutes = (app: express.Application): void => {
     [ CORE_RESOURCES.partner,CORE_ACTIONS.write ]
   ]), userActions.createUserAction);
 
+  app.delete('/api/v1/user/:userId', middleware.authorization([
+    [ CORE_RESOURCES.user,CORE_ACTIONS.update ],
+    [ CORE_RESOURCES.partner,CORE_ACTIONS.write ]
+  ]), userActions.deleteUserAction);
+
   app.get('/api/v1/profile', middleware.authenticate, userActions.getProfileAction);
   app.get('/api/v1/me/address', middleware.authenticate, userActions.fetchAddressAction);
   app.post('/api/v1/me/address', middleware.authenticate, userActions.addNewAddressAction);

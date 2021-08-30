@@ -216,7 +216,7 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
     const {
       login, password, companyId
     } = req.body;
-    await casbin.enforcer.addPolicy(...['612040c0a5095a27dcb7f124','888888','company','write' ])
+    
     if (!login || !password) {
       throw new ValidationFailedError('Vui lòng nhập vào tên đăng nhập và mật khẩu.');
     }
