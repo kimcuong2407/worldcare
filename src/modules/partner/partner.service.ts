@@ -38,7 +38,7 @@ const findAvailableSlug = async (slug: string) => {
 
 const createPartner = async (partnerInfo: any) => {
   // const slug = await findAvailableSlug(get(partnerInfo, 'slug'));
-  const { name, description, email, phoneNumber, address, logo } = partnerInfo;
+  const { name, description, email, phoneNumber, address, logo, modules } = partnerInfo;
   const partner = await PartnerCollection.create({
     ...partnerInfo,
     // slug,
@@ -59,7 +59,7 @@ const createPartner = async (partnerInfo: any) => {
     logo,
     partnerId: _id
   });
-  await authService.setupDefaultRoles(get(branch, '_id'));
+  await authService.setupDefaultRoles(get(branch, '_id'), modules);
 
   return {
     _id,

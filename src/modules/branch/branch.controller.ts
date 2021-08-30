@@ -80,7 +80,7 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
       ...branchInfo,
       branchType: get(partner, 'modules'),
     });
-    await authService.setupDefaultRoles(get(data, '_id'));
+    await authService.setupDefaultRoles(get(data, '_id'), get(partner, 'modules'));
     res.send(data);
   } catch (e) {
     logger.error('createBranchAction', e);

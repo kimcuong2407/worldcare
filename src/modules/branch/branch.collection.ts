@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
+import addressUtil from '@app/utils/address.util';
 
 const { Schema } = mongoose;
 
@@ -71,6 +72,13 @@ const BranchSchema = new Schema({
   timestamps: true,
   toJSON: {
     virtuals: true,
+    transform: (doc, ret) => {
+      const { address } = ret;
+      return {
+        ...ret,
+        address: addressUtil.formatAddressV2(address)
+      };
+    }
   }
 });
 

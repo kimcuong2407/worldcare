@@ -5,7 +5,6 @@ export const CORE_RESOURCES = {
   employee: 'employee',
   user: 'user',
   userGroup: 'userGroup',
-  // order: 'order',
   customer: 'customer',
   patient: 'patient',
 }
@@ -21,6 +20,11 @@ export const CLINIC_RESOURCES = {
   appointment: 'appointment',
 };
 
+export const ROOT_RESOURCES = {
+  ...CORE_RESOURCES,
+  ...CLINIC_RESOURCES,
+  cms: 'cms',
+}
 
 export const CORE_ACTIONS = {
   read: 'read',

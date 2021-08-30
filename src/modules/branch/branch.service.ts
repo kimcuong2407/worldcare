@@ -117,7 +117,7 @@ const fetchBranchInfo = async (branchIdOrSlug: string, language = 'vi', isRaw = 
   let query: any = { $or: [{ _id: branchIdOrSlug }, { slug: branchIdOrSlug }] };
 
   if (isRaw) {
-    return BranchCollection.findOne(query).lean();
+    return BranchCollection.findOne(query);
   }
 
   branch = await BranchCollection.findOne(query).populate('speciality', 'name').lean();
