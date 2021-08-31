@@ -19,8 +19,9 @@ class ConfirmOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.CONFIRM,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Đơn hàng đã được xác nhận với khách hàng',
+          data: get(payload, 'data'),
         },
       },
     }).exec());

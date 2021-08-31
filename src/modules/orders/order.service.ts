@@ -51,7 +51,7 @@ const createOrder = async (order: any) => {
       {
         action: ORDER_ACTIONS.CREATE,
         // authorId: get(payload, 'userId'),
-        time: new Date(),
+        timestamp: new Date(),
         // data: payload,
       }
     ]

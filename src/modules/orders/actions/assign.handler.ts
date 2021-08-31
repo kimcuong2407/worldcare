@@ -5,12 +5,14 @@ import OrderAbstractHandler from './order-handler.abstract';
 import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
 import OrderCollection from '../order.collection';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import branchService from '@app/modules/branch/branch.service';
 
 class AssignOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
     const { data } = payload;
     const { branchId } = data;
+    const branch = await branchService.findBranchById(branchId);
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
     }, {
@@ -22,8 +24,12 @@ class AssignOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.ASSIGN,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: `Đơn hàng đã được giao cho nhà thuốc ${get(branch, 'name.vi')}`,
+          data: {
+            ...get(payload, 'data'),
+            pharmacy: get('name.vi'),
+          },
         },
       },
     }).exec());

@@ -40,8 +40,15 @@ const enumerateDaysBetweenDates = (startTime: number, endTime: number, format = 
   return dates;
 };
 
+const mask = (str: string, mask = '*') => {
+    const n = (str|| '').length / 1.2 ;
+    return ('' + str).slice(0, -n)
+        .replace(/./g, mask)
+        + ('' + str).slice(-n);
+}
 export default {
   getPaging,
   mapLanguage,
   enumerateDaysBetweenDates,
+  mask,
 }

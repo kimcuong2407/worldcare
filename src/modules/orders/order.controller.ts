@@ -213,6 +213,50 @@ const handleOrderAction = async (req: express.Request, res: express.Response, ne
   }
 };
 
+const trackingOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const { orderNumber, phoneNumber } = req.body;
+
+    if(!phoneNumber || !orderNumber) {
+      throw new ValidationFailedError('Vui lòng nhập vào mã đơn hàng.');
+    }
+
+    if(!orderNumber) {
+      throw new ValidationFailedError('Vui lòng nhập vào số điện thoại nhận hàng.');
+    }
+
+    const result: any = await orderService.findOrderDetail({
+      orderNumber: orderNumber,
+    });
+
+    if(!result) {
+      throw new NotFoundError('Không tìm thấy đơn hàng.');
+    }
+    const foundOrder = result.toJSON();
+    const orderPhoneNumber = get(foundOrder, 'shippingAddress.phoneNumber');
+    if(orderPhoneNumber !== phoneNumber) {
+      throw new NotFoundError('Không tìm thấy đơn hàng.');
+    }
+    const { shippingAddress, ...rest } = foundOrder;
+    const { street, ward, district, city, fullName } = shippingAddress;
+    res.send({
+      ...rest,
+      shippingAddress: {
+        street: appUtil.mask(street),
+        ward: appUtil.mask(ward),
+        district: appUtil.mask(district),
+        city: appUtil.mask(city),
+        fullName: appUtil.mask(fullName),
+        phoneNumber: appUtil.mask(phoneNumber),
+      }
+    });
+  } catch (e) {
+    logger.error('trackingOrderAction', e);
+    next(e);
+  }
+};
+
+
 export default { 
   createPrescriptionAction,
   createOrderAction,
@@ -222,5 +266,6 @@ export default {
   getPendingOrderAction,
   getOrderDetailAction,
   handleOrderAction,
+  trackingOrderAction,
 };
 

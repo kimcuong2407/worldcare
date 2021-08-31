@@ -22,8 +22,9 @@ class RejectOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.REJECT,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Nhà thuốc đã từ chối đơn hàng',
+          data: data,
         },
       },
     }).exec());

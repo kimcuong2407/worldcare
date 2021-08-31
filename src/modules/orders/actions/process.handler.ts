@@ -19,8 +19,9 @@ class ProcessOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.PROCESS,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Đơn hàng đã được xử lý',
+          data: get(payload, 'data'),
         },
       },
     }).exec());

@@ -33,29 +33,69 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     }
     const aggLineItem = await OrderItemCollection.aggregate([
       {
-        $match: { orderNumber: Number(get(order, 'orderNumber')) }
-      },
-      {
+        '$match': {
+          'orderNumber': get(order, 'orderNumber')
+        }
+      }, {
+        '$lookup': {
+          'from': 'order_item', 
+          'localField': 'orderNumber', 
+          'foreignField': 'orderNumber', 
+          'as': 'items'
+        }
+      }, {
         '$addFields': {
-          'subTotalPerItem': {
-            '$multiply': [
-              '$price', '$saleQuantity'
+          'total': {
+            '$sum': {
+              '$map': {
+                'input': '$items', 
+                'as': 'item', 
+                'in': {
+                  '$multiply': [
+                    {
+                      '$ifNull': [
+                        '$$item.saleQuantity', 0
+                      ]
+                    }, {
+                      '$ifNull': [
+                        '$$item.price', 0
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }, {
+        '$addFields': {
+          'grandTotal': {
+            '$sum': [
+              '$total', {
+                '$ifNull': [
+                  '$shippingFee', 0
+                ]
+              }, {
+                '$ifNull': [
+                  '$serviceFee', 0
+                ]
+              }
             ]
           }
         }
       }, {
-        '$group': {
-          '_id': '$orderNumber',
-          'subTotal': {
-            '$sum': '$subTotalPerItem'
-          }
+        '$project': {
+          'grandTotal': 1, 
+          'subTotal': 1
         }
       }
     ]).exec();
     const subTotalPerItem = get(aggLineItem, '0.subTotal');
+    const grandTotal = get(aggLineItem, '0.grandTotal');
 
     await OrderCollection.findOneAndUpdate({ orderNumber: get(order, 'orderNumber') }, {
       subTotal: subTotalPerItem,
+      grandTotal: grandTotal,
     })
     return Promise.resolve(order);
   }

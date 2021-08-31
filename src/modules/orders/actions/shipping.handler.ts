@@ -21,8 +21,9 @@ class ShippingOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.SHIPPING,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          message: 'Đã giao cho đơn vị vận chuyển',
+          timestamp: new Date(),
+          data: data,
         },
       },
     }).exec());

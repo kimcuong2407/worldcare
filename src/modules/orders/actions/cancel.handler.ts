@@ -22,8 +22,9 @@ class CancelOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.CANCEL,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Đơn hàng đã bị hủy.',
+          data: get(payload, 'data'),
         },
       },
     }).exec());

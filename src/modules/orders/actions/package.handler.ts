@@ -19,8 +19,9 @@ class PackageOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.PACKAGE,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Đơn hàng đã được đóng gói',
+          data: get(payload, 'data'),
         },
       },
     }).exec());

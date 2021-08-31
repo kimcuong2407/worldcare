@@ -19,8 +19,9 @@ class CompleteOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.ORDER_COMPLETION,
           authorId: get(payload, 'userId'),
-          time: new Date(),
-          data: payload,
+          timestamp: new Date(),
+          message: 'Đơn hàng đã được hoàn thành',
+          data: get(payload, 'data'),
         },
       },
     }).exec());
