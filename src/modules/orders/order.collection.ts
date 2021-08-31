@@ -65,9 +65,11 @@ const OrderSchema = new Schema({
   rejectReason: String,
   history: [
     {
+      _id: false,
       action: String,
       timestamp: Date,
-      actor: String,
+      authorId: String,
+      message: String,
     }
   ],
   deletedAt: Date,
