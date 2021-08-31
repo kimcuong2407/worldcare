@@ -332,6 +332,9 @@ const findBranchBySlug = async (slug: string) => {
 
 
 const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, filter: any) => {
+  if(!parentBranchId && !partnerId) {
+    return [];
+  }
   let aggs: any[] = [];
   if (partnerId) {
     aggs.push({

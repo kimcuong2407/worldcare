@@ -18,7 +18,7 @@ const EmployeeSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'user' },
   fullName: String,
   branchId: Number,
-  entityId: Number,
+  partnerId: Number,
   employeeNumber: Number,
   description: {
     type: String,
@@ -74,7 +74,7 @@ const EmployeeSchema = new Schema({
 EmployeeSchema.plugin(AutoIncrement(mongoose), {
   id: 'employee_number_by_company',
   inc_field: 'employeeNumber',
-  reference_fields: ['entityId'],
+  reference_fields: ['partnerId'],
   // startAt: 10005,
   // incrementBy: 1
 });

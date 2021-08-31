@@ -6,6 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 import isNull from 'lodash/isNull';
 import { Types } from 'mongoose';
 import authService from '../auth/auth.service';
+import branchService from '../branch/branch.service';
 import HospitalCollection from '../hospital/hospital.collection';
 import hospitalService from '../hospital/hospital.service';
 import userService from '../user/user.service';
@@ -131,6 +132,8 @@ const deleteEmployee = async (staffId: string) => {
 
 
 const createBranchUser = async (staff: any, branchId: string) => {
+  const branch = await branchService.findBranchById(branchId);
+  const partnerId = get(branch, 'partnerId');
   const {
     firstName,
     lastName,
@@ -181,6 +184,7 @@ const createBranchUser = async (staff: any, branchId: string) => {
     avatar,
     employeeHistory,
     certification,
+    partnerId,
   };
 
   return await createEmployee(staffInfo);
