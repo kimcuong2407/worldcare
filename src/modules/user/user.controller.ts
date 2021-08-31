@@ -158,6 +158,8 @@ const registerAction = async (req: express.Request, res: express.Response, next:
       password,
       firstName,
       lastName,
+      fullName,
+      name,
     } = req.body;
 
     if (!phoneNumber) {
@@ -184,6 +186,7 @@ const registerAction = async (req: express.Request, res: express.Response, next:
         password,
         firstName,
         lastName,
+        fullName: name || fullName,
       }
     );
     const sessionId = uuidv4();
