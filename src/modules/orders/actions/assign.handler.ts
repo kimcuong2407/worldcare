@@ -19,7 +19,7 @@ class AssignOrderHandler extends OrderAbstractHandler {
         branchId: branchId,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.ASSIGN,
           authorId: get(payload, 'userId'),
           time: new Date(),

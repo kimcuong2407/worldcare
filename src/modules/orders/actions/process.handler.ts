@@ -16,7 +16,7 @@ class ProcessOrderHandler extends OrderAbstractHandler {
         status: ORDER_STATUS.PROCESSED,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.PROCESS,
           authorId: get(payload, 'userId'),
           time: new Date(),

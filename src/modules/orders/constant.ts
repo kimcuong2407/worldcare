@@ -21,6 +21,7 @@ export const PAYMENT_STATUS = {
 }
 
 export const ORDER_ACTIONS = {
+  CREATE: 'CREATE',
   ASSIGN: 'ASSIGN',
   REJECT: 'REJECT',
   UPDATE_LINE_ITEM: 'UPDATE-ITEM',

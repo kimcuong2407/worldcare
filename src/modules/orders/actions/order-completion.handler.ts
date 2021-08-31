@@ -16,7 +16,7 @@ class CompleteOrderHandler extends OrderAbstractHandler {
         status: ORDER_STATUS.DELIVERED,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.ORDER_COMPLETION,
           authorId: get(payload, 'userId'),
           time: new Date(),

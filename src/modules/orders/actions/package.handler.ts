@@ -16,7 +16,7 @@ class PackageOrderHandler extends OrderAbstractHandler {
         status: ORDER_STATUS.PACKAGED,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.PACKAGE,
           authorId: get(payload, 'userId'),
           time: new Date(),

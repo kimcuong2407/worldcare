@@ -19,7 +19,7 @@ class CancelOrderHandler extends OrderAbstractHandler {
         cancelReason,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.CANCEL,
           authorId: get(payload, 'userId'),
           time: new Date(),

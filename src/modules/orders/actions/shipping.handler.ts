@@ -18,7 +18,7 @@ class ShippingOrderHandler extends OrderAbstractHandler {
         shippingInfo: data,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.SHIPPING,
           authorId: get(payload, 'userId'),
           time: new Date(),

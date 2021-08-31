@@ -19,7 +19,7 @@ class RejectOrderHandler extends OrderAbstractHandler {
         rejectReason,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.REJECT,
           authorId: get(payload, 'userId'),
           time: new Date(),

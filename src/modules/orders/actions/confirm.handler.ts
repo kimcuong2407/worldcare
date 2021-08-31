@@ -16,7 +16,7 @@ class ConfirmOrderHandler extends OrderAbstractHandler {
         status: ORDER_STATUS.CONFIRMED,
       },
       $push: {
-        histories: {
+        history: {
           action: ORDER_ACTIONS.CONFIRM,
           authorId: get(payload, 'userId'),
           time: new Date(),

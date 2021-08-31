@@ -2,7 +2,7 @@ import makeQuery from '@app/core/database/query'
 import { get } from 'lodash';
 import CustomerCollection from '../customer/customer.collection';
 import userService from '../user/user.service';
-import { ORDER_STATUS } from './constant';
+import { ORDER_ACTIONS, ORDER_STATUS } from './constant';
 import OrderItemCollection from './order-item.collection';
 import OrderCollection from './order.collection';
 import PrescriptionCollection from './prescription.collection';
@@ -47,6 +47,14 @@ const createOrder = async (order: any) => {
     customerId,
     branchId: companyId || branchId,
     status: (companyId || branchId) ? ORDER_STATUS.RECEIVED : ORDER_STATUS.NEW,
+    history: [
+      {
+        action: ORDER_ACTIONS.CREATE,
+        // authorId: get(payload, 'userId'),
+        time: new Date(),
+        // data: payload,
+      }
+    ]
   }
 
   return makeQuery(OrderCollection.create(createdOrder));
