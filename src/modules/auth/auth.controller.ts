@@ -232,6 +232,7 @@ const staffLoginAction = async (req: express.Request, res: express.Response, nex
 const getResourcePermissionAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     let entityId = get(req.query, 'branchId') || req.companyId;
+    // console.log(entityId, req.isRoot)
 
     if(!req.isRoot) {
       entityId = req.companyId;

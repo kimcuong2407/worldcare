@@ -8,7 +8,12 @@ const authRoutes = (app: express.Application): void => {
   app.post('/api/v1/staff-login', authActions.staffLoginAction);
   app.put('/api/v1/change-password', middleware.authenticate, authActions.changePasswordAction);
   app.get('/api/v1/role', middleware.authenticate, authActions.fetchHospitalRolesAction);
-  app.get('/api/v1/resource-permission', middleware.authenticate, authActions.getResourcePermissionAction);
+  app.get('/api/v1/resource-permission', 
+  middleware.authorization([
+    [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
+    [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+  ]),
+  authActions.getResourcePermissionAction);
   app.get('/api/v1/user-policy', middleware.authenticate, authActions.fetchPolicyAction);
   // app.post('/api/v1/role', middleware.authenticate, authActions.createHospitalRolesAction);
   app.post('/api/v1/assign-role', authActions.assignUserToGroupAction);
