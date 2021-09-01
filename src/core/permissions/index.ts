@@ -68,6 +68,10 @@ export const RESOURCES = [
   },
   {
     key: CORE_RESOURCES.userGroup,
+    name: 'Quản lý chi nhánh',
+  },
+  {
+    key: CORE_RESOURCES.userGroup,
     name: 'Quản lý nhóm người dùng',
   },
   {
@@ -89,5 +93,9 @@ export const RESOURCES = [
   {
     key: CORE_RESOURCES.patient,
     name: 'Quản lý bệnh nhân',
-  }
+  },
+  {
+    key: ROOT_RESOURCES.cms,
+    name: 'Quản lý CMS',
+  },
 ]
