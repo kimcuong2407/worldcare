@@ -114,7 +114,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
 
 const fetchBranchInfo = async (branchIdOrSlug: string, language = 'vi', isRaw = false) => {
   let branch = null;
-  let query: any = { $or: [{ _id: branchIdOrSlug }, { slug: branchIdOrSlug }] };
+  let query: any = { $or: [{ _id: branchIdOrSlug }, { slug: branchIdOrSlug }], deletedAt: null };
 
   if (isRaw) {
     return BranchCollection.findOne(query);
@@ -153,7 +153,6 @@ const updateBranchInfo = async (branchId: number, branchInfo: any) => {
   const branch = await BranchCollection.findByIdAndUpdate(branchId, branchInfo, { new: true });
 
   if (parentId !== get(currentBranch, 'parentId')) {
-    console.log(branchId, get(currentBranch, 'parentId'), parentId)
     await authService.updateParentBranch(branchId, get(currentBranch, 'parentId'), parentId);
   }
 
@@ -161,18 +160,13 @@ const updateBranchInfo = async (branchId: number, branchInfo: any) => {
 };
 
 const deleteBranch = async (branchId: string) => {
-  const data = await BranchCollection.findByIdAndUpdate(branchId, {
+
+  await BranchCollection.updateOne({ _id: Number(branchId)}, {
     $set: {
       deletedAt: new Date,
       slug: new Date().getTime(),
     }
   });
-  if (isNull(data)) {
-    const data = await BranchCollection.findById(branchId);
-    if (!data) {
-      throw new Error('There is no branchId!');
-    }
-  }
   return true;
 };
 
@@ -201,6 +195,7 @@ const isBranch = async (branchIdOrSlug: string) => {
 const fetchBranchByType = async (branchType: string, keyword: string, language = 'vi') => {
   let aggs: any[] = [];
   const query: any = {
+    deletedAt: null,
   }
   if (keyword) {
     query['$text'] = { $search: keyword }
@@ -382,7 +377,10 @@ const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, f
     }])
   }
   aggs.push({
-    $match: filter
+    $match: {
+      ...filter,
+      deletedAt: null,
+    }
   })
   // const aggregation = await BranchCollection.aggregate(aggs).exec();
   const result: any = await makeQuery(BranchCollection.aggregate(aggs).exec());
