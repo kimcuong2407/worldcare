@@ -67,7 +67,7 @@ export const RESOURCES = [
     name: 'Quản lý công ty',
   },
   {
-    key: CORE_RESOURCES.userGroup,
+    key: CORE_RESOURCES.branch,
     name: 'Quản lý chi nhánh',
   },
   {
