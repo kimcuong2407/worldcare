@@ -200,6 +200,10 @@ const handleOrderAction = async (req: express.Request, res: express.Response, ne
     }
 
     const handler = orderActions.getOrderActionHandler(action, get(order, 'status'));
+    await handler.validate(order, {
+      data,
+      userId,
+    });
     await handler.handle(order, {
       data,
       userId,
