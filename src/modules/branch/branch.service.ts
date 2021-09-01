@@ -314,7 +314,7 @@ const getBranchUsers = async (branchId: number, options: any) => {
 }
 
 const findBranchByPartnerId = async (partnerId: number) => {
-  return makeQuery(BranchCollection.find({ partnerId: partnerId }).exec());
+  return makeQuery(BranchCollection.find({ partnerId: partnerId, deletedAt: null }).exec());
 }
 
 const findBranchById = async (branchId: number) => {
@@ -322,7 +322,7 @@ const findBranchById = async (branchId: number) => {
 }
 
 const findBranchBySlug = async (slug: string) => {
-  return makeQuery(BranchCollection.findOne({ slug }).exec());
+  return makeQuery(BranchCollection.findOne({ slug, deletedAt: null }).exec());
 }
 
 

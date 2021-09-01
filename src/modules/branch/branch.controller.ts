@@ -186,7 +186,10 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
 
 const deleteBranchAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const branchId = get(req.params, 'branchId');
+    let branchId = get(req.params, 'branchId');
+    if(!req.isRoot) {
+      branchId = req.companyId;
+    }
     const data = await branchService.deleteBranch(branchId);
     res.send(data);
   } catch (e) {
