@@ -81,17 +81,22 @@ const findOrders = async (params: any, page: number, limit: number) => {
     query.status = status;
   }
 
+  const time = [];
   if(startTime) {
-    query.createdAt = {
-      $gte: moment(startTime, 'YYYY-MM-DD'),
-    };
+    time.push({
+      createdAt: { $gte: moment(startTime, 'YYYY-MM-DD').toDate(), }
+    });
   }
 
   if(endTime) {
-    query.createdAt = {
-      $lte: moment(endTime, 'YYYY-MM-DD'),
-    };
+    time.push({
+      createdAt: { $lte: moment(endTime, 'YYYY-MM-DD').toDate(), }
+    });
   }
+  if(time && time.length > 0) {
+    query['$and'] = time;
+  }
+  console.log(JSON.stringify(query));
   const orders = await makeQuery(OrderCollection.paginate(query, {
     populate: [{ path: 'shippingAddress' }, { path: 'shopInfo' }],
     page,
