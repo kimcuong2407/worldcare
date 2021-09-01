@@ -1,5 +1,6 @@
 import makeQuery from '@app/core/database/query'
 import { get } from 'lodash';
+import moment from 'moment';
 import CustomerCollection from '../customer/customer.collection';
 import userService from '../user/user.service';
 import { ORDER_ACTIONS, ORDER_STATUS } from './constant';
@@ -78,13 +79,13 @@ const findOrders = async (params: any, page: number, limit: number) => {
 
   if(startTime) {
     query.createdAt = {
-      $gte: startTime,
+      $gte: moment(startTime, 'YYYY-MM-DD'),
     };
   }
 
   if(endTime) {
     query.createdAt = {
-      $lte: endTime,
+      $lte: moment(endTime, 'YYYY-MM-DD'),
     };
   }
   const orders = await makeQuery(OrderCollection.paginate(query, {
