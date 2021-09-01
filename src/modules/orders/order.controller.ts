@@ -131,7 +131,7 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
   try {
     const userId = req.user.id;
     const { page, limit } = appUtil.getPaging(req);
-    const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
+    const { status, companyId, startTime, endTime, sortBy, sortDirection, keyword } = req.query;
     let entityId = companyId;
 
     if(!req.isRoot) {
@@ -139,7 +139,7 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
     }
     const orderStatus = status ? String(status).split(',') : null;
     const result = await orderService.findOrders(omitBy({
-      status: orderStatus && orderStatus.length > 0 ? orderStatus : null, branchId: entityId, startTime, endTime, sortBy, sortDirection,
+      keyword, status: orderStatus && orderStatus.length > 0 ? orderStatus : null, branchId: entityId, startTime, endTime, sortBy, sortDirection,
     }, isNil), page, limit);
     res.send(result);
   } catch (e) {

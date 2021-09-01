@@ -63,7 +63,7 @@ const createOrder = async (order: any) => {
 
 
 const findOrders = async (params: any, page: number, limit: number) => {
-  const { status, branchId, startTime, endTime, sortBy, sortDirection, } = params;
+  const { status, branchId, startTime, endTime, sortBy, sortDirection, keyword, } = params;
   const sort: any = {};
   if(sortBy) {
     sort[sortBy] = sortDirection || -1;
@@ -71,6 +71,10 @@ const findOrders = async (params: any, page: number, limit: number) => {
   const query: any = {};
   if(branchId) {
     query.branchId = branchId;
+  }
+
+  if (keyword) {
+    query.orderNumber = keyword;
   }
 
   if(status) {
