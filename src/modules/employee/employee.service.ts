@@ -42,6 +42,7 @@ const fetchEmployee = async (params: any, language = 'vi') => {
     keyword, options, hospitalId, title, degree, speciality, employeeGroup
   } = params;
   const query: any = {
+    deletedAt: null,
   };
 
   if (hospitalId) {
@@ -119,14 +120,11 @@ const updateEmployeeInfo = async (query: any, staffInfo: any) => {
   };
 };
 
-const deleteEmployee = async (staffId: string) => {
-  const data = await EmployeeCollection.findByIdAndDelete(staffId);
-  if (isNull(data)) {
-    const data = await EmployeeCollection.findById(staffId);
-    if (!data) {
-      throw new Error('There is no staffId!');
-    }
-  }
+const deleteEmployee = async (employeeNumber: number) => {
+  const data = await EmployeeCollection.findOneAndUpdate({
+    employeeNumber: Number(employeeNumber),
+  }, { deletedAt: new Date() });
+
   return true;
 };
 

@@ -207,8 +207,27 @@ const updateEmployeeInfoAction = async (req: express.Request, res: express.Respo
   }
 };
 
-const deleteEmployeeAction = async() => {
+const deleteEmployeeAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      let employeeNumber = get(req.params, 'employeeNumber');
+      let branchId = null;
+      const query: any = {
+        employeeNumber,
+      }
+      if(!req.isRoot) {
+        query.branchId = req.companyId;
+      }
+      const employee = await employeeService.getEmployeeInfo(query);
+      if(!employee) {
+        throw new NotFoundError();
+      }
 
+      const data = await employeeService.deleteEmployee(Number(employeeNumber));
+      res.send(data);
+    } catch (e) {
+      logger.error('deleteEmployeeAction', e);
+      next(e);
+    };
 }
 
 
