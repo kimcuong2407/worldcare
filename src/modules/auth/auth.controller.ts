@@ -168,10 +168,15 @@ const fetchPolicyAction = async (
 ) => {
   try {
     const userId = get(req.user, 'id');
-    const companyId: string = get(req, 'companyId');
-
+    // const companyId: string = get(req, 'companyId');
+    // await casbin.enforcer.addNamedGroupingPolicy('g2', "10062", "888888");
+    const user = await userService.findUserById(userId);
+    const companyId = get(user, 'branchId');
+    if(!user || !companyId) {
+      return {};
+    }
     const policies = await casbin.enforcer.getImplicitPermissionsForUser(userId);
-    const formattedPolicies = policies.filter(policy => policy[1] === companyId).map((policy) => {
+    const formattedPolicies = policies.filter(policy => policy[1] === String(companyId)).map((policy) => {
       return policy.slice(2)
     });
     const groupedPolicies: any = {};
