@@ -43,6 +43,7 @@ const addNewAddressAction = async (
       isPrimary,
       fullName,
       phoneNumber,
+      email,
     } = req.body;
 
     if (!fullName) {
@@ -73,6 +74,7 @@ const addNewAddressAction = async (
       isPrimary,
       fullName,
       phoneNumber,
+      email,
     });
 
     res.send({ status: true });
@@ -112,6 +114,7 @@ const updateAddressAction = async (
       isPrimary,
       fullName,
       phoneNumber,
+      email,
     } = req.body;
 
     if (!fullName) {
@@ -140,6 +143,7 @@ const updateAddressAction = async (
       isPrimary,
       fullName,
       phoneNumber,
+      email,
     });
     res.send({
       status: true

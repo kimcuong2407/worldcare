@@ -45,6 +45,7 @@ const addNewAddress = async (address: {
   isPrimary: Boolean,
   fullName: string,
   phoneNumber: string,
+  email: string,
 }) => {
   if (get(address, 'isPrimary')) {
     await UserAddressCollection.updateMany({ userId: get(address, 'userId') }, { isPrimary: false });

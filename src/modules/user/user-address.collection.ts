@@ -15,6 +15,7 @@ const UserAddressSchema = new Schema({
   },
   userId: { type: Schema.Types.ObjectId, ref: 'user', index: true, },
   phoneNumber: String,
+  email: String,
   isPrimary: Boolean,
   fullName: String,
   street: String,
