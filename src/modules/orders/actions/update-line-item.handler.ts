@@ -15,16 +15,19 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     const id = get(item, '_id');
     const isDeleted = get(item, 'isDeleted', false);
     const query: any = {};
-
-    if (isDeleted) {
-      await makeQuery(OrderItemCollection.deleteOne(query).exec());
-    } else if (id) {
+    
+    if (id) {
       query._id = Types.ObjectId(id)
 
-      await makeQuery(OrderItemCollection.updateOne(query, {
-        ...item,
-        orderNumber: get(order, 'orderNumber'),
-      }, { upsert: true }).exec());
+      if (isDeleted) {
+        await makeQuery(OrderItemCollection.deleteOne(query).exec());
+      } else {
+        await makeQuery(OrderItemCollection.updateOne(query, {
+          ...item,
+          orderNumber: get(order, 'orderNumber'),
+        }, { upsert: true }).exec());
+      }
+  
     } else {
       await makeQuery(OrderItemCollection.create({
         ...item,
