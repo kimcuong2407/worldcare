@@ -12,6 +12,7 @@ const logger = loggerHelper.getLogger('appointment.controller');
 const createAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const { customer, time, serviceId, hospitalId, message, source, specialityId } = req.body;
+    
     const appointment = await appointmentAppointment.createAppointment({
       customer, time, serviceId, hospitalId, message, source, specialityId,
     });
@@ -23,6 +24,22 @@ const createAppointmentAction = async (req: express.Request, res: express.Respon
   }
 };
 
+
+// DEGREE
+const createAppointmentForBranchAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const hospitalId = req.companyId;
+    const { customer, time, serviceId, message, source, specialityId } = req.body;
+    const appointment = await appointmentAppointment.createAppointment({
+      customer, time, serviceId, hospitalId, message, source, specialityId,
+    });
+
+    res.send(appointment);
+  } catch (e) {
+    logger.error('createAppointmentForBranchAction', e);
+    next(e);
+  }
+};
 
 const updateAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -40,8 +57,9 @@ const updateAppointmentAction = async (req: express.Request, res: express.Respon
 const fetchAppointmentAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const { startTime, endTime, serviceId,specialityId, hospitalId, status, source } = req.query;
-    const appointments = await appointmentAppointment.fetchAppointment(
-      startTime, endTime, serviceId, specialityId, hospitalId, status, source);
+    const appointments = await appointmentAppointment.fetchAppointmentV2({
+      startTime, endTime, serviceId, specialityId, hospitalId, status, source
+    }, {});
     res.send(appointments);
   } catch (e) {
     logger.error('createAppointmentAction', e);
@@ -82,4 +100,5 @@ export default {
   fetchAppointmentAction,
   getAppointmentByIdAction,
   updateAppointmentAction,
+  createAppointmentForBranchAction,
 }

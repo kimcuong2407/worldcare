@@ -3,13 +3,11 @@ import mongooseIntl from 'mongoose-intl';
 /* eslint-disable func-names */
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import get from 'lodash/get';
-import last from 'lodash/last';
+import AutoIncrement from 'mongoose-sequence';
 
 const { Schema } = mongoose;
 
 const CustomerSchema = new Schema({
-  __v: { type: Number, select: false },
   fullName: String,
   phoneNumber: String,
   email: String,
@@ -17,8 +15,10 @@ const CustomerSchema = new Schema({
   source: String,
   dateOfBirth: Date,
   customerGroup: Number,
-  idNumber: String,
+  customerNumber: Number,
   branchId: Number,
+  userId: String,
+  partnerId: Number,
   note: String,
   address: {
     street: String,
@@ -31,6 +31,13 @@ const CustomerSchema = new Schema({
 });
 
 CustomerSchema.plugin(mongoosePaginate);
+
+
+CustomerSchema.plugin(AutoIncrement(mongoose), {
+  id: 'customer_number_by_company',
+  inc_field: 'customerNumber',
+  reference_fields: ['partnerId'],
+});
 
 const CustomerCollection = mongoose.model('customer', CustomerSchema, 'customer');
 

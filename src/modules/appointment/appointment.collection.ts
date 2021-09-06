@@ -23,7 +23,7 @@ const AppointmentSchema = new Schema({
     type: String,
     default: 'WEBSITE'
   },
-  customer: { type: Schema.Types.ObjectId, ref: 'customer' },
+  customerNumber: { type: Number },
   message: String,
   status: {
     type: String,
@@ -35,6 +35,13 @@ const AppointmentSchema = new Schema({
 });
 
 AppointmentSchema.plugin(mongoosePaginate);
+AppointmentSchema.virtual('customerInfo', {
+  ref: 'customer', // the collection/model name
+  localField: 'customerNumber',
+  foreignField: 'customer',
+  match: (doc: any) => ({ branchId: doc.branchId }),
+  justOne: true, // default is false
+});
 
 const AppointmentCollection = mongoose.model('appointment', AppointmentSchema, 'appointment');
 
