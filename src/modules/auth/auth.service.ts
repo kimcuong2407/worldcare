@@ -28,7 +28,8 @@ const authenticate = async (login: string, password: string) => {
       {
         username: login
       }
-    ]
+    ],
+    deletedAt: null,
   }).lean().exec();
   if (!user) {
     throw new UnAuthenticated();

@@ -63,12 +63,15 @@ const createOrder = async (order: any) => {
 
 
 const findOrders = async (params: any, page: number, limit: number) => {
-  const { status, branchId, startTime, endTime, sortBy, sortDirection, keyword, } = params;
+  const { status, branchId, startTime, endTime, sortBy, sortDirection, keyword, userId } = params;
   const sort: any = {};
   if(sortBy) {
     sort[sortBy] = sortDirection || -1;
   }
   const query: any = {};
+  if(userId) {
+    query.userId = userId;
+  }
   if(branchId) {
     query.branchId = branchId;
   }
@@ -96,7 +99,6 @@ const findOrders = async (params: any, page: number, limit: number) => {
   if(time && time.length > 0) {
     query['$and'] = time;
   }
-  console.log(JSON.stringify(query));
   const orders = await makeQuery(OrderCollection.paginate(query, {
     populate: [{ path: 'shippingAddress' }, { path: 'shopInfo' }],
     page,

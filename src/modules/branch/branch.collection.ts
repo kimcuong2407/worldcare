@@ -62,6 +62,10 @@ const BranchSchema = new Schema({
   },
   logo: String,
   photos: [String],
+  isPublic: {
+    type: Boolean,
+    default: false,
+  },
   slug: {
     type: String,
     unique: true,
