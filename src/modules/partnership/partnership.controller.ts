@@ -91,9 +91,7 @@ const getPartnershipDetailAction  = async (req: express.Request, res: express.Re
   try {
     let partnershipId = get(req.params, 'partnershipId');
 
-    const partnership: any = await partnershipService.getPartnershipInfo({
-      partnershipId: partnershipId,
-    });
+    const partnership: any = await partnershipService.getPartnershipInfo(partnershipId);
 
     res.send(setResponse(partnership, true));
   } catch (e) {
