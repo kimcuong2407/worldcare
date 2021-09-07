@@ -66,7 +66,7 @@ const createCouponAction = async (req: express.Request, res: express.Response, n
      throw new ValidationFailedError('Vui lòng nhập ngày kết thúc hiệu lực của mã giảm giá.')
    }
  
-   if(!discountPercent || !discountValue) {
+   if(!discountPercent && !discountValue) {
      throw new ValidationFailedError('Vui lòng nhập giá trị của mã giảm giá theo số tiền hoặc theo %.')
    }
 
@@ -129,6 +129,14 @@ const updateCouponAction = async (req: express.Request, res: express.Response, n
    if(!endTime) {
      throw new ValidationFailedError('Vui lòng nhập ngày kết thúc hiệu lực của mã giảm giá.')
    }
+
+   if(!discountPercent && !discountValue) {
+    throw new ValidationFailedError('Vui lòng nhập giá trị của mã giảm giá theo số tiền hoặc theo %.')
+  }
+
+  if(discountPercent && discountValue && discountPercent >0 && discountValue > 0) {
+   throw new ValidationFailedError('Không thể áp dụng cùng lúc giảm giá theo giá trị và phần trăm.')
+ }
 
     const updatedCoupon = await couponService.updateCoupon(
       get(req.params, 'couponId'),
