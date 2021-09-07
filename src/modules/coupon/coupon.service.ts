@@ -3,7 +3,7 @@ import makeQuery from '@app/core/database/query';
 import { UnAuthenticated, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import bcryptUtil from '@app/utils/bcrypt.util';
 import jwtUtil from '@app/utils/jwt.util';
-import { get, isNil, map, omitBy, pick } from 'lodash';
+import { get, isNil, map, omitBy, pick, toLower } from 'lodash';
 import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import CouponCollection from '../coupon/coupon.collection';
@@ -65,6 +65,27 @@ const getCouponInfo = async (couponId: string) => {
   return data;
 }
 
+const getValidCoupon = async (couponCode: string) => {
+  const coupon: any = await CouponCollection.findOne({
+    code: toLower(couponCode),
+    startTime: {
+      $lte: new Date(),
+    },
+    endTime: {
+      $gte: new Date(),
+    },
+    $or: [
+      {
+        $where: '!this.usageCount || (this.usageCount < this.maxUsage)',
+      },
+      {
+        maxUsage: null,
+      }
+    ]
+  });
+  return coupon;
+}
+
 const fetchCoupon = async (params: any, options: any) => {
   const {
     code, startTime, endTime,
@@ -107,4 +128,5 @@ export default {
   fetchCoupon,
   getCouponInfo,
   updateCoupon,
+  getValidCoupon,
 };

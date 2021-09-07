@@ -12,6 +12,7 @@ import { getPreSignedUrl } from '@app/core/s3';
 import orderActions from './actions';
 import { setResponse } from '@app/utils/response.util';
 import { ORDER_STATUS } from './constant';
+import couponService from '../coupon/coupon.service';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -22,6 +23,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       addressId,
       address,
       companyId,
+      couponCode,
     } = req.body;
     const userId = get(req, 'user.id', '');
 
@@ -32,12 +34,20 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
     if(userId && !addressId) {
       throw new ValidationFailedError('Vui lòng chọn thông tin địa chỉ nhận hàng.')
     }
+    if(couponCode) {
+      const coupon = await couponService.getValidCoupon(couponCode);
+      if(!coupon) {
+        throw new ValidationFailedError('Mã giảm giá không tồn tại hoặc đã hết hiệu lực.');
+      }
+    }
+
     const data = await orderService.createOrder({
       prescriptionId,
       addressId,
       address,
       userId,
       companyId,
+      couponCode,
     });
     await orderService.updatePrescription(prescriptionId, get(data, 'orderNumber'));
     await zalo.sendZaloMessage(`New order created: ${get(data, 'orderNumber')}`);

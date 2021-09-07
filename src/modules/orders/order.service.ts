@@ -1,5 +1,5 @@
 import makeQuery from '@app/core/database/query'
-import { get } from 'lodash';
+import { get, toLower } from 'lodash';
 import moment from 'moment';
 import CustomerCollection from '../customer/customer.collection';
 import userService from '../user/user.service';
@@ -7,6 +7,10 @@ import { ORDER_ACTIONS, ORDER_STATUS } from './constant';
 import OrderItemCollection from './order-item.collection';
 import OrderCollection from './order.collection';
 import PrescriptionCollection from './prescription.collection';
+import mongoose from 'mongoose';
+import CouponCollection from '../coupon/coupon.collection';
+import couponService from '../coupon/coupon.service';
+import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 
 const createPrescription = async (fileId: string) => {
   return makeQuery(PrescriptionCollection.create({
@@ -26,6 +30,7 @@ const createOrder = async (order: any) => {
     prescriptionId,
     companyId,
     branchId,
+    couponCode,
   } = order;
   let addressId = get(order, 'addressId', null);
   let userId = get(order, 'userId', null);
@@ -40,8 +45,9 @@ const createOrder = async (order: any) => {
     let newAddress = await userService.addNewAddress(address);
     addressId = get(newAddress, '_id');
   }
+  const session = await mongoose.startSession();
 
-  let createdOrder = {
+  let requestOrder = {
     prescriptionId,
     userId,
     shippingAddressId: addressId,
@@ -57,8 +63,32 @@ const createOrder = async (order: any) => {
       }
     ]
   }
-
-  return makeQuery(OrderCollection.create(createdOrder));
+  if(couponCode) {
+    const updated = await CouponCollection.updateOne({
+      code: toLower(couponCode),
+      startTime: {
+        $lte: new Date(),
+      },
+      endTime: {
+        $gte: new Date(),
+      },
+      $or: [
+        {
+          $where: '!this.usageCount || (this.usageCount < this.maxUsage)',
+        },
+        {
+          maxUsage: null,
+        }
+      ]
+    }, { $inc: { usageCount: 1 } }, { session })
+    if(!updated.nModified) {
+      session.abortTransaction();
+      throw new ValidationFailedError('Mã giảm giá không tồn tại hoặc đã hết lượt sử dụng.')
+    }
+  }
+  const createdOrder = await OrderCollection.create(requestOrder, {session});
+  session.endSession();
+  return createdOrder;
 }
 
 

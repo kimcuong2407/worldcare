@@ -30,6 +30,10 @@ const CouponSchema = new Schema({
   maxUsage: {
     type: Number
   },
+  usageCount: {
+    type: Number,
+    default: 0,
+  },
   conditions: [{
     type: String,
     condition: Object

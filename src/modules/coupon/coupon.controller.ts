@@ -9,7 +9,7 @@ import appUtil from '@app/utils/app.util';
 import jwtUtil from '@app/utils/jwt.util';
 import { v4 as uuidv4 } from 'uuid';
 import { Types } from 'mongoose';
-import { xor } from 'lodash';
+import { toLower, xor } from 'lodash';
 
 const logger = loggerHelper.getLogger('coupon.controller');
 
@@ -69,8 +69,12 @@ const createCouponAction = async (req: express.Request, res: express.Response, n
    if(!discountPercent || !discountValue) {
      throw new ValidationFailedError('Vui lòng nhập giá trị của mã giảm giá theo số tiền hoặc theo %.')
    }
+
+   if(discountPercent && discountValue && discountPercent >0 && discountValue > 0) {
+    throw new ValidationFailedError('Không thể áp dụng cùng lúc giảm giá theo giá trị và phần trăm.')
+  }
    const existingCode = await couponService.findCoupon({
-     code: code
+     code: toLower(code)
    });
    if(existingCode && existingCode.length> 0) {
       throw new ValidationFailedError('Mã giảm giá đã tồn tại.')
@@ -80,7 +84,7 @@ const createCouponAction = async (req: express.Request, res: express.Response, n
       {
         name,
         description,
-        code,
+        code: toLower(code),
         startTime,
         endTime,
         discountValue,
@@ -162,6 +166,27 @@ const getCouponDetailAction  = async (req: express.Request, res: express.Respons
   }
 }
 
+const checkCouponDetailAction  = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let couponCode = get(req.params, 'couponCode');
+
+    const coupon = await couponService.getValidCoupon(couponCode);
+    if(!coupon) {
+      throw new NotFoundError('Mã giảm giá không tồn tại hoặc đã hết hiệu lực.');
+    }
+    const { name, code, discountValue, discountPercent, maxDiscount } = coupon;
+    res.send(setResponse({
+      name,
+      code,
+      discountValue,
+      discountPercent: !discountValue ? discountPercent : 0,
+      maxDiscount,
+    }, true));
+  } catch (e) {
+    logger.error('getCouponDetailAction', e);
+    next(e);
+  }
+}
 
 const deleteCouponAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -182,4 +207,5 @@ export default {
   updateCouponAction,
   getCouponDetailAction,
   deleteCouponAction,
+  checkCouponDetailAction,
 };
