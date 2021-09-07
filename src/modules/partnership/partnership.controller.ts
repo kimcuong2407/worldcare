@@ -37,6 +37,10 @@ const createPartnershipAction = async (req: express.Request, res: express.Respon
       logo,
       description,
       address,
+      slug,
+      email,
+      phoneNumber,
+
     } = req.body;
 
     if (!name) {
@@ -45,10 +49,13 @@ const createPartnershipAction = async (req: express.Request, res: express.Respon
 
     const createdPartnership = await partnershipService.createPartnership(
       {
-      name,
-      logo,
-      description,
-      address,
+        name,
+        logo,
+        description,
+        address,
+        slug,
+        email,
+        phoneNumber,
       }
     );
     res.send(setResponse(createdPartnership, true, 'Tài khoản đã được tạo thành công.'));
@@ -65,6 +72,9 @@ const updatePartnershipAction = async (req: express.Request, res: express.Respon
       logo,
       description,
       address,
+      slug,
+      email,
+      phoneNumber,
     } = req.body;
 
     if (!name) {
@@ -78,6 +88,9 @@ const updatePartnershipAction = async (req: express.Request, res: express.Respon
         logo,
         description,
         address,
+        slug,
+        email,
+        phoneNumber,
       }
     );
     res.send(setResponse(updatedPartnership, true, 'Partnership đã được tạo thành công.'));
