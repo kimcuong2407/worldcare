@@ -122,7 +122,7 @@ const updateEmployeeInfo = async (query: any, staffInfo: any) => {
 
 const deleteEmployee = async (employeeNumber: number) => {
   const data = await EmployeeCollection.findOneAndUpdate({
-    employeeNumber: Number(employeeNumber),
+    employeeNumber: employeeNumber,
   }, { deletedAt: new Date() });
 
   return true;

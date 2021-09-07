@@ -24,7 +24,7 @@ const employeeRoutes = (app: express.Application): void => {
     [CORE_RESOURCES.partner, CORE_ACTIONS.write]
   ]), employeeActions.updateEmployeeInfoAction);
 
-  app.delete('/api/v1/employee/:employeeId', middleware.authorization([
+  app.delete('/api/v1/employee/:employeeNumber', middleware.authorization([
     [CORE_RESOURCES.employee, CORE_ACTIONS.delete],
     [CORE_RESOURCES.partner, CORE_ACTIONS.write]
   ]), employeeActions.deleteEmployeeAction);
