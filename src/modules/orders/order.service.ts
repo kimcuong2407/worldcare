@@ -86,7 +86,7 @@ const createOrder = async (order: any) => {
       throw new ValidationFailedError('Mã giảm giá không tồn tại hoặc đã hết lượt sử dụng.')
     }
   }
-  const createdOrder = await OrderCollection.create(requestOrder, {session});
+  const createdOrder = await OrderCollection.create(requestOrder);
   session.endSession();
   return createdOrder;
 }
