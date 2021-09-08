@@ -113,6 +113,7 @@ const setupDefaultRoles = async (branchId: string, modules: string[]) => {
       const policies = action.map((act: any) => ([get(createdRole, '_id'), branchId, resource, act]))
       return Promise.all(policies.map((pol: any) => casbin.enforcer.addPolicy(...pol)));
     }))
+    await casbin.enforcer.loadPolicy();
 
     return Promise.resolve();
 

@@ -1,5 +1,4 @@
 export const CORE_RESOURCES = {
-  partner: 'partner',
   branch: 'branch',
   companyInfo: 'companyInfo',
   employee: 'employee',
@@ -23,6 +22,7 @@ export const CLINIC_RESOURCES = {
 export const ROOT_RESOURCES = {
   ...CORE_RESOURCES,
   ...CLINIC_RESOURCES,
+  partner: 'partner',
   cms: 'cms',
 }
 

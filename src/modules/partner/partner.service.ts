@@ -105,7 +105,6 @@ const fetchPartner = async (params: any, options: any) => {
       $match: query
     }
   ]);
-  console.log(query)
 
   const sort: any = {};
 
