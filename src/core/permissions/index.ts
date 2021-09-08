@@ -63,7 +63,7 @@ export const ACTIONS = [
 
 export const RESOURCES = [
   {
-    key: CORE_RESOURCES.partner,
+    key: ROOT_RESOURCES.partner,
     name: 'Quản lý công ty',
   },
   {
@@ -75,8 +75,12 @@ export const RESOURCES = [
     name: 'Quản lý nhóm người dùng',
   },
   {
-    key: CORE_RESOURCES.employee,
+    key: CORE_RESOURCES.user,
     name: 'Quản lý người dùng',
+  },
+  {
+    key: CORE_RESOURCES.employee,
+    name: 'Quản lý hồ sơ nhân viên',
   },
   {
     key: CLINIC_RESOURCES.appointment,
