@@ -11,7 +11,7 @@ const authRoutes = (app: express.Application): void => {
   app.get('/api/v1/resource-permission', 
   middleware.authorization([
     [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
-    [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+    [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
   ]),
   authActions.getResourcePermissionAction);
   app.get('/api/v1/user-policy', middleware.authenticate, authActions.fetchPolicyAction);
@@ -24,35 +24,35 @@ const authRoutes = (app: express.Application): void => {
   app.get('/api/v1/user-group',
   middleware.authorization([
     [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
-    [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+    [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
   ]),
   authActions.fetchUserGroupAction);
 
   app.post('/api/v1/user-group',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.write],
-      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+      [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.createUserGroupAction);
 
   app.put('/api/v1/user-group/:groupId',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.update],
-      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+      [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.updateUserGroupAction);
 
   app.delete('/api/v1/user-group/:groupId',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.delete],
-      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+      [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.deleteUserGroupAction);
 
   app.get('/api/v1/user-group/:groupId',
     middleware.authorization([
       [CORE_RESOURCES.userGroup, CORE_ACTIONS.read],
-      [CORE_RESOURCES.partner, CORE_ACTIONS.write],
+      [ROOT_RESOURCES.partner, CORE_ACTIONS.write],
     ]),
     authActions.getUserGroupDetailAction);
     

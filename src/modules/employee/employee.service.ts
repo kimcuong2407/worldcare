@@ -37,16 +37,16 @@ const formatEmployee = (staff: any) => {
   }
 }
 
-const fetchEmployee = async (params: any, language = 'vi') => {
+const fetchEmployee = async (params: any, options: any) => {
   const {
-    keyword, options, hospitalId, title, degree, speciality, employeeGroup
+    keyword, branchId, title, degree, speciality, employeeGroup
   } = params;
   const query: any = {
     deletedAt: null,
   };
 
-  if (hospitalId) {
-    query.hospital = hospitalId;
+  if (branchId) {
+    query.branchId = branchId;
   }
   if (degree) {
     query.degree = degree;
@@ -67,11 +67,9 @@ const fetchEmployee = async (params: any, language = 'vi') => {
   if (keyword) {
     query['$text'] = { $search: keyword }
   }
-  EmployeeCollection.setDefaultLanguage(language);
   let data = await EmployeeCollection.paginate(query, {
     ...options,
     'populate': [
-      { path: 'hospital', select: ['hospitalName', 'address', 'workingHours'] },
       { path: 'degree.degreeId', select: 'name' },
       { path: 'title', select: 'name' },
       { path: 'speciality', select: 'name' },
@@ -193,7 +191,8 @@ const getEmployeeByBranchId = async (query: any, options: any) => {
   const aggregation: any = [
     {
       '$match': {
-        'branchId': Number(branchId)
+        'branchId': Number(branchId),
+        deletedAt: null,
       }
     }, {
       '$lookup': {

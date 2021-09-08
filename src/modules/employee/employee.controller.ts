@@ -94,7 +94,7 @@ const fetchEmployeeAction = async (req: express.Request, res: express.Response, 
     if(!req.isRoot) {
       branchId = req.companyId;
     }
-    const data = await employeeService.getEmployeeByBranchId({ branchId },options);
+    const data = await employeeService.fetchEmployee({ branchId, keyword }, options);
     res.send(data);
   } catch (e) {
     logger.error('fetchEmployeeAction', e);
