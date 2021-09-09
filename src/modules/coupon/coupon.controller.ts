@@ -208,6 +208,17 @@ const deleteCouponAction = async (req: express.Request, res: express.Response, n
   }
 }
 
+const getFreeCouponAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+
+    const coupon = await couponService.getFreeCoupon();
+    res.send(setResponse(coupon, true));
+  } catch (e) {
+    logger.error('getFreeCouponAction', e);
+    next(e);
+  }
+}
+
 
 export default {
   fetchCouponAction,
@@ -216,4 +227,5 @@ export default {
   getCouponDetailAction,
   deleteCouponAction,
   checkCouponDetailAction,
+  getFreeCouponAction,
 };

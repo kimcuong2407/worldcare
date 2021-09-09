@@ -14,6 +14,7 @@ const couponRoutes = (app: express.Application): void => {
 
   app.get('/api/v1/coupon/:couponId', couponActions.getCouponDetailAction);
   app.get('/api/v1/check-coupon/:couponCode', couponActions.checkCouponDetailAction);
+  app.get('/api/v1/free-coupon', couponActions.getFreeCouponAction);
 
   app.put('/api/v1/coupon/:couponId', middleware.authorization([
     [ROOT_RESOURCES.cms, CORE_ACTIONS.update],

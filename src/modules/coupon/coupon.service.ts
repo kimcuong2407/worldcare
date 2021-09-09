@@ -33,7 +33,7 @@ const createCoupon = async (coupon: any) => {
   //   maxUsage,
   //   maxShippingDiscount,
   //  } = coupon;
- 
+
   // const couponInfo = {
   //   name,
   //   description,
@@ -116,9 +116,21 @@ const fetchCoupon = async (params: any, options: any) => {
 }
 
 const deleteCoupon = async (couponId: string) => {
-  await CouponCollection.findByIdAndUpdate(couponId, { $set: { deletedAt: new Date()} });
+  await CouponCollection.findByIdAndUpdate(couponId, { $set: { deletedAt: new Date() } });
   return true;
 };
+
+const getFreeCoupon = async () => {
+  return makeQuery(CouponCollection.find({
+    startTime: {
+      $lte: new Date()
+    },
+    endTime: {
+      $gte: new Date()
+    },
+    deletedAt: null,
+  }).exec());
+}
 
 export default {
   findCoupon,
@@ -129,4 +141,5 @@ export default {
   getCouponInfo,
   updateCoupon,
   getValidCoupon,
+  getFreeCoupon,
 };
