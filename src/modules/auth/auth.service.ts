@@ -19,12 +19,12 @@ const authenticate = async (login: string, password: string) => {
   const sessionId = uuidv4();
   const user = await UserCollection.findOne({
     $or: [
-      {
-        phoneNumber: login,
-      },
-      {
-        email: login,
-      },
+      // {
+      //   phoneNumber: login,
+      // },
+      // {
+      //   email: login,
+      // },
       {
         username: login
       }

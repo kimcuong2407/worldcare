@@ -14,15 +14,18 @@ import appUtil from '@app/utils/app.util';
 import employeeService from '../employee/employee.service';
 import authService from '../auth/auth.service';
 import { ROOT_COMPANY_ID } from '@app/core/constant';
+import moment from 'moment';
 
 // Auth service
 const getUserProfileById = async (userId: string) => {
   const profile = await UserCollection.findOne({ _id: userId }).lean().exec();
+  const { address } = profile;
   // const roles = await casbin.enforcer.getRolesForUser(userId);
   const employee = await employeeService.getEmployeeInfo({ userId: userId }, true);
   const queryBranches: any = await branchService.findBranchAndChild(null, get(profile, 'branchId'), {});
   return {
     ...profile,
+    address: addressUtil.formatAddressV2(address),
     ...pick(employee, ['firstName', 'lastName']),
     branches: map(queryBranches, (branch) => pick(branch, ['_id', 'name', 'address'])),
     // roles,
@@ -31,6 +34,10 @@ const getUserProfileById = async (userId: string) => {
 
 // Auth service
 const updateUserProfile = async (userId: string, profile: any) => {
+  const  { dob } = profile;
+  if(dob) {
+    profile.dob = moment.utc(dob, 'DD-MM-YYYY').startOf('day').toDate();
+  }
   await UserCollection.findByIdAndUpdate(userId, profile).lean().exec();
   // const roles = await casbin.enforcer.getRolesForUser(userId);
   return true;
@@ -160,6 +167,7 @@ const createStaffAccount = async (inputUser: any) => {
     username,
     groups,
     branchId,
+    isCustomer,
     address } = inputUser;
   const encryptedPassword = await bcryptUtil.generateHash(password);
   const user = {
@@ -175,6 +183,7 @@ const createStaffAccount = async (inputUser: any) => {
     avatar,
     employeeNumber,
     groups,
+    isCustomer,
     address
   };
   const createdUser = await createUser(user);

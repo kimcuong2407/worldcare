@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import get from 'lodash/get';
 import last from 'lodash/last';
+import addressUtil from '@app/utils/address.util';
 
 const { Schema } = mongoose;
 
@@ -29,15 +30,30 @@ const UserSchema = new Schema({
   password: String,
   address: Object,
   avatar: String,
-  dob: String,
+  dob: Date,
   note: String,
   deletedAt: Date,
   createdBy: String,
   updatedBy: String,
+  isActive: Boolean,
+  isCustomer: {
+    type: Boolean,
+    default: true,
+  },
   lastActivity: Date,
   lastLoggedIn: Date,
 }, {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (doc, ret) => {
+      const { address } = ret;
+      return {
+        ...ret,
+        address: addressUtil.formatAddressV2(address)
+      };
+    }
+  }
 });
 
 UserSchema.plugin(mongoosePaginate);

@@ -1,5 +1,5 @@
 import middleware from '@app/core/middleware';
-import { CORE_ACTIONS, CORE_RESOURCES } from '@app/core/permissions';
+import { CORE_ACTIONS, CORE_RESOURCES, ROOT_RESOURCES } from '@app/core/permissions';
 import express from 'express';
 import employeeActions from './employee.controller';
 

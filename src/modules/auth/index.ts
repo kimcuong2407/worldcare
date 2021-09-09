@@ -1,4 +1,4 @@
-import { ACTIONS, CORE_ACTIONS, CORE_RESOURCES } from './../../core/permissions/index';
+import { ACTIONS, CORE_ACTIONS, CORE_RESOURCES, ROOT_RESOURCES } from './../../core/permissions/index';
 import middleware from '@app/core/middleware';
 import express from 'express';
 import authActions from './auth.controller';

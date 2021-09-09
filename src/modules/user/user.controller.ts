@@ -9,7 +9,7 @@ import appUtil from '@app/utils/app.util';
 import jwtUtil from '@app/utils/jwt.util';
 import { v4 as uuidv4 } from 'uuid';
 import { Types } from 'mongoose';
-import { xor } from 'lodash';
+import { isNil, omitBy, xor } from 'lodash';
 
 const logger = loggerHelper.getLogger('user.controller');
 
@@ -83,6 +83,7 @@ const addNewAddressAction = async (
     next(e);
   }
 };
+
 const fetchAddressAction = async (
   req: express.Request,
   res: express.Response,
@@ -277,9 +278,9 @@ const createUserAction = async (req: express.Request, res: express.Response, nex
         groups,
         address,
         branchId,
+        isCustomer: false,
       }
     );
-    console.log(get(createdUser, '_id'), groups, branchId)
     await userService.updateUserGroups(get(createdUser, '_id'), groups, branchId);
     res.send(setResponse(createdUser, true, 'Tài khoản đã được tạo thành công.'));
   } catch (e) {
@@ -357,6 +358,45 @@ const updateUserAction = async (req: express.Request, res: express.Response, nex
   }
 }
 
+
+const updateUserProfileAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let userId = get(req.user, 'id');
+
+    const {
+      fullName,
+      idNumber,
+      dob,
+      gender,
+      bloodType,
+      phoneNumber,
+      email,
+      avatar,
+      address,
+    } = req.body;
+
+    const updatedUser = await userService.updateUserProfile(
+      userId,
+      omitBy({
+        fullName,
+        idNumber,
+        dob,
+        gender,
+        bloodType,
+        phoneNumber,
+        email,
+        avatar,
+        address,
+      }, isNil),
+    );
+  
+    res.send(setResponse(updatedUser, true, 'Tài khoản đã được cập nhật thành công.'));
+  } catch (e) {
+    logger.error('updateUserProfileAction', e);
+    next(e);
+  }
+}
+
 const getUserDetailAction  = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     let branchId = get(req.query, 'branchId');
@@ -415,4 +455,5 @@ export default {
   updateUserAction,
   getUserDetailAction,
   deleteUserAction,
+  updateUserProfileAction,
 };
