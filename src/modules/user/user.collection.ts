@@ -29,6 +29,8 @@ const UserSchema = new Schema({
   groups: [{ type: Schema.Types.ObjectId, ref: 'role' }],
   password: String,
   address: Object,
+  idNumber: String,
+  bloodType: String,
   avatar: String,
   dob: Date,
   note: String,
