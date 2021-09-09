@@ -130,6 +130,7 @@ const fetchUser = async (params: any, options: any) => {
     keyword, branchId, groups
   } = params;
   const query: any = {
+    deletedAt: null,
   };
   if (keyword) {
     query['$text'] = { $search: keyword }
