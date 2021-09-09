@@ -24,6 +24,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       address,
       companyId,
       couponCode,
+      customerNote,
     } = req.body;
     const userId = get(req, 'user.id', '');
 
@@ -48,6 +49,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       userId,
       companyId,
       couponCode,
+      customerNote,
     });
     await orderService.updatePrescription(prescriptionId, get(data, 'orderNumber'));
     await zalo.sendZaloMessage(`New order created: ${get(data, 'orderNumber')}`);

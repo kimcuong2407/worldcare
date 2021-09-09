@@ -31,6 +31,7 @@ const createOrder = async (order: any) => {
     companyId,
     branchId,
     couponCode,
+    customerNote,
   } = order;
   let addressId = get(order, 'addressId', null);
   let userId = get(order, 'userId', null);
@@ -61,7 +62,8 @@ const createOrder = async (order: any) => {
         timestamp: new Date(),
         // data: payload,
       }
-    ]
+    ],
+    customerNote,
   }
   if(couponCode) {
     const updated = await CouponCollection.updateOne({
