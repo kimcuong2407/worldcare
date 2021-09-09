@@ -117,7 +117,11 @@ const fetchBranchInfo = async (branchIdOrSlug: string, language = 'vi', isRaw = 
   let query: any = { $or: [{ _id: branchIdOrSlug }, { slug: branchIdOrSlug }], deletedAt: null };
 
   if (isRaw) {
-    return BranchCollection.findOne(query);
+    const foundBranch = await BranchCollection.findOne(query).lean().exec();
+    return {
+      ...foundBranch,
+      address: addressUtil.formatAddressV2(get(foundBranch, 'address')),
+    }
   }
 
   branch = await BranchCollection.findOne(query).populate('speciality', 'name').lean();
