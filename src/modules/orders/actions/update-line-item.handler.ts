@@ -116,12 +116,12 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
       },
     });
 
-    const { shippingFee } = order;
-    const discountValue = orderService.calculateDiscount({ shippingFee, subTotalPerItem });
-    await OrderCollection.findOneAndUpdate({
+    const { shippingFee, couponCode } = order;
+    const discountAmount = await orderService.calculateDiscount({ shippingFee, couponCode, subTotalPerItem });
+    const updatedOrder = await OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber')
-    }, { $set: { discountValue: discountValue || 0 } });
-    return Promise.resolve(order);
+    }, { $set: { discountAmount: discountAmount || 0, grandTotal: Math.max(grandTotal - (+discountAmount || 0), 0) } });
+    return Promise.resolve(updatedOrder);
   }
 
   async validate(order: any, payload: any) {
