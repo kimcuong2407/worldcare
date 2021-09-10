@@ -41,6 +41,31 @@ const findCustomer = async (userId: string, partnerId: number, branchId: number,
 
   return customerInfo;
 }
+
+const calculateDiscount = async(order: any) => {
+  const { couponCode, shippingFee, subTotal } = order;
+  const coupon: any = await couponService.findOneCoupon({code: toLower(couponCode)});
+  const { discountPercent, maxDiscount, discountValue } = coupon;
+  let discountAmount = 0;
+  if(get(coupon, 'isFreeShipping')) {
+    const maxShippingDiscount = get(coupon, 'maxShippingDiscount') ;
+    if(maxShippingDiscount) {
+      return (maxShippingDiscount - shippingFee) > 0 ? shippingFee : maxShippingDiscount;
+    }
+  }
+  
+  if(discountPercent) {
+    discountAmount = (Math.round((subTotal/discountPercent) * 1e2) / 1e2)
+  }
+  if(discountValue) {
+    discountAmount = discountValue;
+  }
+  if(maxDiscount) {
+    discountAmount = Math.min(discountAmount, maxDiscount);
+  }
+  return discountAmount;
+};
+
 const createOrder = async (order: any) => {
   const {
     address,
@@ -419,4 +444,5 @@ export default {
   getMonthlyReport,
   getLast7DaysReport,
   getOverviewReport,
+  calculateDiscount,
 }

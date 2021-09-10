@@ -6,6 +6,7 @@ import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
 import OrderCollection from '../order.collection';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import OrderItemCollection from '../order-item.collection';
+import orderService from '../order.service';
 
 class UpdateItemOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
@@ -113,7 +114,13 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
           data: data,
         },
       },
-    })
+    });
+
+    const { shippingFee } = order;
+    const discountValue = orderService.calculateDiscount({ shippingFee, subTotalPerItem });
+    await OrderCollection.findOneAndUpdate({
+      orderNumber: get(order, 'orderNumber')
+    }, { $set: { discountValue: discountValue || 0 } });
     return Promise.resolve(order);
   }
 

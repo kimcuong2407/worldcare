@@ -18,6 +18,10 @@ const findCoupon = async (query: any) => {
   return makeQuery(CouponCollection.find(query).lean().exec());
 }
 
+const findOneCoupon = async (query: any) => {
+  return makeQuery(CouponCollection.findOne(query).lean().exec());
+}
+
 const createCoupon = async (coupon: any) => {
   // const { 
   //   name,
@@ -142,4 +146,5 @@ export default {
   updateCoupon,
   getValidCoupon,
   getFreeCoupon,
+  findOneCoupon,
 };
