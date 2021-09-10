@@ -18,6 +18,7 @@ import customerRoutes from './modules/customer';
 import partnershipRoutes from './modules/partnership';
 import couponRoutes from './modules/coupon';
 import policyRoutes from './modules/policy';
+import shippingVendorRoutes from './modules/shipping-vendor';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -39,4 +40,5 @@ export default (app: express.Application): void => {
   partnershipRoutes(app);
   couponRoutes(app);
   policyRoutes(app);
+  shippingVendorRoutes(app);
 };
