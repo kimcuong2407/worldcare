@@ -102,6 +102,7 @@ const createOrder = async (order: any) => {
     customerId: get(customer, '_id'),
     branchId: companyId || branchId,
     status: (companyId || branchId) ? ORDER_STATUS.RECEIVED : ORDER_STATUS.NEW,
+    couponCode,
     history: [
       {
         action: ORDER_ACTIONS.CREATE,
