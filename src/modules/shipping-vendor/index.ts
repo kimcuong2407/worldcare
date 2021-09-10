@@ -8,10 +8,10 @@ const shippingVendorRoutes = (app: express.Application): void => {
   app.post('/api/v1/shipping-vendor', middleware.authorization([
     [ROOT_RESOURCES.cms, CORE_ACTIONS.read],
   ]), shippingVendorActions.createShippingVendorAction);
-  app.get('/api/v1/shipping-vendor', middleware.authorization([
+  app.get('/api/v1/shipping-vendor', middleware.authenticate, shippingVendorActions.fetchShippingVendorAction);
+  app.get('/api/v1/shipping-vendor/:id',  middleware.authorization([
     [ROOT_RESOURCES.cms, CORE_ACTIONS.read],
-  ]), shippingVendorActions.fetchShippingVendorAction);
-  app.get('/api/v1/shipping-vendor/:id', middleware.authenticate,shippingVendorActions.getShippingVendorByIdOrSlugAction);
+  ]),shippingVendorActions.getShippingVendorByIdOrSlugAction);
   app.put('/api/v1/shipping-vendor/:id', middleware.authorization([
     [ROOT_RESOURCES.cms, CORE_ACTIONS.read],
   ]), shippingVendorActions.updateShippingVendorAction);
