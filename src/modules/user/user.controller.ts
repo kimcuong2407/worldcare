@@ -10,6 +10,7 @@ import jwtUtil from '@app/utils/jwt.util';
 import { v4 as uuidv4 } from 'uuid';
 import { Types } from 'mongoose';
 import { isNil, omitBy, xor } from 'lodash';
+import authService from '../auth/auth.service';
 
 const logger = loggerHelper.getLogger('user.controller');
 
@@ -373,6 +374,8 @@ const updateUserProfileAction = async (req: express.Request, res: express.Respon
       email,
       avatar,
       address,
+      currentPassword,
+      newPassword,
     } = req.body;
 
     const updatedUser = await userService.updateUserProfile(
@@ -389,6 +392,9 @@ const updateUserProfileAction = async (req: express.Request, res: express.Respon
         address,
       }, isNil),
     );
+    if(currentPassword && newPassword) {
+      await authService.changePasswordByUserId(userId, currentPassword, newPassword);
+    }
   
     res.send(setResponse(updatedUser, true, 'Tài khoản đã được cập nhật thành công.'));
   } catch (e) {
