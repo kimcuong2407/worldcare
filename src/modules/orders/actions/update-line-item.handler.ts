@@ -48,7 +48,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         }
       }, {
         '$addFields': {
-          'total': {
+          'subTotal': {
             '$sum': {
               '$map': {
                 'input': '$items',
@@ -74,7 +74,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         '$addFields': {
           'grandTotal': {
             '$sum': [
-              '$total', {
+              '$subTotal', {
                 '$ifNull': [
                   '$shippingFee', 0
                 ]

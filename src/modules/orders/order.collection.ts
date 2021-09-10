@@ -62,6 +62,7 @@ const OrderSchema = new Schema({
     type: Number,
     default: 0
   },
+  couponCode: String,
   shippingInfo: {
     shippingVendorId: String,
     'shippingVendor': String,
