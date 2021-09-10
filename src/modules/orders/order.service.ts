@@ -46,6 +46,9 @@ const createOrder = async (order: any) => {
     let newAddress = await userService.addNewAddress(address);
     addressId = get(newAddress, '_id');
   }
+  // else {
+  //   customerId
+  // }
   const session = await mongoose.startSession();
 
   let requestOrder = {
@@ -60,6 +63,7 @@ const createOrder = async (order: any) => {
         action: ORDER_ACTIONS.CREATE,
         // authorId: get(payload, 'userId'),
         timestamp: new Date(),
+        message: 'Đơn hàng đã được tạo thành công',
         // data: payload,
       }
     ],

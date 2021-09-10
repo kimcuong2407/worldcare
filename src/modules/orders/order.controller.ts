@@ -78,8 +78,9 @@ const getMyOrderAction = async (req: express.Request, res: express.Response, nex
     const userId = req.user.id;
     const { page, limit } = appUtil.getPaging(req);
     const { status, startTime, endTime, sortBy, sortDirection } = req.query;
+    const orderStatus = status ? String(status).split(',') : null;
 
-    const result = await orderService.findOrders({status, startTime, endTime, sortBy, sortDirection, userId}, page, limit);
+    const result = await orderService.findOrders({status: orderStatus, startTime, endTime, sortBy, sortDirection, userId}, page, limit);
     res.send(result);
   } catch (e) {
     logger.error('getMyOrderAction', e);

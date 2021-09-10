@@ -54,6 +54,14 @@ const OrderSchema = new Schema({
     type: Number,
     default: 0
   },
+  discountAmount: {
+    type: Number,
+    default: 0
+  },
+  vatAmount: {
+    type: Number,
+    default: 0
+  },
   shippingInfo: {
     'shippingVendor': String,
     'shipperName':  String,
