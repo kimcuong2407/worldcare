@@ -10,6 +10,8 @@ import OrderItemCollection from '../order-item.collection';
 class ProcessOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
+    const { data, currentUser } = payload;
+
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
     }, {
@@ -19,6 +21,7 @@ class ProcessOrderHandler extends OrderAbstractHandler {
       $push: {
         history: {
           action: ORDER_ACTIONS.PROCESS,
+          author: get(currentUser, 'fullName'),
           authorId: get(payload, 'userId'),
           timestamp: new Date(),
           message: 'Đơn hàng đã được xử lý',

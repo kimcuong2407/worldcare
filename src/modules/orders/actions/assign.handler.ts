@@ -10,7 +10,7 @@ import branchService from '@app/modules/branch/branch.service';
 class AssignOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
-    const { data } = payload;
+    const { data, currentUser } = payload;
     const { branchId } = data;
     const branch = await branchService.findBranchById(branchId);
     await makeQuery(OrderCollection.findOneAndUpdate({
@@ -24,6 +24,7 @@ class AssignOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.ASSIGN,
           authorId: get(payload, 'userId'),
+          author: get(currentUser, 'fullName'),
           timestamp: new Date(),
           message: `Đơn hàng đã được giao cho nhà thuốc ${get(branch, 'name.vi')}`,
           data: {

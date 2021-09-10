@@ -9,7 +9,7 @@ import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 class ShippingOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
-    const { data } = payload;
+    const { data, currentUser } = payload;
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
     }, {
@@ -20,6 +20,7 @@ class ShippingOrderHandler extends OrderAbstractHandler {
       $push: {
         history: {
           action: ORDER_ACTIONS.SHIPPING,
+          author: get(currentUser, 'fullName'),
           authorId: get(payload, 'userId'),
           message: 'Đã giao cho đơn vị vận chuyển',
           timestamp: new Date(),

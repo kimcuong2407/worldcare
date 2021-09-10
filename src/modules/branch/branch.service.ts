@@ -241,7 +241,7 @@ const fetchBranchByType = async (branchType: string, keyword: string, language =
     }, 
     {
       $match: {
-        type: toUpper(branchType),
+        branchType: toUpper(branchType),
       }
     },
     {
@@ -330,7 +330,7 @@ const findBranchBySlug = async (slug: string) => {
 }
 
 
-const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, filter: any) => {
+const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, filter?: any) => {
   if(!parentBranchId && !partnerId) {
     return [];
   }

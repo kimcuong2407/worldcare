@@ -9,7 +9,7 @@ import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 class RejectOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
-    const { data } = payload;
+    const { data, currentUser } = payload;
     const { rejectReason } = data;
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
@@ -22,6 +22,7 @@ class RejectOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.REJECT,
           authorId: get(payload, 'userId'),
+          author: get(currentUser, 'fullName'),
           timestamp: new Date(),
           message: 'Nhà thuốc đã từ chối đơn hàng',
           data: data,

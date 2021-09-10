@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Types } from 'mongoose';
 import { isNil, omitBy, xor } from 'lodash';
 import authService from '../auth/auth.service';
+import branchService from '../branch/branch.service';
 
 const logger = loggerHelper.getLogger('user.controller');
 
@@ -259,9 +260,11 @@ const createUserAction = async (req: express.Request, res: express.Response, nex
     if (!password) {
       throw new ValidationFailedError('Vui lòng nhập vào mật khẩu.');
     }
+    const branch = await branchService.findBranchById(branchId);
+    const partnerId = Number(get(branch, 'partnerId'));
     const user = await userService.findUser({
       username,
-      branchId: Number(branchId),
+      partnerId,
     });
     if (user && user.length > 0) {
       throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
@@ -279,6 +282,7 @@ const createUserAction = async (req: express.Request, res: express.Response, nex
         groups,
         address,
         branchId,
+        partnerId,
         isCustomer: false,
       }
     );

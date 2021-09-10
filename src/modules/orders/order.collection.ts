@@ -80,6 +80,7 @@ const OrderSchema = new Schema({
       timestamp: Date,
       authorId: String,
       message: String,
+      author: String,
     }
   ],
   deletedAt: Date,

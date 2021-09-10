@@ -1,3 +1,4 @@
+import { ForbiddenError } from './../../core/types/ErrorTypes';
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
 import branchService from './branch.service';
@@ -8,7 +9,7 @@ import lowerCase from 'lodash/lowerCase';
 import trim from 'lodash/trim';
 import { WORKING_HOURS } from './constant';
 import appUtil from '@app/utils/app.util';
-import { isNil, isString, isUndefined, map, omitBy, pick } from 'lodash';
+import { find, isNil, isString, isUndefined, map, omit, omitBy, pick } from 'lodash';
 import { setResponse } from '@app/utils/response.util';
 import moment from 'moment';
 import authService from '../auth/auth.service';
@@ -30,8 +31,8 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
       speciality,
       address,
       workingHours,
-      branchSettings,
       branchType,
+      branchSettings,
       logo,
       photos,
       slug,
@@ -46,11 +47,11 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
 
     let partnerIdentity = partnerId;
 
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       partnerIdentity = null;
     }
 
-    if(!partnerIdentity) {
+    if (!partnerIdentity) {
       const currentBranch = await branchService.findBranchById(Number(req.companyId));
       partnerIdentity = get(currentBranch, 'partnerId');
     }
@@ -78,9 +79,8 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
     const partner = await partnerService.findPartnerById(partnerIdentity);
     const data = await branchService.createBranch({
       ...branchInfo,
-      branchType: get(partner, 'modules'),
     });
-    await authService.setupDefaultRoles(get(data, '_id'), get(partner, 'modules'));
+    await authService.setupDefaultRoles(get(data, '_id'), branchType);
     res.send(data);
   } catch (e) {
     logger.error('createBranchAction', e);
@@ -99,13 +99,13 @@ const fetchBranchAction = async (req: express.Request, res: express.Response, ne
     const branchType: string = get(req.query, 'branchType');
     let partnerId: number = Number(get(req.query, 'partnerId'));
     let branchId: number = null
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       partnerId = null;
       branchId = req.companyId;
     }
     branchId = partnerId ? null : req.companyId;
 
-    
+
     const language: string = get(req, 'language');
     const keyword = get(req, 'query.keyword', '');
     const data = await branchService.findBranchAndChild(partnerId, branchId, omitBy({
@@ -134,13 +134,29 @@ const fetchBranchInfoAction = async (req: express.Request, res: express.Response
 
 const updateBranchInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const branchId = get(req.params, 'branchId');
+    let branchId = +get(req.params, 'branchId');
+    if (!req.isRoot) {
+      const childBranches = await branchService.findBranchAndChild(null, req.companyId);
+      const isChildBranch = find(childBranches, (branch) => get(branch, '_id') === Number(branchId));
+      if (!isChildBranch) {
+        throw new ForbiddenError();
+      }
+    }
+
+    const branch = await branchService.findBranchById(branchId);
+
+    if (get(branch, 'isPublic')) {
+      throw new ValidationFailedError('Thông tin hiện đang được công khai trên mạng lưới nhà thuốc, vui lòng liên hệ quản trị viên để cập nhật.');
+    }
+
     const {
       name,
       description,
       email,
       phoneNumber,
       speciality,
+      modules,
+      branchType,
       address,
       workingHours,
       branchSettings,
@@ -150,6 +166,7 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
       diseases,
       services,
       parentId,
+      isPublic,
     } = req.body;
     const branchInfo: any = omitBy({
       name,
@@ -164,19 +181,21 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
       photos,
       diseases,
       services,
+      branchType,
       parentId,
+      isPublic,
       slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
     }, isNil);
 
-    if(slug) {
+    if (slug) {
       const existingSlug = await branchService.findBranchBySlug(slug);
-      if(existingSlug) {
+      if (existingSlug && get(existingSlug, 'id') !== branchId) {
         throw new ValidationFailedError('Đường dẫn đã tồn tại, vui lòng chọn tên đường dẫn khác.');
       }
     }
 
     // const params = { branchId, branchInfo };
-    const data = await branchService.updateBranchInfo(Number(branchId), branchInfo);
+    const data = await branchService.updateBranchInfo(Number(branchId), omitBy(branchInfo, isNil));
     res.send(data);
   } catch (e) {
     logger.error('updateBranchInfoAction', e);
@@ -187,9 +206,14 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
 const deleteBranchAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     let branchId = get(req.params, 'branchId');
-    if(!req.isRoot) {
-      branchId = req.companyId;
+    if (!req.isRoot) {
+      const childBranches = await branchService.findBranchAndChild(null, req.companyId);
+      const isChildBranch = find(childBranches, (branch) => get(branch, '_id') === Number(branchId));
+      if (!isChildBranch) {
+        throw new ForbiddenError();
+      }
     }
+
     const data = await branchService.deleteBranch(branchId);
     res.send(data);
   } catch (e) {
@@ -233,12 +257,12 @@ const createBranchUserAction = async (req: express.Request, res: express.Respons
     const {
       firstName, lastName, username,
     } = req.body;
-    if (!firstName || !lastName ){
+    if (!firstName || !lastName) {
       throw new ValidationFailedError('First name and last name are required.');
     }
 
-    const createdUser = await userService.findUser({username: username, branchId: branchId || null});
-    if(createdUser && createdUser.length > 0) {
+    const createdUser = await userService.findUser({ username: username, branchId: branchId || null });
+    if (createdUser && createdUser.length > 0) {
       throw new ValidationFailedError('Tên đăng nhập đã tồn tại.');
     }
     const data = await branchService.createBranchUser(req.body, branchId);
@@ -296,9 +320,9 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
 const getBranchUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const options = appUtil.getPaging(req);
-    let branchId = get(req.query, 'branchId');
+    let branchId = +get(req.query, 'branchId');
     const keyword = get(req.query, 'keyword');
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       branchId = req.companyId;
     }
     const users = await branchService.getBranchUsers(Number(branchId), options);
@@ -309,7 +333,7 @@ const getBranchUserAction = async (req: express.Request, res: express.Response, 
   }
 };
 
-export default { 
+export default {
   createBranchAction,
   fetchBranchAction,
   fetchBranchInfoAction,

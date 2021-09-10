@@ -1,5 +1,5 @@
 import makeQuery from '@app/core/database/query'
-import { get, toLower } from 'lodash';
+import { find, get, toLower } from 'lodash';
 import moment from 'moment';
 import CustomerCollection from '../customer/customer.collection';
 import userService from '../user/user.service';
@@ -11,6 +11,7 @@ import mongoose from 'mongoose';
 import CouponCollection from '../coupon/coupon.collection';
 import couponService from '../coupon/coupon.service';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import branchService from '../branch/branch.service';
 
 const createPrescription = async (fileId: string) => {
   return makeQuery(PrescriptionCollection.create({
@@ -24,6 +25,22 @@ const updatePrescription = async (prescriptionId: string, orderNumer: string) =>
   }).exec());
 };
 
+const findCustomer = async (userId: string, partnerId: number, branchId: number, phoneNumber: string, fullName: string) => {
+  let customerInfo = null;
+  if (userId) {
+    customerInfo = await CustomerCollection.findOne({ userId, partnerId, branchId }).lean().exec();
+  }
+
+  if (!userId) {
+    customerInfo = await CustomerCollection.findOne({ phoneNumber, fullName: fullName }).lean().exec();
+  }
+
+  if (!customerInfo) {
+    customerInfo = await CustomerCollection.create({ userId, partnerId, branchId, phoneNumber, fullName }, { new: true });
+  }
+
+  return customerInfo;
+}
 const createOrder = async (order: any) => {
   const {
     address,
@@ -35,27 +52,29 @@ const createOrder = async (order: any) => {
   } = order;
   let addressId = get(order, 'addressId', null);
   let userId = get(order, 'userId', null);
-  let customerId = '';
-
-  if (!userId) {
-    const { phoneNumber, fullName } = address;
-    const customerInfo = await CustomerCollection.findOneAndUpdate(
-      { phoneNumber, name: fullName },
-      { upsert: true, new: true }).exec();
-    customerId = get(customerInfo, '_id');
+  let customer = null;
+  if (branchId) {
+    const branch = await branchService.findBranchById(branchId);
+    customer = await findCustomer(
+      userId,
+      get(branch, 'partnerId'),
+      branchId,
+      get(address, 'phoneNumber'),
+      get(address, 'fullName'),
+    )
+  }
+  if (!addressId) {
     let newAddress = await userService.addNewAddress(address);
     addressId = get(newAddress, '_id');
   }
-  // else {
-  //   customerId
-  // }
+
   const session = await mongoose.startSession();
 
   let requestOrder = {
     prescriptionId,
     userId,
     shippingAddressId: addressId,
-    customerId,
+    customerId: get(customer, '_id'),
     branchId: companyId || branchId,
     status: (companyId || branchId) ? ORDER_STATUS.RECEIVED : ORDER_STATUS.NEW,
     history: [
@@ -69,7 +88,7 @@ const createOrder = async (order: any) => {
     ],
     customerNote,
   }
-  if(couponCode) {
+  if (couponCode) {
     const updated = await CouponCollection.updateOne({
       code: toLower(couponCode),
       startTime: {
@@ -87,7 +106,7 @@ const createOrder = async (order: any) => {
         }
       ]
     }, { $inc: { usageCount: 1 } }, { session })
-    if(!updated.nModified) {
+    if (!updated.nModified) {
       session.abortTransaction();
       throw new ValidationFailedError('Mã giảm giá không tồn tại hoặc đã hết lượt sử dụng.')
     }
@@ -101,14 +120,14 @@ const createOrder = async (order: any) => {
 const findOrders = async (params: any, page: number, limit: number) => {
   const { status, branchId, startTime, endTime, sortBy, sortDirection, keyword, userId } = params;
   const sort: any = {};
-  if(sortBy) {
+  if (sortBy) {
     sort[sortBy] = sortDirection || -1;
   }
   const query: any = {};
-  if(userId) {
+  if (userId) {
     query.userId = userId;
   }
-  if(branchId) {
+  if (branchId) {
     query.branchId = branchId;
   }
 
@@ -116,23 +135,23 @@ const findOrders = async (params: any, page: number, limit: number) => {
     query.orderNumber = keyword;
   }
 
-  if(status) {
+  if (status) {
     query.status = status;
   }
 
   const time = [];
-  if(startTime) {
+  if (startTime) {
     time.push({
       createdAt: { $gte: moment(startTime, 'YYYY-MM-DD').toDate(), }
     });
   }
 
-  if(endTime) {
+  if (endTime) {
     time.push({
       createdAt: { $lte: moment(endTime, 'YYYY-MM-DD').toDate(), }
     });
   }
-  if(time && time.length > 0) {
+  if (time && time.length > 0) {
     query['$and'] = time;
   }
   const orders = await makeQuery(OrderCollection.paginate(query, {
@@ -152,10 +171,252 @@ const findOrderDetail = async (query: any) => {
 
   return order;
 }
+
+const getMonthlyReport = async (branchId?: number) => {
+  const query: any = {
+    createdAt: {
+      $gte: moment().subtract(11, 'month').startOf('month').toDate(),
+    },
+    status: ORDER_STATUS.DELIVERED,
+  };
+  if (branchId) {
+    query.branchId = branchId;
+  }
+
+  const aggregation = [
+    {
+      '$match': query
+    }, {
+      '$group': {
+        '_id': {
+          'month': {
+            '$month': '$createdAt'
+          },
+          'year': {
+            '$year': '$createdAt'
+          }
+        },
+        'count': {
+          '$sum': 1
+        },
+        'total': {
+          '$sum': '$grandTotal'
+        }
+      }
+    }, {
+      '$addFields': {
+        'month': {
+          '$concat': [
+            {
+              '$toString': '$_id.month'
+            }, '-', {
+              '$toString': '$_id.year'
+            }
+          ]
+        }
+      }
+    }, {
+      '$project': {
+        '_id': 0
+      }
+    }
+  ];
+  const last12Months = Array.apply(0, Array(12)).map((_, i) => { return moment().subtract('month', i).format('M-YYYY') });
+
+  const reports = await OrderCollection.aggregate(aggregation).exec();
+  return last12Months.map((month: string) => {
+    const report = (find(reports, (report) => report.month === month) || {});
+    return {
+      totalSale: get(report, 'count', 0),
+      totalAmount: get(report, 'total', 0),
+      month,
+    }
+  });
+}
+
+
+const getLast7DaysReport = async (branchId?: number) => {
+  const query: any = {
+    createdAt: {
+      $gte: moment().subtract(6, 'day').startOf('day').toDate(),
+    },
+    status: ORDER_STATUS.DELIVERED,
+  };
+  if (branchId) {
+    query.branchId = branchId;
+  }
+
+  const aggregation = [
+    {
+      '$match': query
+    }, {
+      '$sort': {
+        'createdAt': -1
+      }
+    }, {
+      '$group': {
+        '_id': {
+          'date': {
+            '$dateToString': {
+              'format': '%d-%m-%Y',
+              'date': '$createdAt'
+            }
+          }
+        },
+        'count': {
+          '$sum': 1
+        },
+        'total': {
+          '$sum': '$grandTotal'
+        }
+      }
+    }, {
+      '$addFields': {
+        'date': '$_id.date'
+      }
+    }, {
+      '$project': {
+        '_id': 0
+      }
+    }
+  ];
+  const last7Days = Array.apply(0, Array(7)).map((_, i) => { return moment().subtract('day', i).format('DD-MM-YYYY') });
+
+  const reports = await OrderCollection.aggregate(aggregation).exec();
+  return last7Days.map((date: string) => {
+    const report = (find(reports, (report) => report.date === date) || {});
+    return {
+      totalSale: get(report, 'count', 0),
+      totalAmount: get(report, 'total', 0),
+      date,
+    }
+  });
+}
+
+
+const calculateWeeRevenueAndOrders = async (branchId?: number, startTime?: Date, endTime?: Date)=> {
+  const query: any = {
+    status: ORDER_STATUS.DELIVERED,
+  };
+  if(branchId) {
+    query.branchId = branchId;
+  }
+  if(startTime) {
+    query.createdAt = {
+      $gte: startTime,
+    }
+  }
+  if(endTime) {
+    query.createdAt = {
+      $lte: endTime,
+    }
+  }
+  const aggregation = [
+    {
+      '$match': query
+    }, 
+      {
+        '$group': {
+          '_id': 1, 
+          'totalRevenue': {
+            '$sum': '$grandTotal'
+          }, 
+          'totalOrder': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$project': {
+          '_id': 0
+        }
+      }
+    ];
+    
+
+  const reports = await OrderCollection.aggregate(aggregation).exec();
+  return reports[0];
+}
+const calculateWeeklyRevenueAndOrders = async (branchId?: number, startTime?: Date, endTime?: Date) => {
+  const query: any = {
+    status: ORDER_STATUS.DELIVERED,
+  };
+  if (branchId) {
+    query.branchId = branchId;
+  }
+  if (startTime) {
+    query.createdAt = {
+      $gte: startTime,
+    }
+  }
+  if (endTime) {
+    query.createdAt = {
+      $lte: endTime,
+    }
+  }
+  console.log(query)
+
+  const aggregation = [
+    {
+      '$match': query
+    },
+      {
+        '$sort': {
+          'createdAt': -1
+        }
+      }, {
+        '$group': {
+          '_id': {
+            'week': {
+              '$week': '$createdAt'
+            }
+          },
+          'totalRevenue': {
+            '$sum': '$grandTotal'
+          },
+          'totalOrder': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$addFields': {
+          'week': '$_id.week'
+        }
+      }, {
+        '$project': {
+          '_id': 0
+        }
+      }
+    ];
+
+  const reports = await OrderCollection.aggregate(aggregation).exec();
+  return reports;
+}
+
+const getOverviewReport = async (branchId: number) => {
+  const allTimeReport = await calculateWeeRevenueAndOrders(branchId);
+  const weekReport = await calculateWeeklyRevenueAndOrders(branchId,
+    moment().subtract(1, 'week').startOf('week').toDate())
+  const lastWeek = moment().subtract(1, 'week').format('W');
+  const thisWeek = moment().format('W');
+  const lastWeekReport = find(weekReport, ({week}) => week === +lastWeek);
+  const thisWeekReport = find(weekReport, ({week}) => week === +thisWeek);
+  return {
+    allTimeReport,
+    lastWeekReport,
+    thisWeekReport: {
+      ...thisWeekReport,
+      orderChange: Math.floor(((get(thisWeekReport, 'totalOrder',0)-get(lastWeekReport, 'totalOrder',0))/get(lastWeekReport, 'totalOrder',0))*100),
+      revenueChange: Math.floor(((get(thisWeekReport, 'totalRevenue',0)-get(lastWeekReport, 'totalRevenue',0))/get(lastWeekReport, 'totalRevenue',0))*100)
+    },
+  }
+}
 export default {
   createPrescription,
   createOrder,
   updatePrescription,
   findOrders,
   findOrderDetail,
+  getMonthlyReport,
+  getLast7DaysReport,
+  getOverviewReport,
 }

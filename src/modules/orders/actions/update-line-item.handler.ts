@@ -10,12 +10,12 @@ import OrderItemCollection from '../order-item.collection';
 class UpdateItemOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
-    const { data } = payload;
+    const { data, currentUser } = payload;
     const { item } = data;
     const id = get(item, '_id');
     const isDeleted = get(item, 'isDeleted', false);
     const query: any = {};
-    
+
     if (id) {
       query._id = Types.ObjectId(id)
 
@@ -27,7 +27,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
           orderNumber: get(order, 'orderNumber'),
         }, { upsert: true }).exec());
       }
-  
+
     } else {
       await makeQuery(OrderItemCollection.create({
         ...item,
@@ -41,9 +41,9 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         }
       }, {
         '$lookup': {
-          'from': 'order_item', 
-          'localField': 'orderNumber', 
-          'foreignField': 'orderNumber', 
+          'from': 'order_item',
+          'localField': 'orderNumber',
+          'foreignField': 'orderNumber',
           'as': 'items'
         }
       }, {
@@ -51,8 +51,8 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
           'total': {
             '$sum': {
               '$map': {
-                'input': '$items', 
-                'as': 'item', 
+                'input': '$items',
+                'as': 'item',
                 'in': {
                   '$multiply': [
                     {
@@ -88,7 +88,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         }
       }, {
         '$project': {
-          'grandTotal': 1, 
+          'grandTotal': 1,
           'subTotal': 1
         }
       }
@@ -96,9 +96,23 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     const subTotalPerItem = get(aggLineItem, '0.subTotal');
     const grandTotal = get(aggLineItem, '0.grandTotal');
 
-    await OrderCollection.findOneAndUpdate({ orderNumber: get(order, 'orderNumber') }, {
-      subTotal: subTotalPerItem,
-      grandTotal: grandTotal,
+    await OrderCollection.findOneAndUpdate({
+      orderNumber: get(order, 'orderNumber')
+    }, {
+      $set: {
+        subTotal: subTotalPerItem,
+        grandTotal: grandTotal,
+      },
+      $push: {
+        history: {
+          action: ORDER_ACTIONS.UPDATE_LINE_ITEM,
+          author: get(currentUser, 'fullName'),
+          authorId: get(payload, 'userId'),
+          message: 'Đã cập nhật sản phẩm trong đơn hàng',
+          timestamp: new Date(),
+          data: data,
+        },
+      },
     })
     return Promise.resolve(order);
   }

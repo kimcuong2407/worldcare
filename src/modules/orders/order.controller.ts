@@ -13,6 +13,7 @@ import orderActions from './actions';
 import { setResponse } from '@app/utils/response.util';
 import { ORDER_STATUS } from './constant';
 import couponService from '../coupon/coupon.service';
+import userService from '../user/user.service';
 
 const logger = loggerHelper.getLogger('company.controller');
 
@@ -28,16 +29,16 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
     } = req.body;
     const userId = get(req, 'user.id', '');
 
-    if(!userId && !address) {
+    if (!userId && !address) {
       throw new ValidationFailedError('Vui lòng nhập thông tin và địa chỉ nhận hàng.')
     }
 
-    if(userId && !addressId) {
+    if (userId && !addressId) {
       throw new ValidationFailedError('Vui lòng chọn thông tin địa chỉ nhận hàng.')
     }
-    if(couponCode) {
+    if (couponCode) {
       const coupon = await couponService.getValidCoupon(couponCode);
-      if(!coupon) {
+      if (!coupon) {
         throw new ValidationFailedError('Mã giảm giá không tồn tại hoặc đã hết hiệu lực.');
       }
     }
@@ -80,7 +81,7 @@ const getMyOrderAction = async (req: express.Request, res: express.Response, nex
     const { status, startTime, endTime, sortBy, sortDirection } = req.query;
     const orderStatus = status ? String(status).split(',') : null;
 
-    const result = await orderService.findOrders({status: orderStatus, startTime, endTime, sortBy, sortDirection, userId}, page, limit);
+    const result = await orderService.findOrders({ status: orderStatus, startTime, endTime, sortBy, sortDirection, userId }, page, limit);
     res.send(result);
   } catch (e) {
     logger.error('getMyOrderAction', e);
@@ -91,7 +92,7 @@ const getMyOrderAction = async (req: express.Request, res: express.Response, nex
 const getPrescriptionDetail = async (prescriptionId: string) => {
   const prescription: any = await PrescriptionCollection.findById(prescriptionId).lean().exec();
   const { images } = prescription;
-  const presignedImages = await Promise.all(map(images || [], (image: string)=> getPreSignedUrl(image)));
+  const presignedImages = await Promise.all(map(images || [], (image: string) => getPreSignedUrl(image)));
   return {
     ...prescription,
     images: presignedImages,
@@ -103,10 +104,10 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
     const userId = req.user.id;
     const orderNumber = get(req.params, 'orderNumber');
 
-    const result: any = await orderService.findOrderDetail({userId: userId, orderNumber: orderNumber});
-    if(result.prescriptionId) {
+    const result: any = await orderService.findOrderDetail({ userId: userId, orderNumber: orderNumber });
+    if (result.prescriptionId) {
       const prescription = await getPrescriptionDetail(result.prescriptionId);
-      result.prescription = pick(prescription, ['_id','images']);
+      result.prescription = pick(prescription, ['_id', 'images']);
     }
     res.send(result);
   } catch (e) {
@@ -120,19 +121,19 @@ const getOrderDetailAction = async (req: express.Request, res: express.Response,
     const orderNumber = get(req.params, 'orderNumber');
     let entityId = get(req.query, 'branchId');
 
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       entityId = req.companyId;
     }
-    const query: any = {orderNumber: orderNumber};
+    const query: any = { orderNumber: orderNumber };
 
-    if(entityId) {
+    if (entityId) {
       query.branchId = entityId;
     }
 
     const result: any = await orderService.findOrderDetail(query);
-    if(result.prescriptionId) {
+    if (result.prescriptionId) {
       const prescription = await getPrescriptionDetail(result.prescriptionId);
-      result.prescription = pick(prescription, ['_id','images']);
+      result.prescription = pick(prescription, ['_id', 'images']);
     }
     res.send(result);
   } catch (e) {
@@ -148,7 +149,7 @@ const getOrderAction = async (req: express.Request, res: express.Response, next:
     const { status, companyId, startTime, endTime, sortBy, sortDirection, keyword } = req.query;
     let entityId = companyId;
 
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       entityId = req.companyId;
     }
     const orderStatus = status ? String(status).split(',') : null;
@@ -170,7 +171,7 @@ const getPendingOrderAction = async (req: express.Request, res: express.Response
     const { status, companyId, startTime, endTime, sortBy, sortDirection } = req.query;
     let entityId = companyId;
 
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       entityId = req.companyId;
     }
     const result = await orderService.findOrders(omitBy({
@@ -203,13 +204,13 @@ const handleOrderAction = async (req: express.Request, res: express.Response, ne
     const query: any = {
       orderNumber,
     }
-    if(!req.isRoot) {
+    if (!req.isRoot) {
       entityId = req.companyId;
       query.branchId = entityId;
     }
-    
+
     const order = await orderService.findOrderDetail(query);
-    if(!order) {
+    if (!order) {
       throw new NotFoundError();
     }
 
@@ -218,9 +219,11 @@ const handleOrderAction = async (req: express.Request, res: express.Response, ne
       data,
       userId,
     });
+    const currentUser = await userService.findUserById(userId);
     await handler.handle(order, {
       data,
       userId,
+      currentUser,
     });
     const newOrder = await orderService.findOrderDetail(query);
 
@@ -235,11 +238,11 @@ const trackingOrderAction = async (req: express.Request, res: express.Response, 
   try {
     const { orderNumber, phoneNumber } = req.body;
 
-    if(!phoneNumber || !orderNumber) {
+    if (!phoneNumber || !orderNumber) {
       throw new ValidationFailedError('Vui lòng nhập vào mã đơn hàng.');
     }
 
-    if(!orderNumber) {
+    if (!orderNumber) {
       throw new ValidationFailedError('Vui lòng nhập vào số điện thoại nhận hàng.');
     }
 
@@ -247,12 +250,12 @@ const trackingOrderAction = async (req: express.Request, res: express.Response, 
       orderNumber: orderNumber,
     });
 
-    if(!result) {
+    if (!result) {
       throw new NotFoundError('Không tìm thấy đơn hàng.');
     }
     const foundOrder = result.toJSON();
     const orderPhoneNumber = get(foundOrder, 'shippingAddress.phoneNumber');
-    if(orderPhoneNumber !== phoneNumber) {
+    if (orderPhoneNumber !== phoneNumber) {
       throw new NotFoundError('Không tìm thấy đơn hàng.');
     }
     const { shippingAddress, ...rest } = foundOrder;
@@ -274,8 +277,50 @@ const trackingOrderAction = async (req: express.Request, res: express.Response, 
   }
 };
 
+const getMonthlyOrderReportAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let branchId = null;
+    if (!req.isRoot) {
+      branchId = +req.companyId;;
+    }
+    const reports = await orderService.getMonthlyReport(branchId);
+    res.send(reports);
+  } catch (e) {
+    logger.error('getMonthlyOrderReportAction', e);
+    next(e);
+  }
+};
 
-export default { 
+const getDailyOrderReportAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let branchId = null;
+    if (!req.isRoot) {
+      branchId = +req.companyId;;
+    }
+    const reports = await orderService.getLast7DaysReport(branchId);
+    res.send(reports);
+  } catch (e) {
+    logger.error('getDailyOrderReportAction', e);
+    next(e);
+  }
+};
+
+const getOrderOverviewReportAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    let branchId = null;
+    if (!req.isRoot) {
+      branchId = +req.companyId;;
+    }
+    const reports = await orderService.getOverviewReport(branchId);
+    res.send(reports);
+  } catch (e) {
+    logger.error('getOrderOverviewReportAction', e);
+    next(e);
+  }
+};
+
+
+export default {
   createPrescriptionAction,
   createOrderAction,
   getMyOrderAction,
@@ -285,5 +330,8 @@ export default {
   getOrderDetailAction,
   handleOrderAction,
   trackingOrderAction,
+  getMonthlyOrderReportAction,
+  getDailyOrderReportAction,
+  getOrderOverviewReportAction,
 };
 

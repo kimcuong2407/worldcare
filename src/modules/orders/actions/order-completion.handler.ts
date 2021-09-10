@@ -9,6 +9,8 @@ import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 class CompleteOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
+    const { data, currentUser } = payload;
+
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
     }, {
@@ -20,6 +22,7 @@ class CompleteOrderHandler extends OrderAbstractHandler {
           action: ORDER_ACTIONS.ORDER_COMPLETION,
           authorId: get(payload, 'userId'),
           timestamp: new Date(),
+          author: get(currentUser, 'fullName'),
           message: 'Đơn hàng đã được hoàn thành',
           data: get(payload, 'data'),
         },

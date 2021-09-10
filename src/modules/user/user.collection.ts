@@ -20,6 +20,7 @@ const UserSchema = new Schema({
     index: true
   },
   branchId: Number,
+  partnerId: Number,
   employeeNumber: Number,
   username: String,
   email: {
@@ -59,7 +60,7 @@ const UserSchema = new Schema({
 });
 
 UserSchema.plugin(mongoosePaginate);
-UserSchema.index({ username: 1, branchId: 1 }, { unique: true })
+UserSchema.index({ username: 1, partnerId: 1 }, { unique: true })
 
 const UserCollection = mongoose.model('user', UserSchema, 'user');
 

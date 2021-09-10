@@ -9,7 +9,7 @@ import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 class CancelOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
   async handle(order: any, payload: any): Promise<void> {
-    const { data } = payload;
+    const { data, currentUser } = payload;
     const { cancelReason } = data;
     await makeQuery(OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber'),
@@ -22,6 +22,7 @@ class CancelOrderHandler extends OrderAbstractHandler {
         history: {
           action: ORDER_ACTIONS.CANCEL,
           authorId: get(payload, 'userId'),
+          author: get(currentUser, 'fullName'),
           timestamp: new Date(),
           message: 'Đơn hàng đã bị hủy.',
           data: get(payload, 'data'),

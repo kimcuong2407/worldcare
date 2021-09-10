@@ -14,6 +14,21 @@ const orderRoutes = (app: express.Application): void => {
     [PHARMACY_RESOURCES.order, ROOT_ACTIONS.admin]
   ]), orderActions.getOrderAction);
 
+  app.get('/api/v1/order-report/monthly', middleware.authorization([
+    [PHARMACY_RESOURCES.order, CORE_ACTIONS.read],
+    [PHARMACY_RESOURCES.order, ROOT_ACTIONS.admin]
+  ]), orderActions.getMonthlyOrderReportAction);
+
+  app.get('/api/v1/order-report/daily', middleware.authorization([
+    [PHARMACY_RESOURCES.order, CORE_ACTIONS.read],
+    [PHARMACY_RESOURCES.order, ROOT_ACTIONS.admin]
+  ]), orderActions.getDailyOrderReportAction);
+
+  app.get('/api/v1/order-report/overview', middleware.authorization([
+    [PHARMACY_RESOURCES.order, CORE_ACTIONS.read],
+    [PHARMACY_RESOURCES.order, ROOT_ACTIONS.admin]
+  ]), orderActions.getOrderOverviewReportAction);
+  
   app.get('/api/v1/order/pending', middleware.authorization([
     [PHARMACY_RESOURCES.order, CORE_ACTIONS.read]
   ]), orderActions.getPendingOrderAction);
