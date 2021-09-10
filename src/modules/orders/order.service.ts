@@ -45,6 +45,9 @@ const findCustomer = async (userId: string, partnerId: number, branchId: number,
 const calculateDiscount = async(order: any) => {
   const { couponCode, shippingFee, subTotal } = order;
   const coupon: any = await couponService.findOneCoupon({code: toLower(couponCode)});
+  if(!coupon) {
+    return 0;
+  }
   const { discountPercent, maxDiscount, discountValue } = coupon;
   let discountAmount = 0;
   if(get(coupon, 'isFreeShipping')) {
