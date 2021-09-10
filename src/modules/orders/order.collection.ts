@@ -63,10 +63,12 @@ const OrderSchema = new Schema({
     default: 0
   },
   shippingInfo: {
+    shippingVendorId: String,
     'shippingVendor': String,
-    'shipperName':  String,
-    'shipperPhoneNumber':  String,
-    'trackingId':  String,
+    'shippingNote': String,
+    'shipperName': String,
+    'shipperPhoneNumber': String,
+    'trackingId': String,
   },
   deliveryMethod: String,
   deliveryId: String,
