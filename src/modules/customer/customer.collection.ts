@@ -37,6 +37,7 @@ CustomerSchema.plugin(AutoIncrement(mongoose), {
   id: 'customer_number_by_company',
   inc_field: 'customerNumber',
   reference_fields: ['partnerId'],
+  start_seq: 10001,
 });
 
 const CustomerCollection = mongoose.model('customer', CustomerSchema, 'customer');

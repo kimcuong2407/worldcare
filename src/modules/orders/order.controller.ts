@@ -3,7 +3,7 @@ import loggerHelper from '@utils/logger.util';
 import orderService from './order.service';
 import get from 'lodash/get';
 import appUtil from '@app/utils/app.util';
-import { isNil, isString, isUndefined, map, omit, omitBy, pick } from 'lodash';
+import { filter, find, isNil, isString, isUndefined, map, omit, omitBy, pick, rest } from 'lodash';
 import { uploadImage } from '../file/file.service';
 import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import zalo from '@app/core/zalo';
@@ -105,11 +105,19 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
     const orderNumber = get(req.params, 'orderNumber');
 
     const result: any = await orderService.findOrderDetail({ userId: userId, orderNumber: orderNumber });
+    if(!result) {
+      throw new NotFoundError();
+    }
     if (result.prescriptionId) {
       const prescription = await getPrescriptionDetail(result.prescriptionId);
       result.prescription = pick(prescription, ['_id', 'images']);
     }
-    res.send(result);
+    const { history, ...rest } = result;
+    
+    res.send({
+      history: filter(history||[], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
+      ...rest,
+    });
   } catch (e) {
     logger.error('getMyOrderDetailAction', e);
     next(e);
@@ -258,10 +266,11 @@ const trackingOrderAction = async (req: express.Request, res: express.Response, 
     if (orderPhoneNumber !== phoneNumber) {
       throw new NotFoundError('Không tìm thấy đơn hàng.');
     }
-    const { shippingAddress, ...rest } = foundOrder;
+    const { shippingAddress, history, ...rest } = foundOrder;
     const { street, ward, district, city, fullName } = shippingAddress;
     res.send({
       ...rest,
+      history: filter(history||[], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
       shippingAddress: {
         street: appUtil.mask(street),
         ward: appUtil.mask(ward),

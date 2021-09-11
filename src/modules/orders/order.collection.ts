@@ -99,6 +99,8 @@ const OrderSchema = new Schema({
 
 OrderSchema.plugin(AutoIncrement(mongoose), {
   inc_field: 'orderNumber',
+  start_seq: 10001,
+
 });
 OrderSchema.index({ orderNumber: 1 }, { unique: true })
 

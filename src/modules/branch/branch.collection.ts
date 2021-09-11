@@ -89,6 +89,7 @@ const BranchSchema = new Schema({
 BranchSchema.plugin(AutoIncrement(mongoose), {
   inc_field: '_id',
   id: 'branch_id_by_company',
+  start_seq: 10001,
   // startAt: 10005,
   // incrementBy: 1
 });

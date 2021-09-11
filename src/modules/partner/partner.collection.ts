@@ -49,6 +49,7 @@ const PartnerSchema = new Schema({
 PartnerSchema.plugin(AutoIncrement(mongoose), {
   inc_field: '_id',
   id: 'partner_id',
+  start_seq: 10001,
   // startAt: 10005,
   // incrementBy: 1
 });

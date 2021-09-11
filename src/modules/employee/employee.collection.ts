@@ -75,6 +75,7 @@ EmployeeSchema.plugin(AutoIncrement(mongoose), {
   id: 'employee_number_by_company',
   inc_field: 'employeeNumber',
   reference_fields: ['partnerId'],
+  start_seq: 10001,
   // startAt: 10005,
   // incrementBy: 1
 });
