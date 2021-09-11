@@ -14,4 +14,4 @@ export const ENTITY_TYPE = {
   'LAB': 'LAB'
 }
 
-export const ROOT_COMPANY_ID = 888888;
+export const ROOT_COMPANY_ID = +process.env.ROOT_COMPANY_ID || 99999;
