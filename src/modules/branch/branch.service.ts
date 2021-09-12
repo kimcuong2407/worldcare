@@ -92,7 +92,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
     query['address.city'] = city;
   }
   if (branchType) {
-    query['branchType'] = branchType;
+    query['branchType'] = toUpper(branchType);
   }
   const aggregate = BranchCollection.aggregate([
     {
@@ -112,9 +112,14 @@ const fetchBranch = async (params: any, language = 'vi') => {
   };
 }
 
-const fetchBranchInfo = async (branchIdOrSlug: string, language = 'vi', isRaw = false) => {
+const fetchBranchInfo = async (branchIdOrSlug: number, language = 'vi', isRaw = false) => {
   let branch = null;
-  let query: any = { $or: [{ _id: branchIdOrSlug }, { slug: branchIdOrSlug }], deletedAt: null };
+  let query: any = { slug: branchIdOrSlug };
+  if ( typeof branchIdOrSlug === 'number') {
+    query = { _id: branchIdOrSlug };
+  }
+
+  query = { ...query, deletedAt: null };
 
   if (isRaw) {
     const foundBranch = await BranchCollection.findOne(query).lean().exec();
@@ -137,15 +142,17 @@ const fetchBranchInfo = async (branchIdOrSlug: string, language = 'vi', isRaw = 
 const getSimillarBranch = async (branchIdOrSlug: string, language = 'vi') => {
   let branch = null;
   let query: any = { slug: { $ne: branchIdOrSlug } };
-  if (Types.ObjectId.isValid(branchIdOrSlug)) {
-    query = { _id: { $ne: Types.ObjectId(branchIdOrSlug) } };
+  if ( typeof branchIdOrSlug === 'number') {
+    query = { _id: { $ne: branchIdOrSlug } };
   }
 
-  branch = await BranchCollection.find(query).populate('speciality', 'name');
+  // branch = await BranchCollection.find(query).populate('speciality', 'name');
 
   const data = await BranchCollection.find(query).limit(5).populate({ path: 'speciality', select: 'name', ref: 'speciality' })
 
-  return map(data, formatBranch)
+  return map(data, (d) => {
+    return formatBranch(d.toJSON());
+  })
 }
 
 
@@ -399,6 +406,59 @@ const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, f
     }
   })
 }
+
+
+const getAvailableHospitalSlot = async (hospitalIdOrSlug: any, startRangeTime: number, endRangeTime: number) => {
+  let query: any = {slug: hospitalIdOrSlug};
+  if(typeof hospitalIdOrSlug === 'number') {
+    query = { _id: hospitalIdOrSlug};
+  }
+
+  const result: any = {};
+  const hospital = await BranchCollection.findOne(query).lean();
+  const { workingHours, branchSettings } = hospital;
+  const days = appUtil.enumerateDaysBetweenDates(startRangeTime, endRangeTime)
+  const appointments = await AppointmentCollection.find({
+    branchId: get(hospital, '_id'),
+    time: {
+      $gte: startRangeTime,
+      $lte: endRangeTime
+    },
+    status: {
+      $ne: 'CANCEL'
+    }
+  }).select('time').lean().exec();
+  const slotTime = get(branchSettings, 'slotTime');
+  const capacityPerSlot = get(branchSettings, 'capacityPerSlot');
+  each(days, (day) => {
+    const currentDay = moment(day, 'YYYYMMDD').utcOffset('+07:00');
+    const todaySchedule = find(workingHours, ['weekDay', Number(currentDay.format('d'))]);
+    const isOpen = get(todaySchedule, 'isOpen', false);
+    const startTime = get(todaySchedule, 'startTime', false);
+    const endTime = get(todaySchedule, 'endTime', false);
+    const placedAppointments = filter(appointments, (app) => 
+    moment(app.time).utcOffset('+07:00').valueOf() >= currentDay.startOf('day').valueOf() &&
+    moment(app.time).utcOffset('+07:00').valueOf() <= currentDay.endOf('day').valueOf()
+    );
+    const placedTimes = countBy(map(placedAppointments, (d) => ({
+      time: moment(get(d, 'time')).utcOffset('+07:00').format('HH:mm')
+    })), 'time');
+    if(isOpen) {
+      result[day] = [];
+      let currentTime = moment(startTime, 'HH:mm');
+      let closingTime = moment(endTime, 'HH:mm');
+      while (currentTime.isBefore(closingTime)) {
+        if(get(placedTimes, currentTime.format('HH:mm'), 0) < capacityPerSlot){
+          result[day].push(currentTime.format('HH:mm'))
+        }
+        currentTime.add(slotTime, 'minute');
+      }
+    }
+  });
+
+  return result;
+}
+
 export default {
   createBranch,
   fetchBranch,
@@ -416,4 +476,5 @@ export default {
   findBranchById,
   findBranchAndChild,
   findBranchBySlug,
+  getAvailableHospitalSlot,
 };

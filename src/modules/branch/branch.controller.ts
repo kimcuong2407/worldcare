@@ -224,7 +224,7 @@ const deleteBranchAction = async (req: express.Request, res: express.Response, n
 
 const getSimillarBranchInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const branchIdOrSlug = get(req.params, 'branchId');
+    const branchIdOrSlug = get(req.params, 'hospitalId');
     const language: string = get(req, 'language');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const data = await branchService.getSimillarBranch(branchIdOrSlug, language, raw);
@@ -238,10 +238,10 @@ const getSimillarBranchInfoAction = async (req: express.Request, res: express.Re
 
 const getAvailableBranchSlotAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const branchIdOrSlug = get(req.params, 'branchId');
+    const branchIdOrSlug = get(req.params, 'hospitalId');
     const startTime = moment().valueOf();
     const endTime = moment().add(14, 'days').endOf('day').valueOf();
-    const data = await branchService.getAvailableBranchSlot(branchIdOrSlug, startTime, endTime);
+    const data = await branchService.getAvailableHospitalSlot(branchIdOrSlug, startTime, endTime);
     res.send(data);
   } catch (e) {
     logger.error('getAvailableBranchSlotAction', e);
@@ -308,7 +308,8 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
       const { _id, ...rest } = comp;
       return {
         companyId: _id,
-        ...pick(rest, ['address', 'branchId', 'name', '_id']),
+        id: _id,
+        ...pick(rest, ['address', 'branchId', 'name', '_id', 'slug']),
       }
     }));
   } catch (e) {
@@ -316,6 +317,32 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
     next(e);
   }
 };
+
+
+const getClinicBranchAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const branchType = get(req.params, 'branchType');
+    const keyword = get(req.query, 'keyword');
+    const language: string = get(req, 'language');
+
+    const companies = await branchService.fetchBranch({ branchType, keyword }, language);
+    const { docs, ...rest } = companies;
+    res.send({
+      docs: map(docs, (doc)=> {
+        // console.log(doc)
+        return {
+          id: doc._id,
+          ...doc
+        }
+      }),
+      ...rest,
+    });
+  } catch (e) {
+    logger.error('getBranchGroupAction', e);
+    next(e);
+  }
+};
+
 
 const getBranchUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -333,6 +360,35 @@ const getBranchUserAction = async (req: express.Request, res: express.Response, 
   }
 };
 
+
+const getSimillarHospitalInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const hospitalIdOrSlug = get(req.params, 'hospitalId');
+    const language: string = get(req, 'language');
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const data = await branchService.getSimillarBranch(hospitalIdOrSlug, language);
+    res.send(data);
+  } catch (e) {
+    logger.error('fetchHospitalInfoAction', e);
+    next(e);
+  }
+};
+
+
+const getAvailableHospitalSlotAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const hospitalIdOrSlug = get(req.params, 'hospitalId');
+    const startTime = moment().valueOf();
+    const endTime = moment().add(14, 'days').endOf('day').valueOf();
+    const data = await branchService.getA(hospitalIdOrSlug, startTime, endTime);
+    res.send(data);
+  } catch (e) {
+    logger.error('getAvailableHospitalSlotAction', e);
+    next(e);
+  }
+};
+
+
 export default {
   createBranchAction,
   fetchBranchAction,
@@ -346,4 +402,5 @@ export default {
   getBranchGroupAction,
   getBranchByCategoryAction,
   getBranchGroupDetailAction,
+  getClinicBranchAction,
 };

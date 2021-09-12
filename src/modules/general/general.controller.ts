@@ -12,6 +12,7 @@ import staffService from '../staff/staff.service';
 import configurationService from '../configuration/configuration.service';
 import { find } from 'lodash';
 import { EMPLOYEE_GROUP } from '../configuration/constant';
+import branchService from '../branch/branch.service';
 
 const logger = loggerHelper.getLogger('general.controller');
 
@@ -34,7 +35,7 @@ const fetchHomepageContentAction = async (req: express.Request, res: express.Res
       employeeGroup: get(nursingGroup, '_id')
     }, language);
 
-    const { docs: hospitals } = await hospitalService.fetchHospital({
+    const { docs: hospitals } = await branchService.fetchBranch({
       options: {limit: 10}
     }, language);
 

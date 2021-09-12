@@ -5,7 +5,7 @@ import hospitalActions from './hospital.controller';
 
 const hospitalRoutes = (app: express.Application): void => {
   app.post('/api/v1/hospital', middleware.authorization(CORE_RESOURCES.company, CORE_ACTIONS.write), hospitalActions.createHospitalAction);
-  app.get('/api/v1/hospital', hospitalActions.fetchHospitalAction);
+  // app.get('/api/v1/hospital', hospitalActions.fetchHospitalAction);
   app.get('/api/v1/hospital/:hospitalId/simillar-hospital', hospitalActions.getSimillarHospitalInfoAction);
   app.get('/api/v1/hospital/:hospitalId/available-slot', hospitalActions.getAvailableHospitalSlotAction);
   app.get('/api/v1/hospital/:hospitalId', hospitalActions.fetchHospitalInfoAction);
