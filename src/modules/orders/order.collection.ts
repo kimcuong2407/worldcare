@@ -21,8 +21,8 @@ const OrderSchema = new Schema({
   customerNumber: String,
   branchId: Number,
   partnerId: Number,
-  shippingAddressId: { type: Schema.Types.ObjectId, ref: 'user_address'},
-  billingAddressId: { type: Schema.Types.ObjectId, ref: 'user_address' },
+  shippingAddressId: { type: Schema.Types.ObjectId, ref: 'customer_address'},
+  billingAddressId: { type: Schema.Types.ObjectId, ref: 'customer_address' },
   productId: String,
   paymentMethod: {
     type: String,
@@ -105,7 +105,7 @@ OrderSchema.plugin(AutoIncrement(mongoose), {
 OrderSchema.index({ orderNumber: 1 }, { unique: true })
 
 OrderSchema.virtual('shippingAddress', {
-  ref: 'user_address', // the collection/model name
+  ref: 'customer_address', // the collection/model name
   localField: 'shippingAddressId',
   foreignField: '_id',
   justOne: true, // default is false

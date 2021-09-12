@@ -17,7 +17,6 @@ const logger = loggerHelper.getLogger('main');
 const app = express();
 
 // app.use(compression({ level: COMPRESSION_LEVEL }));
-
 const parseLanguage = (req: express.Request, res: express.Response, next: express.NextFunction)=>{
   const language: string = req.acceptsLanguages()[0];
   req.language = ACCEPTED_LANGUAGES.includes(language) ? language : 'vi';
@@ -42,4 +41,5 @@ app.use(handleError);
 
 app.listen(PORT, () => {
   logger.info(`App listening on port http://localhost:${PORT}`);
+
 });

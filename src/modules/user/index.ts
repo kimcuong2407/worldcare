@@ -4,7 +4,7 @@ import express from 'express';
 import userActions from './user.controller';
 
 const userRoutes = (app: express.Application): void => {
-  app.post('/api/v1/register', userActions.registerAction);
+  // app.post('/api/v1/register', userActions.registerAction);
 
   app.get('/api/v1/user', middleware.authorization([
     [ CORE_RESOURCES.user,CORE_ACTIONS.read ],
@@ -31,11 +31,11 @@ const userRoutes = (app: express.Application): void => {
     [ ROOT_RESOURCES.partner,CORE_ACTIONS.write ]
   ]), userActions.deleteUserAction);
 
-  app.get('/api/v1/profile', middleware.authenticate, userActions.getProfileAction);
-  app.put('/api/v1/profile', middleware.authenticate, userActions.updateUserProfileAction);
-  app.get('/api/v1/me/address', middleware.authenticate, userActions.fetchAddressAction);
-  app.post('/api/v1/me/address', middleware.authenticate, userActions.addNewAddressAction);
-  app.put('/api/v1/me/address/:addressId', middleware.authenticate, userActions.updateAddressAction);
+  app.get('/api/v1/staff-profile', middleware.authenticate, userActions.getProfileAction);
+  // app.put('/api/v1/profile', middleware.authenticate, userActions.updateUserProfileAction);
+  // app.get('/api/v1/me/address', middleware.authenticate, userActions.fetchAddressAction);
+  // app.post('/api/v1/me/address', middleware.authenticate, userActions.addNewAddressAction);
+  // app.put('/api/v1/me/address/:addressId', middleware.authenticate, userActions.updateAddressAction);
 };
 
 export default userRoutes;

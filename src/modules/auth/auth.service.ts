@@ -13,15 +13,16 @@ import { Types } from 'mongoose';
 import branchService from '../branch/branch.service';
 import partnerService from '../partner/partner.service';
 import { CLINIC_RESOURCES, PHARMACY_RESOURCES, RESOURCES, CORE_ACTIONS, ROOT_ACTIONS, ACTIONS, CORE_RESOURCES, ROOT_RESOURCES } from '@app/core/permissions';
+import CustomerAccountCollection from '../customer-account/customer-account.collection';
 
 // Auth service
 const authenticate = async (login: string, password: string) => {
   const sessionId = uuidv4();
-  const user = await UserCollection.findOne({
+  const user = await CustomerAccountCollection.findOne({
     $or: [
-      // {
-      //   phoneNumber: login,
-      // },
+      {
+        phoneNumber: login,
+      },
       // {
       //   email: login,
       // },
