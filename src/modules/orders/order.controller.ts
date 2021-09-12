@@ -108,11 +108,13 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
     if(!result) {
       throw new NotFoundError();
     }
-    if (result.prescriptionId) {
-      const prescription = await getPrescriptionDetail(result.prescriptionId);
-      result.prescription = pick(prescription, ['_id', 'images']);
+    const order = result.toJSON();
+
+    if (order.prescriptionId) {
+      const prescription = await getPrescriptionDetail(order.prescriptionId);
+      order.prescription = pick(prescription, ['_id', 'images']);
     }
-    const { history, ...rest } = result;
+    const { history, ...rest } = order;
     
     res.send({
       history: filter(history||[], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),

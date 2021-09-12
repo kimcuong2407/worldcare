@@ -116,7 +116,7 @@ OrderSchema.virtual('shopInfo', {
   localField: 'branchId',
   foreignField: '_id',
   justOne: true, // default is false
-  options: { select: 'name -_id -id -branchId', projection: { name: 1, branchId: -1, _id: -1, id: -1} },
+  options: { select: 'name -_id -id -branchId address', projection: { name: 1, branchId: -1, _id: -1, id: -1, address: 1} },
 });
 
 OrderSchema.virtual('items', {

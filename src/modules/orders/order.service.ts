@@ -195,9 +195,12 @@ const findOrders = async (params: any, page: number, limit: number) => {
 }
 
 const findOrderDetail = async (query: any) => {
-  const order = await makeQuery(OrderCollection.findOne(query, '', {
+  const order = await makeQuery(OrderCollection.findOne(
+    query,
+    [],
+  {
     populate: ['shippingAddress', 'prescription', 'shopInfo', 'items']
-  }));
+  }).exec());
 
   return order;
 }
@@ -383,7 +386,6 @@ const calculateWeeklyRevenueAndOrders = async (branchId?: number, startTime?: Da
       $lte: endTime,
     }
   }
-  console.log(query)
 
   const aggregation = [
     {
