@@ -115,7 +115,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
 const fetchBranchInfo = async (branchIdOrSlug: number, language = 'vi', isRaw = false) => {
   let branch = null;
   let query: any = { slug: branchIdOrSlug };
-  if ( typeof branchIdOrSlug === 'number') {
+  if (Number(branchIdOrSlug)) {
     query = { _id: branchIdOrSlug };
   }
 
