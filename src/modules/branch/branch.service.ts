@@ -59,8 +59,10 @@ const createBranch = async (branchInfo: any) => {
 const formatBranch = (branch: any, preferLang = 'vi') => {
   // branch = branch.toJSON();
   const address = addressUtil.formatAddressV2(get(branch, 'address'));
+  const { speciality } = branch;
   return {
     ...appUtil.mapLanguage(branch, preferLang),
+    speciality: (speciality|| []).map((sp) => appUtil.mapLanguage(sp)),
     address,
   }
 }
@@ -94,13 +96,17 @@ const fetchBranch = async (params: any, language = 'vi') => {
   if (branchType) {
     query['branchType'] = toUpper(branchType);
   }
-  const aggregate = BranchCollection.aggregate([
-    {
-      $match: query
-    }
-  ]);
+  // const aggregate = BranchCollection.aggregate([
+  //   {
+  //     $match: query
+  //   }
+  // ]);
 
-  const result = await BranchCollection.aggregatePaginate(aggregate, { ...options });
+  const result = await BranchCollection.paginate(query,
+     { 
+       ...options,
+       lean: true,
+    populate: { path: 'speciality', select: 'name', ref: 'speciality' } })
 
   // const data = await BranchCollection.find({
   //   _id: { $in: map(result.docs, '_id') }
@@ -410,8 +416,8 @@ const findBranchAndChild = async (partnerId?: number, parentBranchId?: number, f
 
 const getAvailableHospitalSlot = async (hospitalIdOrSlug: any, startRangeTime: number, endRangeTime: number) => {
   let query: any = {slug: hospitalIdOrSlug};
-  if(typeof hospitalIdOrSlug === 'number') {
-    query = { _id: hospitalIdOrSlug};
+  if(Number(hospitalIdOrSlug)) {
+    query = { _id: Number(hospitalIdOrSlug)};
   }
 
   const result: any = {};
