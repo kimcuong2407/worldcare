@@ -6,6 +6,7 @@ import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
 import OrderCollection from '../order.collection';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import branchService from '@app/modules/branch/branch.service';
+import zalo from '@app/core/zalo';
 
 class AssignOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
@@ -34,6 +35,7 @@ class AssignOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
+    await zalo.sendZaloMessage(`[Đã Giao Cho Nhà Thuốc] Đơn hàng đã được giao cho nhà thuốc ${get(branch, 'name.vi')} - bởi ${get(currentUser, 'fullName')}`);
 
     return Promise.resolve(order);
   }

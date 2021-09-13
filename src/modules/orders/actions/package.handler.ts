@@ -5,6 +5,7 @@ import OrderAbstractHandler from './order-handler.abstract';
 import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
 import OrderCollection from '../order.collection';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import zalo from '@app/core/zalo';
 
 class PackageOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
@@ -28,6 +29,7 @@ class PackageOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
+    await zalo.sendZaloMessage('[Đã đóng gói] Đơn hàng đã được đóng gói xong');
 
     return Promise.resolve(order);
   }
