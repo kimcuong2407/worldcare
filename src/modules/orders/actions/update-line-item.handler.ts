@@ -117,7 +117,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     });
 
     const { shippingFee, couponCode } = order;
-    const discountAmount = await orderService.calculateDiscount({ shippingFee, couponCode, subTotalPerItem });
+    const discountAmount = await orderService.calculateDiscount({ shippingFee, couponCode, subTotal: subTotalPerItem });
     const updatedOrder = await OrderCollection.findOneAndUpdate({
       orderNumber: get(order, 'orderNumber')
     }, { $set: { discountAmount: discountAmount || 0, grandTotal: Math.max(grandTotal - (+discountAmount || 0), 0) } });
