@@ -12,6 +12,7 @@ import CouponCollection from '../coupon/coupon.collection';
 import couponService from '../coupon/coupon.service';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import branchService from '../branch/branch.service';
+import customerAccountService from '../customer-account/customer-account.service';
 
 const createPrescription = async (fileId: string) => {
   return makeQuery(PrescriptionCollection.create({
@@ -25,18 +26,18 @@ const updatePrescription = async (prescriptionId: string, orderNumer: string) =>
   }).exec());
 };
 
-const findCustomer = async (userId: string, partnerId: number, branchId: number, phoneNumber: string, fullName: string) => {
+const findCustomer = async (customerAccountId: string, partnerId: number, branchId: number, phoneNumber: string, fullName: string) => {
   let customerInfo = null;
-  if (userId) {
-    customerInfo = await CustomerCollection.findOne({ userId, partnerId, branchId }).lean().exec();
+  if (customerAccountId) {
+    customerInfo = await CustomerCollection.findOne({ customerAccountId, partnerId, branchId }).lean().exec();
   }
 
-  if (!userId) {
+  if (!customerAccountId) {
     customerInfo = await CustomerCollection.findOne({ phoneNumber, fullName: fullName }).lean().exec();
   }
 
   if (!customerInfo) {
-    customerInfo = await CustomerCollection.create({ userId, partnerId, branchId, phoneNumber, fullName }, { new: true });
+    customerInfo = await CustomerCollection.create({ customerAccountId, partnerId, branchId, phoneNumber, fullName }, { new: true });
   }
 
   return customerInfo;
@@ -93,7 +94,7 @@ const createOrder = async (order: any) => {
     )
   }
   if (!addressId) {
-    let newAddress = await userService.addNewAddress(address);
+    let newAddress = await customerAccountService.addNewAddress(address);
     addressId = get(newAddress, '_id');
   }
 
