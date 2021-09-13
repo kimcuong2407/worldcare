@@ -2,7 +2,7 @@ import { CLINIC_RESOURCES, CORE_ACTIONS, CORE_RESOURCES, PHARMACY_RESOURCES } fr
 
 export const PHARMACY_DEFAULT_ROLES = [
   {
-    name: 'Admin',
+    name: 'Quản Trị Viên',
     permissions: Object.keys(PHARMACY_RESOURCES).map(resource => {
       return  {
           resource: resource,
@@ -35,7 +35,7 @@ export const PHARMACIST_DEFAULT_ROLES = [
 
 export const CLINIC_DEFAULT_ROLES = [
   {
-    name: 'Admin',
+    name: 'Quản Trị Viên',
     permissions: Object.keys(CLINIC_RESOURCES).map(resource => {
       return  {
           resource: resource,
