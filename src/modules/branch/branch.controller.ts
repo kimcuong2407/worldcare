@@ -334,7 +334,7 @@ const getClinicBranchAction = async (req: express.Request, res: express.Response
     const branchId: string = get(req.query, 'branchId');
 
     const companies = await branchService.fetchBranch({
-      branchType,
+      branchType: 'CLINIC',
       specialityId,
       city,
       hospitalId,
