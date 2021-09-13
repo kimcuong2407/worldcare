@@ -30,7 +30,7 @@ class ProcessOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
-    await zalo.sendZaloMessage(`[Đã Xử Lý] Đơn hàng đã được nhà thuốc xử lý xong: ${get(order, 'orderNumber')}`);
+    await zalo.sendZaloMessage(`[Đã Xử Lý] Đơn hàng #${get(order, 'orderNumber')} đã được nhà thuốc xử lý xong`);
 
     return Promise.resolve(order);
   }

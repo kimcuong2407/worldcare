@@ -29,7 +29,7 @@ class PackageOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
-    await zalo.sendZaloMessage('[Đã đóng gói] Đơn hàng đã được đóng gói xong');
+    await zalo.sendZaloMessage(`[Đã đóng gói] Đơn hàng ${get(order, 'orderNumber')} đã được đóng gói xong`);
 
     return Promise.resolve(order);
   }

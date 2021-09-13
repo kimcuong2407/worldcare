@@ -27,7 +27,7 @@ class AssignOrderHandler extends OrderAbstractHandler {
           authorId: get(payload, 'userId'),
           author: get(currentUser, 'fullName'),
           timestamp: new Date(),
-          message: `Đơn hàng đã được giao cho nhà thuốc ${get(branch, 'name.vi')}`,
+          message: `Đơn hàng #${get(order, 'orderNumber')} đã được giao cho nhà thuốc ${get(branch, 'name.vi')}`,
           data: {
             ...get(payload, 'data'),
             pharmacy: get('name.vi'),
@@ -35,7 +35,7 @@ class AssignOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
-    await zalo.sendZaloMessage(`[Đã Giao Cho Nhà Thuốc] Đơn hàng đã được giao cho nhà thuốc ${get(branch, 'name.vi')} - bởi ${get(currentUser, 'fullName')}`);
+    await zalo.sendZaloMessage(`[Đã Giao Cho Nhà Thuốc] Đơn hàng #${get(order, 'orderNumber')} đã được giao cho nhà thuốc ${get(branch, 'name.vi')} - bởi ${get(currentUser, 'fullName')}`);
 
     return Promise.resolve(order);
   }
