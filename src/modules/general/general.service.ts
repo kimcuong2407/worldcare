@@ -14,7 +14,7 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
       [
         {
           '$lookup': {
-            'from': 'hospital',
+            'from': 'branch',
             'let': {
               'speciality': '$_id'
             },
@@ -39,7 +39,7 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
                 '$limit': 1
               }, {
                 '$project': {
-                  'hospitalName': 1,
+                  'name': 1,
                   'slug': 1,
                   '_id': 1
                 }

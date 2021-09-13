@@ -1,6 +1,7 @@
 import middleware from '@app/core/middleware';
 import { CORE_ACTIONS, CORE_RESOURCES, ROOT_RESOURCES } from '@app/core/permissions';
 import express from 'express';
+import branchController from './branch.controller';
 import branchActions from './branch.controller';
 
 const branchRoutes = (app: express.Application): void => {
@@ -14,12 +15,14 @@ const branchRoutes = (app: express.Application): void => {
     [ROOT_RESOURCES.partner, CORE_ACTIONS.write]
   ]), branchActions.updateBranchInfoAction);
 
-  app.get('/api/v1/:branchType(pharmacy|clinic)', branchActions.getBranchByCategoryAction);
+  app.get('/api/v1/:branchType(pharmacy)', branchActions.getBranchByCategoryAction);
 
-  app.get('/api/v1/branch/:branchId', middleware.authorization([
-    [CORE_RESOURCES.branch, CORE_ACTIONS.write],
-    [ROOT_RESOURCES.partner, CORE_ACTIONS.write]
-  ]), branchActions.fetchBranchInfoAction);
+  app.get('/api/v1/:branchType(clinic)', branchActions.getClinicBranchAction);
+
+  app.get('/api/v1/clinic/:branchId', branchActions.fetchBranchInfoAction);
+
+
+  app.get('/api/v1/branch/:branchId', branchActions.fetchBranchInfoAction);
 
   app.delete('/api/v1/branch/:branchId', middleware.authorization([
     [CORE_RESOURCES.branch, CORE_ACTIONS.write],
@@ -50,6 +53,9 @@ const branchRoutes = (app: express.Application): void => {
   app.get('/api/v1/branch/:branchId/group/:groupId', middleware.authorization([
     [CORE_RESOURCES.branch, CORE_ACTIONS.write]
   ]), branchActions.getBranchGroupDetailAction);
+
+  app.get('/api/v1/clinic/:hospitalId/simillar-hospital', branchController.getSimillarBranchInfoAction);
+  app.get('/api/v1/clinic/:hospitalId/available-slot', branchController.getAvailableBranchSlotAction);
 
 
 

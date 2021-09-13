@@ -14,7 +14,6 @@ import branchService from '../branch/branch.service';
 import appUtil from '@app/utils/app.util';
 import addressUtil from '@app/utils/address.util';
 
-// DEGREE
 const createAppointment = async (appointment: any) => {
   const { customer, time, serviceId, hospitalId, message, source, specialityId } = appointment;
   const { phoneNumber, name, email } = customer || {};
@@ -24,12 +23,12 @@ const createAppointment = async (appointment: any) => {
   customerInfo = await CustomerCollection.findOne({ phoneNumber, fullName: name, branchId: hospitalId, partnerId: get(branch, 'partnerId') });
 
   if(!customerInfo) {
-    customerInfo = await CustomerCollection.create({ phoneNumber, fullName: name, email, branchId: hospitalId, partnerId: get(branch, 'partnerId') });
+    customerInfo = await CustomerCollection.create({ phoneNumber, fullName: name, email, branchId: hospitalId, partnerId: get(branch, 'partnerId') }, { new: true});
   }
-    
+  console.log(customerInfo)
   // const hospital = await hospitalService.fetchHospitalInfo(hospitalId);
   const createdAppointment = await AppointmentCollection.create({
-    customer: get(customerInfo, 'customerNumber'),
+    customerNumber: get(customerInfo, 'customerNumber'),
     time,
     service: serviceId,
     // hospital: hospitalId,
@@ -40,7 +39,7 @@ const createAppointment = async (appointment: any) => {
     serviceType: get(speciality, 'service'),
   });
   await zalo.sendZaloMessage(`Khách hàng ${name} vừa thực hiện đặt lịch tại ${get(branch, 'name.vi')} 
-    vào lúc ${moment(time).utcOffset('+07:00').format('DD/MM/YYYY HH:mm')}, lời nhắn: ${message}`);
+    vào lúc ${moment(time).utcOffset('+07:00').format('DD/MM/YYYY HH:mm')}, lời nhắn: ${message || ''}`);
   const data = await getAppointmentById(createdAppointment._id);
   return data;
 }
@@ -110,7 +109,7 @@ const fetchAppointmentV2 = async (params: any, options: any) => {
         'from': 'customer', 
         'let': {
           'branchId': '$branchId', 
-          'customerNumber': '$customer'
+          'customerNumber': '$customerNumber'
         }, 
         'pipeline': [
           {
@@ -158,7 +157,6 @@ const fetchAppointmentV2 = async (params: any, options: any) => {
   // const aggregation = AppointmentCollection.aggregate([matchStage, ...mainStage]);
   const data = await AppointmentCollection.aggregate([matchStage, ...mainStage])
     // .populate('speciality', 'name');
-
   return map(data, (d) => {
     const { branch } = d;
     const { address, ...rest } = branch;

@@ -53,7 +53,7 @@ const createOrderAction = async (req: express.Request, res: express.Response, ne
       customerNote,
     });
     await orderService.updatePrescription(prescriptionId, get(data, 'orderNumber'));
-    await zalo.sendZaloMessage(`New order created: ${get(data, 'orderNumber')}`);
+    await zalo.sendZaloMessage(`Đơn hàng mới được tạo thành công: ${get(data, 'orderNumber')}`);
     res.send(data);
   } catch (e) {
     logger.error('createOrderAction', e);

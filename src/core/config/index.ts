@@ -14,3 +14,14 @@ export const ZALO_API = 'https://openapi.zalo.me';
 export const ZALO_OA_TOKEN = process.env.ZALO_OA_TOKEN;
 
 export const SUPPORTED_CITIES = process.env.SUPPORTED_CITIES ? String(process.env.SUPPORTED_CITIES).split(',') : ['48'];
+
+
+export const SMTP_SERVER = '';
+export const SMTP_PORT = '';
+export const SMTP_USER = '';
+export const SMTP_PASSWORD = '';
+export const EMAIL_SEND_FROM = '';
+
+export const AWS_SES_REGION = '';
+export const SMTP_AWS_ACCESS_KEYPASSWORD = '';
+export const AWS_SECRET_KEY = '';

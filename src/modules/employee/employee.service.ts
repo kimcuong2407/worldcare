@@ -25,7 +25,7 @@ const createEmployee = async (staffInfo: any) => {
 
 const formatEmployee = (staff: any) => {
   // staff = staff.toJSON();
-  if(!staff) {
+  if (!staff) {
     return {};
   }
   const { userId, ...rest } = staff || {};
@@ -101,15 +101,15 @@ const getEmployeeInfo = async (query: any, isRaw = false) => {
   return formatEmployee(staff);
 };
 
-const updateEmployeeGroups = async(userId: string, groups: [string], branchId: string) =>{
+const updateEmployeeGroups = async (userId: string, groups: [string], branchId: string) => {
   await authService.removeRoleForUser(userId, branchId);
   return authService.assignUserToGroup(userId, groups, branchId);
 }
 
 const updateEmployeeInfo = async (query: any, staffInfo: any) => {
   const { username, groups, userId, ...info } = staffInfo;
-  const staff = await EmployeeCollection.findOneAndUpdate(query, { $set: info}, { new: true });
-  
+  const staff = await EmployeeCollection.findOneAndUpdate(query, { $set: info }, { new: true });
+
   const { createdAt, updatedAt, ...rest } = get(staff, '_doc', {});
   return {
     ...rest,
@@ -186,14 +186,24 @@ const createBranchUser = async (staff: any, branchId: string) => {
   return await createEmployee(staffInfo);
 }
 
-const getEmployeeByBranchId = async (query: any, options: any) => {
-  const { branchId, ...matchQuery } = query;
+const getEmployeeByBranchId = async (queryInput: any, options: any) => {
+  const { branchId, cityId, keyword, ...matchQuery } = queryInput;
+
+  const query: any = {
+    'branchId': Number(branchId),
+    deletedAt: null,
+  }
+  if (cityId) {
+    query['address.cityId'] = cityId;
+  }
+  if (keyword) {
+    query['$text'] = {
+      '$search': 'pham'
+    };
+  }
   const aggregation: any = [
     {
-      '$match': {
-        'branchId': Number(branchId),
-        deletedAt: null,
-      }
+      '$match': query,
     }, {
       '$lookup': {
         'from': 'user',
@@ -231,8 +241,8 @@ const getEmployeeByBranchId = async (query: any, options: any) => {
         'username': '$user.username',
         'groups': {
           '$cond': [
-            { '$isArray': "$user.groups" },
-            "$user.groups",
+            { '$isArray': '$user.groups' },
+            '$user.groups',
             []
           ]
         }

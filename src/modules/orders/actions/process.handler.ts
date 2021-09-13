@@ -6,6 +6,7 @@ import { ORDER_ACTIONS, ORDER_STATUS } from '../constant';
 import OrderCollection from '../order.collection';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import OrderItemCollection from '../order-item.collection';
+import zalo from '@app/core/zalo';
 
 class ProcessOrderHandler extends OrderAbstractHandler {
   // eslint-disable-next-line class-methods-use-this
@@ -29,6 +30,7 @@ class ProcessOrderHandler extends OrderAbstractHandler {
         },
       },
     }).exec());
+    await zalo.sendZaloMessage(`[Đã Xử Lý] Đơn hàng #${get(order, 'orderNumber')} đã được nhà thuốc xử lý xong`);
 
     return Promise.resolve(order);
   }

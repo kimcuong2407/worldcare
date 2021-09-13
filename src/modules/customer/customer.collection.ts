@@ -17,7 +17,7 @@ const CustomerSchema = new Schema({
   customerGroup: Number,
   customerNumber: Number,
   branchId: Number,
-  userId: String,
+  customerAccountId: String,
   partnerId: Number,
   note: String,
   address: {
