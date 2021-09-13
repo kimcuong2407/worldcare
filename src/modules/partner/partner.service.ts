@@ -13,6 +13,7 @@ import slugify from 'slugify';
 import AppointmentCollection from '../appointment/appointment.collection';
 import authService from '../auth/auth.service';
 import branchService from '../branch/branch.service';
+import { WORKING_HOURS } from '../branch/constant';
 import SpecialityCollection from '../configuration/speciality.collection';
 import employeeService from '../employee/employee.service';
 import StaffCollection from '../staff/staff.collection';
@@ -56,7 +57,9 @@ const createPartner = async (partnerInfo: any) => {
     email,
     phoneNumber,
     address,
+    branchType: modules,
     logo,
+    workingHours: WORKING_HOURS,
     partnerId: _id
   });
   await authService.setupDefaultRoles(get(branch, '_id'), modules);

@@ -71,7 +71,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
   SpecialityCollection.setDefaultLanguage(language);
 
   const {
-    specialityId, keyword, options, city, branchId, branchType,
+    specialityId, keyword, city, branchId, branchType, hospitalId,
   } = params;
   const query: any = {
     deletedAt: null,
@@ -80,8 +80,8 @@ const fetchBranch = async (params: any, language = 'vi') => {
   if (keyword) {
     query['$text'] = { $search: keyword }
   }
-  if (branchId) {
-    query['_id'] = Types.ObjectId(branchId);
+  if (branchId || hospitalId) {
+    query['_id'] = Number(branchId) || Number(hospitalId) ;
   }
   // console.log(await BranchCollection.find({speciality: {$in: [specialityId]}}))
 
@@ -89,7 +89,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
     query['speciality'] = { $in: [Types.ObjectId(specialityId)] };
   }
   if (city) {
-    query['address.city'] = city;
+    query['address.cityId'] = city;
   }
   if (branchType) {
     query['branchType'] = toUpper(branchType);

@@ -321,16 +321,32 @@ const getBranchByCategoryAction = async (req: express.Request, res: express.Resp
 
 const getClinicBranchAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    const { page, limit } = appUtil.getPaging(req);
+    const options = {
+      page, limit,
+    }
     const branchType = get(req.params, 'branchType');
     const keyword = get(req.query, 'keyword');
     const language: string = get(req, 'language');
+    const specialityId: string = get(req.query, 'specialityId');
+    const city: string = get(req.query, 'city');
+    const hospitalId: string = get(req.query, 'hospitalId');
+    const branchId: string = get(req.query, 'branchId');
 
-    const companies = await branchService.fetchBranch({ branchType, keyword }, language);
+    const companies = await branchService.fetchBranch({
+      branchType,
+      specialityId,
+      city,
+      hospitalId,
+      branchId,
+      options,
+      keyword
+    }, language, );
     const { docs, ...rest } = companies;
     res.send({
       docs: map(docs, (doc)=> {
         // console.log(doc)
-        return {
+        return { 
           id: doc._id,
           ...doc
         }
@@ -338,7 +354,7 @@ const getClinicBranchAction = async (req: express.Request, res: express.Response
       ...rest,
     });
   } catch (e) {
-    logger.error('getBranchGroupAction', e);
+    logger.error('getClinicBranchAction', e);
     next(e);
   }
 };
