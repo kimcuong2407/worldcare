@@ -126,6 +126,14 @@ const deleteCoupon = async (couponId: string) => {
 
 const getFreeCoupon = async () => {
   return makeQuery(CouponCollection.find({
+    $or: [
+      {
+        $where: '!this.usageCount || (this.usageCount < this.maxUsage)',
+      },
+      {
+        maxUsage: null,
+      }
+    ],
     startTime: {
       $lte: new Date()
     },
