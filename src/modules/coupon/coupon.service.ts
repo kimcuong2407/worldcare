@@ -127,10 +127,10 @@ const deleteCoupon = async (couponId: string) => {
 const getFreeCoupon = async () => {
   return makeQuery(CouponCollection.find({
     startTime: {
-      $gte: new Date()
+      $lte: new Date()
     },
     endTime: {
-      $lte: new Date()
+      $gte: new Date()
     },
     deletedAt: null,
   }).exec());
