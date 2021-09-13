@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-const saltRounds = 5;
+const saltRounds = 10;
 
 const generateHash = async (password: string) => {
   return bcrypt.hashSync(password, saltRounds);
