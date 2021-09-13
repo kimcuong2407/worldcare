@@ -71,7 +71,7 @@ const fetchBranch = async (params: any, language = 'vi') => {
   SpecialityCollection.setDefaultLanguage(language);
 
   const {
-    specialityId, keyword, city, branchId, branchType, hospitalId,
+    specialityId, keyword, city, branchId, branchType, hospitalId, options,
   } = params;
   const query: any = {
     deletedAt: null,
