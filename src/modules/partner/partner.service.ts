@@ -44,8 +44,8 @@ const createPartner = async (partnerInfo: any) => {
     ...partnerInfo,
     // slug,
   });
-  
-  const { _id,  ...rest } = get(partner, '_doc', {});
+
+  const { _id, ...rest } = get(partner, '_doc', {});
   const branch = await branchService.createBranch({
     name: {
       vi: name,
@@ -115,9 +115,11 @@ const fetchPartner = async (params: any, options: any) => {
     sort[sortBy] = sortDirection || -1;
   }
 
-  const result = await PartnerCollection.aggregatePaginate(aggregate, { ...options, sort: isEmpty(sort) ? {
-    createdAt: -1,
-  } : sort });
+  const result = await PartnerCollection.aggregatePaginate(aggregate, {
+    ...options, sort: isEmpty(sort) ? {
+      createdAt: -1,
+    } : sort
+  });
 
   // const data = await PartnerCollection.find({
   //   _id: { $in: map(result.docs, '_id') }
@@ -162,7 +164,11 @@ const updatePartnerInfo = async (partnerId: Number, partnerInfo: any) => {
 };
 
 const deletePartner = async (partnerId: string) => {
-  await PartnerCollection.findByIdAndUpdate(partnerId, {$set: {deletedAt: new Date()}});
+  await PartnerCollection.findByIdAndUpdate(partnerId, { $set: { deletedAt: new Date() } });
+  const branches = await branchService.findBranchByPartnerId(+partnerId);
+  await Promise.all(branches, (branch: any) => {
+    return branchService.deleteBranch(get(branch, 'id'));
+  });
   return true;
 };
 
