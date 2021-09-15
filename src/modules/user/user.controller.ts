@@ -236,9 +236,9 @@ const fetchUserAction = async (req: express.Request, res: express.Response, next
 const createUserAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     let branchId = get(req.body, 'branchId') || req.companyId;
-    if (!req.isRoot) {
-      branchId = req.companyId;
-    }
+    // if (!req.isRoot) {
+    //   branchId = req.companyId;
+    // }
 
     const {
       fullName,
