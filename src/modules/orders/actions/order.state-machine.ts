@@ -16,23 +16,15 @@ export default (initState: string) => new StateMachine({
       from: ORDER_STATUS.NEW,
       to: ORDER_STATUS.CANCELLED,
     },
-    // t2
     {
       name: ORDER_ACTIONS.PROCESS,
       from: ORDER_STATUS.RECEIVED,
       to: ORDER_STATUS.PROCESSED,
     },
-    // t2
     {
       name: ORDER_ACTIONS.REJECT,
       from: ORDER_STATUS.RECEIVED,
       to: ORDER_STATUS.NEW,
-    },
-    // t2
-    {
-      name: ORDER_ACTIONS.PROCESS,
-      from: ORDER_STATUS.RECEIVED,
-      to: ORDER_STATUS.PROCESSED,
     },
     {
       name: ORDER_ACTIONS.UPDATE_LINE_ITEM,

@@ -66,7 +66,8 @@ const changePasswordByUserId = async (userId: string, currentPassword: string, n
 }
 
 const assignUserToGroup = async (userId: string, roles: [string], domain: string) => {
-  return Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
+  await Promise.all(roles.map((role) => casbin.enforcer.addRoleForUser(userId, role, domain)));
+  return casbin.enforcer.loadPolicy();
 }
 
 const removeRoleForUser = async (userId: string, domain: string) => {
