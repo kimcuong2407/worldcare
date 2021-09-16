@@ -16,7 +16,6 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
     const id = get(item, '_id');
     const isDeleted = get(item, 'isDeleted', false);
     const query: any = {};
-
     if (id) {
       query._id = Types.ObjectId(id)
 
@@ -35,7 +34,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         orderNumber: get(order, 'orderNumber'),
       }));
     }
-    const aggLineItem = await OrderItemCollection.aggregate([
+    const aggLineItem = await OrderCollection.aggregate([
       {
         '$match': {
           'orderNumber': get(order, 'orderNumber')
@@ -49,7 +48,7 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         }
       }, {
         '$addFields': {
-          'subTotal': {
+          'total': {
             '$sum': {
               '$map': {
                 'input': '$items',
@@ -75,26 +74,36 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         '$addFields': {
           'grandTotal': {
             '$sum': [
-              '$subTotal', {
-                '$ifNull': [
-                  '$shippingFee', 0
+              '$total', {
+                '$cond': [
+                  {
+                    '$eq': [
+                      '$shippingFee', null
+                    ]
+                  }, 0, '$shippingFee'
                 ]
               }, {
-                '$ifNull': [
-                  '$serviceFee', 0
+                '$cond': [
+                  {
+                    '$eq': [
+                      '$serviceFee', null
+                    ]
+                  }, 0, '$serviceFee'
                 ]
               }
             ]
           }
         }
-      }, {
+      },
+      {
         '$project': {
           'grandTotal': 1,
-          'subTotal': 1
+          'total': 1,
+          'orderNumber': 1
         }
       }
     ]).exec();
-    const subTotalPerItem = get(aggLineItem, '0.subTotal');
+    const subTotalPerItem = get(aggLineItem, '0.total');
     const grandTotal = get(aggLineItem, '0.grandTotal');
 
     await OrderCollection.findOneAndUpdate({
@@ -115,7 +124,6 @@ class UpdateItemOrderHandler extends OrderAbstractHandler {
         },
       },
     });
-
     const { shippingFee, couponCode } = order;
     const discountAmount = await orderService.calculateDiscount({ shippingFee, couponCode, subTotal: subTotalPerItem });
     const updatedOrder = await OrderCollection.findOneAndUpdate({
