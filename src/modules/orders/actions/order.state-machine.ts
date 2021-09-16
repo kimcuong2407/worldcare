@@ -40,9 +40,19 @@ export default (initState: string) => new StateMachine({
       to: ORDER_STATUS.RECEIVED,
     },
     {
+      name: ORDER_ACTIONS.CANCEL,
+      from: ORDER_STATUS.RECEIVED,
+      to: ORDER_STATUS.CANCELLED,
+    },
+    {
       name: ORDER_ACTIONS.CONFIRM,
       from: ORDER_STATUS.PROCESSED,
       to: ORDER_STATUS.CONFIRMED,
+    },
+    {
+      name: ORDER_ACTIONS.CANCEL,
+      from: ORDER_STATUS.PROCESSED,
+      to: ORDER_STATUS.CANCELLED,
     },
     {
       name: ORDER_ACTIONS.REJECT,
@@ -60,6 +70,11 @@ export default (initState: string) => new StateMachine({
       to: ORDER_STATUS.NEW,
     },
     {
+      name: ORDER_ACTIONS.CANCEL,
+      from: ORDER_STATUS.CONFIRMED,
+      to: ORDER_STATUS.CANCELLED,
+    },
+    {
       name: ORDER_ACTIONS.SHIPPING,
       from: ORDER_STATUS.PACKAGED,
       to: ORDER_STATUS.SHIPPING,
@@ -70,9 +85,14 @@ export default (initState: string) => new StateMachine({
       to: ORDER_STATUS.NEW,
     },
     {
-      name: ORDER_ACTIONS.REJECT,
+      name: ORDER_ACTIONS.CANCEL,
+      from: ORDER_STATUS.PACKAGED,
+      to: ORDER_STATUS.CANCELLED,
+    },
+    {
+      name: ORDER_ACTIONS.CANCEL,
       from: ORDER_STATUS.SHIPPING,
-      to: ORDER_STATUS.NEW,
+      to: ORDER_STATUS.CANCELLED,
     },
     {
       name: ORDER_ACTIONS.ORDER_COMPLETION,
