@@ -12,6 +12,7 @@ import UpdateItemOrderHandler from './update-line-item.handler';
 import { ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { upperCase } from 'lodash';
 import RejectOrderHandler from './reject.handler';
+import CustomerCancelOrderHandler from './customer-cancel.handler';
 
 const getOrderActionHandler = (
   action: string,
@@ -45,6 +46,9 @@ const getOrderActionHandler = (
       break;
     case ORDER_ACTIONS.REJECT:
       handler = new RejectOrderHandler(initialState);
+      break;
+    case ORDER_ACTIONS.CUSTOMER_CANCEL:
+      handler = new CustomerCancelOrderHandler(initialState);
       break;
     default:
       break;

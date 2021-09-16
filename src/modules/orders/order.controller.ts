@@ -11,7 +11,7 @@ import PrescriptionCollection from './prescription.collection';
 import { getPreSignedUrl } from '@app/core/s3';
 import orderActions from './actions';
 import { setResponse } from '@app/utils/response.util';
-import { ORDER_STATUS } from './constant';
+import { ORDER_ACTIONS, ORDER_STATUS } from './constant';
 import couponService from '../coupon/coupon.service';
 import userService from '../user/user.service';
 
@@ -105,7 +105,7 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
     const orderNumber = get(req.params, 'orderNumber');
 
     const result: any = await orderService.findOrderDetail({ userId: userId, orderNumber: orderNumber });
-    if(!result) {
+    if (!result) {
       throw new NotFoundError();
     }
     const order = result.toJSON();
@@ -115,9 +115,8 @@ const getMyOrderDetailAction = async (req: express.Request, res: express.Respons
       order.prescription = pick(prescription, ['_id', 'images']);
     }
     const { history, ...rest } = order;
-    
     res.send({
-      history: filter(history||[], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
+      history: filter(history || [], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
       ...rest,
     });
   } catch (e) {
@@ -272,7 +271,7 @@ const trackingOrderAction = async (req: express.Request, res: express.Response, 
     const { street, ward, district, city, fullName } = shippingAddress;
     res.send({
       ...rest,
-      history: filter(history||[], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
+      history: filter(history || [], (his: any) => get(his, 'action') !== 'UPDATE-ITEM'),
       shippingAddress: {
         street: appUtil.mask(street),
         ward: appUtil.mask(ward),
@@ -331,6 +330,38 @@ const getOrderOverviewReportAction = async (req: express.Request, res: express.R
 };
 
 
+const cancelMyOrderAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const userId = req.user.id;
+    const orderNumber = get(req.params, 'orderNumber');
+    const { cancelReason } = req.body;
+    const query: any = {
+      orderNumber,
+      userId,
+    }
+
+    const order = await orderService.findOrderDetail(query);
+    if (!order) {
+      throw new NotFoundError();
+    }
+
+    const handler = orderActions.getOrderActionHandler(ORDER_ACTIONS.CUSTOMER_CANCEL, get(order, 'status'));
+
+    const currentUser = await userService.findUserById(userId);
+    await handler.handle(order, {
+      data: { cancelReason },
+      userId,
+      currentUser,
+    });
+
+  res.send(setResponse({}, true));
+} catch (e) {
+  logger.error('cancelMyOrderAction', e);
+  next(e);
+}
+};
+
+
 export default {
   createPrescriptionAction,
   createOrderAction,
@@ -344,5 +375,6 @@ export default {
   getMonthlyOrderReportAction,
   getDailyOrderReportAction,
   getOrderOverviewReportAction,
+  cancelMyOrderAction,
 };
 

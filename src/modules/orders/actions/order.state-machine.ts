@@ -10,6 +10,11 @@ export default (initState: string) => new StateMachine({
       from: ORDER_STATUS.NEW,
       to: ORDER_STATUS.RECEIVED,
     },
+    {
+      name: ORDER_ACTIONS.CUSTOMER_CANCEL,
+      from: ORDER_STATUS.NEW,
+      to: ORDER_STATUS.CANCELLED,
+    },
     // t2
     {
       name: ORDER_ACTIONS.CANCEL,
@@ -20,6 +25,11 @@ export default (initState: string) => new StateMachine({
       name: ORDER_ACTIONS.PROCESS,
       from: ORDER_STATUS.RECEIVED,
       to: ORDER_STATUS.PROCESSED,
+    },
+    {
+      name: ORDER_ACTIONS.CUSTOMER_CANCEL,
+      from: ORDER_STATUS.RECEIVED,
+      to: ORDER_STATUS.CANCELLED,
     },
     {
       name: ORDER_ACTIONS.REJECT,
@@ -42,6 +52,11 @@ export default (initState: string) => new StateMachine({
       to: ORDER_STATUS.CONFIRMED,
     },
     {
+      name: ORDER_ACTIONS.CUSTOMER_CANCEL,
+      from: ORDER_STATUS.PROCESSED,
+      to: ORDER_STATUS.CANCELLED,
+    },
+    {
       name: ORDER_ACTIONS.CANCEL,
       from: ORDER_STATUS.PROCESSED,
       to: ORDER_STATUS.CANCELLED,
@@ -55,6 +70,11 @@ export default (initState: string) => new StateMachine({
       name: ORDER_ACTIONS.PACKAGE,
       from: ORDER_STATUS.CONFIRMED,
       to: ORDER_STATUS.PACKAGED,
+    },
+    {
+      name: ORDER_ACTIONS.CUSTOMER_CANCEL,
+      from: ORDER_STATUS.CONFIRMED,
+      to: ORDER_STATUS.CANCELLED,
     },
     {
       name: ORDER_ACTIONS.REJECT,
