@@ -4,8 +4,8 @@ export const CORE_RESOURCES = {
   employee: 'employee',
   user: 'user',
   userGroup: 'userGroup',
-  customer: 'customer',
-  patient: 'patient',
+  // customer: 'customer',
+  // patient: 'patient',
 }
 
 export const PHARMACY_RESOURCES = {
@@ -15,7 +15,7 @@ export const PHARMACY_RESOURCES = {
 
 export const CLINIC_RESOURCES = {
   ...CORE_RESOURCES,
-  order: 'order',
+  // order: 'order',
   appointment: 'appointment',
 };
 

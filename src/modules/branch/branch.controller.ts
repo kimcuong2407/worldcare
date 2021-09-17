@@ -56,7 +56,7 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
       partnerIdentity = get(currentBranch, 'partnerId');
     }
 
-    const generatedNamedSlug = `${get(name, 'vi', '')}-${get(address, 'street')}`;
+    const generatedNamedSlug = `${get(name, 'vi', '')}-${get(address, 'street', '')}`;
     const branchInfo: any = {
       name,
       description,
