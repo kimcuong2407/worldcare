@@ -1,14 +1,11 @@
-# The release pipeline will run only if all jobs in the test pipeline are successful
 stages:
-    - release
+  - release
 
-before_script:
-  - npm install
-
-publish:
-  only:
-    - merge_requests
+semantic_release:
   image: node:14
   stage: release
+  only:
+    - master
   script:
+    - npm i
     - npx semantic-release
