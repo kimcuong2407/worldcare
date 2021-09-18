@@ -25,7 +25,8 @@
     "migrate:create": "sh -c 'ts-node node_modules/.bin/migrate-mongo create $0 -f migrate-mongo-config.ts' ",
     "migrate:status": "ts-node node_modules/.bin/migrate-mongo status -f migrate-mongo-config.ts",
     "migrate:undo-last": "ts-node node_modules/.bin/migrate-mongo down -f migrate-mongo-config.ts && npm run migrate:status",
-    "migrate": "ts-node node_modules/.bin/migrate-mongo up -f migrate-mongo-config.ts"
+    "migrate": "ts-node node_modules/.bin/migrate-mongo up -f migrate-mongo-config.ts",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "rpm",
@@ -36,6 +37,10 @@
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.1",
+    "@semantic-release/gitlab": "^6.2.2",
+    "@semantic-release/npm": "^8.0.0",
     "@types/bcrypt": "^3.0.1",
     "@types/bluebird": "^3.5.32",
     "@types/chai": "^4.2.11",
@@ -58,6 +63,7 @@
     "mocha": "^7.1.2",
     "nyc": "^14.1.1",
     "prettier": "^2.0.5",
+    "semantic-release": "^18.0.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^3.9.3"
@@ -120,5 +126,11 @@
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
       "pre-commit": "npm run lint"
     }
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "*"
+  ]
 }
