@@ -6,7 +6,9 @@ before_script:
   - npm install
 
 publish:
-  image: node:12
+  only:
+    - merge_requests
+  image: node:14
   stage: release
   script:
     - npx semantic-release
