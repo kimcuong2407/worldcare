@@ -1,3 +1,5 @@
+import appUtil from '@app/utils/app.util';
+import { map } from 'lodash';
 import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 import PolicyCollection from './policy.collection';
@@ -11,13 +13,12 @@ const createPolicy = async (policy: any, language = 'vi') => {
 }
 
 const getPolicy = async (language = 'vi', isRaw=false) => {
-  PolicyCollection.setDefaultLanguage(language);
-  let data = await PolicyCollection.find({}).sort({index: 1, createdAt: 1});
+  // PolicyCollection.setDefaultLanguage(language);
+  let data = await PolicyCollection.find({}).lean().sort({index: 1, createdAt: 1});
   if(isRaw) {
-    data = data.toJSON({virtuals: false})
     return data;
   }
-  return data;
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updatePolicyById = async (policyId: string, policy: any) => {
