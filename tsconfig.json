@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "typeRoots": ["./node_modules/@types", "./src/typings"],
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "target": "es6",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "sourceMap": false,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/*"],
+      "@core/*": ["src/core/*"],
+      "@utils/*": ["src/utils/*"],
+      "@modules/*": ["src/modules/*"],
+      "*": ["node_modules/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "linterOptions": {
+    "exclude": ["node_modules/**"]
+  }
+}
