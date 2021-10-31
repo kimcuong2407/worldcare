@@ -21,6 +21,10 @@ import policyRoutes from './modules/policy';
 import shippingVendorRoutes from './modules/shipping-vendor';
 import customerAccountRoutes from './modules/customer-account';
 import supplierRoutes from './modules/supplier';
+import productGroupRoutes from './modules/product-group';
+import productPositionRoutes from './modules/product-position';
+import productUnitRoutes from './modules/product-unit';
+import productRouteAdministrationRoutes from './modules/product-routeadministration';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -45,4 +49,8 @@ export default (app: express.Application): void => {
   shippingVendorRoutes(app);
   customerAccountRoutes(app);
   supplierRoutes(app);
+  productGroupRoutes(app);
+  productPositionRoutes(app);
+  productUnitRoutes(app);
+  productRouteAdministrationRoutes(app);
 };
