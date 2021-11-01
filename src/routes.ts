@@ -25,6 +25,7 @@ import productGroupRoutes from './modules/product-group';
 import productPositionRoutes from './modules/product-position';
 import productUnitRoutes from './modules/product-unit';
 import productRouteAdministrationRoutes from './modules/product-routeadministration';
+import manufacturerRoutes from './modules/manufacturer';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -53,4 +54,5 @@ export default (app: express.Application): void => {
   productPositionRoutes(app);
   productUnitRoutes(app);
   productRouteAdministrationRoutes(app);
+  manufacturerRoutes(app);
 };

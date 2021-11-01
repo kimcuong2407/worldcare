@@ -11,7 +11,7 @@ const ProductGroupSchema = new mongoose.Schema({
   },
   superGroupId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'ProductGroup',
+    ref: 'product_group',
   },
   description: {
     type: String,

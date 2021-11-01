@@ -10,7 +10,7 @@ import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('productGroup.controller');
 
-const validateProductGroup = async (info: any) => {
+const validateProductGroup = async (info: any, id?: String) => {
   // Name is required and unique
   const name = get(info, 'name', null);
   if (!isNil(name)) {
@@ -24,6 +24,11 @@ const validateProductGroup = async (info: any) => {
   const status = get(info, 'status', PRODUCT_GROUP_STATUS.ACTIVE);
   if(!Object.values(PRODUCT_GROUP_STATUS).includes(status)){
     throw new ValidationFailedError('Status is invalid.');
+  }
+
+  const superGroupId = get(info, 'superGroupId', null);
+  if (superGroupId === id) {
+    throw new ValidationFailedError('SuperGroupId must be different with the update one.');
   }
 };
 

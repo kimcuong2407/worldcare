@@ -50,7 +50,7 @@ const createProductRouteAdministrationAction = async (
     );
     res.send(ProductPosition);
   } catch (error) {
-    logger.error('createProductPositionAction', error);
+    logger.error('createProductRouteAdministrationAction', error);
     next(error);
   }
 };
@@ -69,7 +69,7 @@ const fetchProductRouteAdministrationAction = async (
     );
     res.send(ProductPosition);
   } catch (error) {
-    logger.error('fetchProductPositionAction', error);
+    logger.error('fetchProductRouteAdministrationAction', error);
     next(error);
   }
 };
@@ -96,7 +96,7 @@ const updateProductRouteAdministrationAction = async (
 
     res.send(ProductPosition);
   } catch (error) {
-    logger.error('updateProductPositionAction', error);
+    logger.error('updateProductRouteAdministrationAction', error);
     next(error);
   }
 };
@@ -113,7 +113,7 @@ const deleteProductRouteAdministrationByIdAction = async (
     );
     res.send(ProductPosition);
   } catch (error) {
-    logger.error('deleteProductPositionByIdAction', error);
+    logger.error('deleteProductRouteAdministrationByIdAction', error);
     next(error);
   }
 };
