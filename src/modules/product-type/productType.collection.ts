@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-const ProductUnitSchema = new mongoose.Schema(
+const ProductTypeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -25,15 +25,15 @@ const ProductUnitSchema = new mongoose.Schema(
   }
 );
 
-ProductUnitSchema.plugin(mongooseIntl, {
+ProductTypeSchema.plugin(mongooseIntl, {
   languages: ['vi', 'en'],
   defaultLanguage: 'vi',
 });
-ProductUnitSchema.plugin(mongoosePaginate);
+ProductTypeSchema.plugin(mongoosePaginate);
 
-export const ProductUnitCollection = mongoose.model(
-  'product_unit',
-  ProductUnitSchema
+export const ProductTypeCollection = mongoose.model(
+  'product_type',
+  ProductTypeSchema
 );
 
-export default ProductUnitCollection
+export default ProductTypeCollection;
