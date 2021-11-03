@@ -11,7 +11,7 @@ export interface SupplierModel {
   note: string;
   currentDebt: number;
   totalPurchase: number;
-  status: number;
+  status: string;
   createdBy: string;
   updatedBy: string;
   deletedAt: Date;

@@ -1,4 +1,6 @@
-export const SUPPLIER_STATUS = {
-  ACTIVE: 1,
-  INACTIVE: 2
+export enum SUPPLIER_STATUS {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE', 
 }
+
+export default {};

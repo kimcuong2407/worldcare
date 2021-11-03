@@ -30,7 +30,7 @@ const SupplierSchema = new Schema({
   note: String,
   currentDebt: Number,
   totalPurchase: Number,
-  status: Number,
+  status: String,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date,
