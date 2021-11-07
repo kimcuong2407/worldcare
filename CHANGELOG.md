@@ -1,3 +1,10 @@
+## [1.0.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.0...v1.0.1) (2021-11-07)
+
+
+### Bug Fixes
+
+* **product-type:** edit miss match endpoint ([fd033bb](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/fd033bb2e180ba1b224bccc264cae190f01a9e0f))
+
 # 1.0.0 (2021-11-05)
 
 
