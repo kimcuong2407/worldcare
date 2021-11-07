@@ -4,11 +4,11 @@ import express from 'express';
 import productTypeController from './productType.controller';
 
 const productTypeRoutes = (app: express.Application): void => {
-  // Product Unit
-  app.post('/api/v1/product-unit', productTypeController.createProductTypeAction);
-  app.get('/api/1/product-unit', productTypeController.fetchProductTypeAction);
-  app.put('/api/v1/product-unit/:id', productTypeController.updateProductTypeAction);
-  app.delete('/api/v1/product-unit/:id', productTypeController.deleteProductTypeByIdAction);
+  // Product type
+  app.post('/api/v1/product-type', productTypeController.createProductTypeAction);
+  app.get('/api/1/product-type', productTypeController.fetchProductTypeAction);
+  app.put('/api/v1/product-type/:id', productTypeController.updateProductTypeAction);
+  app.delete('/api/v1/product-type/:id', productTypeController.deleteProductTypeByIdAction);
 };
 
 export default productTypeRoutes;
