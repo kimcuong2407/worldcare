@@ -13,7 +13,7 @@ const logger = loggerHelper.getLogger('productGroup.controller');
 const validateProductGroup = async (info: any, id?: String) => {
   // Name is required and unique
   const name = get(info, 'name', null);
-  if (!isNil(name)) {
+  if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
   const data = await productGroupService.getProductGroupInfo({name});

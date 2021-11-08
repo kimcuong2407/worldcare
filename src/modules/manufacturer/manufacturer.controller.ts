@@ -13,7 +13,7 @@ const logger = loggerHelper.getLogger('manufacturer.controller');
 const validateManufacturer = async (info: any) => {
   // Name is required and unique
   const name = get(info, 'name', null);
-  if (!isNil(name)) {
+  if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
   const data = await manufacturerService.getManufacturerInfo({name});

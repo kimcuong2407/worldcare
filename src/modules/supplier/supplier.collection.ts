@@ -8,7 +8,7 @@ import AutoIncrement from "mongoose-sequence";
 const { Schema } = mongoose;
 
 const SupplierSchema = new Schema({
-  supplierId: {
+  supplierCode: {
     type: String,
     unique: true
   },
@@ -41,7 +41,7 @@ const SupplierSchema = new Schema({
 SupplierSchema.plugin(mongoosePaginate);
 SupplierSchema.plugin(mongooseAggregatePaginate);
 SupplierSchema.plugin(AutoIncrement(mongoose), {
-  inc_field: 'supplierIdSequence',
+  inc_field: 'supplierCodeSequence',
   id: 'supplier_id_sequence',
   start_seq: 1,
 });

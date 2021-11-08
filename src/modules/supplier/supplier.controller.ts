@@ -34,7 +34,7 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
     await validateSupplier(supplierInfo, true);
 
     const data = await supplierService.createSupplier(supplierInfo);
-    logger.info(`Created supplier with ID=${supplierInfo.supplierId} and name =${supplierInfo.name}`);
+    logger.info(`Created supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
     res.send(data);
   } catch (e) {
     logger.error('Error while creating new supplier', e);
@@ -63,7 +63,7 @@ const validateSupplier = async (supplierInfo: any, isCreating: boolean) => {
 
 const fetchSuppliersAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    const {keyword, supplierId, name, phoneNumber, email} = req.query;
+    const {keyword, supplierCode, name, phoneNumber, email} = req.query;
     const {page, limit} = appUtil.getPaging(req);
     const options = {
       page,
@@ -71,7 +71,7 @@ const fetchSuppliersAction = async (req: express.Request, res: express.Response,
     }
     const supplierQuery: any = {
       keyword,
-      supplierId,
+      supplierCode,
       name,
       phoneNumber,
       email
@@ -86,9 +86,9 @@ const fetchSuppliersAction = async (req: express.Request, res: express.Response,
 
 const getSupplierByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    let supplierId = get(req.params, 'supplierId');
+    let supplierCode = get(req.params, 'supplierCode');
     const query: any = {
-      supplierId,
+      supplierCode,
     }
     const supplier = await supplierService.getSupplierInfo(query);
     if (!supplier) {
@@ -128,9 +128,9 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
     await validateSupplier(supplierInfo, false);
 
-    let supplierId = get(req.params, 'supplierId');
+    let supplierCode = get(req.params, 'supplierCode');
     const query: any = {
-      supplierId,
+      supplierCode,
     }
     const existedSupplier = await supplierService.getSupplierInfo(query);
     if (!existedSupplier) {
@@ -139,7 +139,7 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
     if (existedSupplier.name !== supplierInfo.name) {
       const supplier = await supplierService.getSupplierInfo({
-        '$and': [{name}, {supplierId: {'$ne': supplierId}}]
+        '$and': [{name}, {supplierCode: {'$ne': supplierCode}}]
       });
       if (supplier && Object.keys(supplier).length !== 0) {
         throw new ValidationFailedError(`Supplier with name ${name} is existed.`);
@@ -156,16 +156,16 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
 const deleteSupplierAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    let supplierId = get(req.params, 'supplierId');
+    let supplierCode = get(req.params, 'supplierCode');
     const query: any = {
-      supplierId,
+      supplierCode,
     }
     const supplier = await supplierService.getSupplierInfo(query);
     if (!supplier) {
       throw new NotFoundError();
     }
 
-    const data = await supplierService.deleteSupplier(supplierId);
+    const data = await supplierService.deleteSupplier(supplierCode);
     res.send(data);
   } catch (e) {
     logger.error('There was an error while deleting supplier', e);

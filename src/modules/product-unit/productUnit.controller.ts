@@ -13,7 +13,7 @@ const logger = loggerHelper.getLogger('ProductUnit.controller');
 const validateProductUnit = async (info: any) => {
   // Name is required and unique
   const name = get(info, 'name', null);
-  if (!isNil(name)) {
+  if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
   const data = await ProductUnitService.getProductUnitInfo({ name });

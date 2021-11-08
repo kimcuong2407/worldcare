@@ -10,7 +10,7 @@ import {SUPPLIER_STATUS} from '@modules/supplier/constant';
 const logger = loggerHelper.getLogger('supplier.service');
 
 const createSupplier = async (supplierInfo: SupplierModel) => {
-  logger.info(`Creating supplier with ID=${supplierInfo.supplierId} and name =${supplierInfo.name}`);
+  logger.info(`Creating supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
   supplierInfo.status = SUPPLIER_STATUS.ACTIVE;
   supplierInfo.totalPurchase = 0;
   supplierInfo.currentDebt = 0;
@@ -18,14 +18,14 @@ const createSupplier = async (supplierInfo: SupplierModel) => {
   return await persistSupplier(supplierInfo);
 }
 
-const initSupplierId = (supplierIdSeq: number) => {
-  let s = '000000000' + supplierIdSeq;
+const initsupplierCode = (supplierCodeSeq: number) => {
+  let s = '000000000' + supplierCodeSeq;
   return s.substr(s.length - 6);
 }
 
 const persistSupplier = async (supplierInfo: SupplierModel) => {
   const supplier = await SupplierCollection.create(supplierInfo);
-  supplier.supplierId = `NCC${initSupplierId(supplier.supplierIdSequence)}`;
+  supplier.supplierCode = `NCC${initsupplierCode(supplier.supplierCodeSequence)}`;
   supplier.save();
 
   const {...rest} = get(supplier, '_doc', {});
@@ -46,8 +46,8 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
   if (queryInput.keyword) {
     query['$text'] = {$search: queryInput.keyword}
   }
-  if (queryInput.supplierId) {
-    query['supplierId'] = queryInput.supplierId;
+  if (queryInput.supplierCode) {
+    query['supplierCode'] = queryInput.supplierCode;
   }
   if (queryInput.name) {
     query['name'] = queryInput.name;
@@ -97,9 +97,9 @@ const updateSupplierInfo = async (query: any, supplierInfo: any) => {
   };
 };
 
-const deleteSupplier = async (supplierId: string) => {
+const deleteSupplier = async (supplierCode: string) => {
   await SupplierCollection.findOneAndUpdate({
-    supplierId: supplierId,
+    supplierCode: supplierCode,
   }, {deletedAt: new Date()});
 
   return true;

@@ -6,11 +6,11 @@ const supplierRoutes = (app: express.Application): void => {
 
   app.get('/api/v1/supplier', supplierActions.fetchSuppliersAction);
 
-  app.delete('/api/v1/supplier/:supplierId', supplierActions.deleteSupplierAction);
+  app.delete('/api/v1/supplier/:supplierCode', supplierActions.deleteSupplierAction);
 
-  app.get('/api/v1/supplier/:supplierId', supplierActions.getSupplierByIdAction);
+  app.get('/api/v1/supplier/:supplierCode', supplierActions.getSupplierByIdAction);
 
-  app.put('/api/v1/supplier/:supplierId', supplierActions.updateSupplierInfoAction);
+  app.put('/api/v1/supplier/:supplierCode', supplierActions.updateSupplierInfoAction);
 };
 
 export default supplierRoutes;
