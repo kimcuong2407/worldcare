@@ -1,3 +1,10 @@
+## [1.0.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.3...v1.0.4) (2021-11-08)
+
+
+### Bug Fixes
+
+* suppliercode ([8d453ad](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/8d453ad9de9f16ae4ff1567f87d851f35a30c679))
+
 ## [1.0.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.2...v1.0.3) (2021-11-08)
 
 
