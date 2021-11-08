@@ -1,3 +1,10 @@
+## [1.0.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.2...v1.0.3) (2021-11-08)
+
+
+### Bug Fixes
+
+* field name ([83654df](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/83654df4e0f9ebd4f17738686091b8566ec8e753))
+
 ## [1.0.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.1...v1.0.2) (2021-11-08)
 
 
