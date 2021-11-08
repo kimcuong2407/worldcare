@@ -1,3 +1,10 @@
+## [1.0.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.1...v1.0.2) (2021-11-08)
+
+
+### Bug Fixes
+
+* fix validation & rename field ([56d3c90](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/56d3c90c314d1d797211388cef4bb1217134a0d1))
+
 ## [1.0.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.0...v1.0.1) (2021-11-07)
 
 
