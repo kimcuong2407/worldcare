@@ -16,6 +16,7 @@ const SupplierSchema = new Schema({
     type: String,
     unique: true
   },
+  supplierCodeSequence: Number,
   phoneNumber: String,
   email: String,
   company: String,
@@ -41,8 +42,9 @@ const SupplierSchema = new Schema({
 SupplierSchema.plugin(mongoosePaginate);
 SupplierSchema.plugin(mongooseAggregatePaginate);
 SupplierSchema.plugin(AutoIncrement(mongoose), {
-  inc_field: 'supplierCode',
+  inc_field: 'supplierCodeSequence',
   id: 'supplier_id_sequence',
+  // reference_fields: ['partnerId'],
   start_seq: 1,
 });
 
