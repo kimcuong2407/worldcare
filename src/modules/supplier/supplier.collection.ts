@@ -41,7 +41,7 @@ const SupplierSchema = new Schema({
 SupplierSchema.plugin(mongoosePaginate);
 SupplierSchema.plugin(mongooseAggregatePaginate);
 SupplierSchema.plugin(AutoIncrement(mongoose), {
-  inc_field: 'supplierCodeSequence',
+  inc_field: 'supplierCode',
   id: 'supplier_id_sequence',
   start_seq: 1,
 });
