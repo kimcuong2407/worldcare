@@ -13,9 +13,13 @@ const logger = loggerHelper.getLogger('productGroup.controller');
 const validateProductGroup = async (info: any, id?: String) => {
   // Name is required and unique
   const name = get(info, 'name', null);
-  if (isNil(name)) {
-    throw new ValidationFailedError('Name is required.');
+  console.log(isNil(id), id)
+  if (isNil(id)) {
+    if (isNil(name)) {
+      throw new ValidationFailedError('Name is required.');
+    }
   }
+  
   const data = await productGroupService.getProductGroupInfo({name});
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(`Product Group with ${name} is already existed.`);
@@ -30,6 +34,10 @@ const validateProductGroup = async (info: any, id?: String) => {
   if (superGroupId === id) {
     throw new ValidationFailedError('SuperGroupId must be different with the update one.');
   }
+  const isSuperGroupIdExist = await productGroupService.getProductGroupInfo({_id: superGroupId});
+  if (isNil(isSuperGroupIdExist)) {
+    throw new ValidationFailedError('SuperGroupId must be exist.');
+  }
 };
 
 const createProductGroupAction = async (
@@ -38,10 +46,11 @@ const createProductGroupAction = async (
   next: express.NextFunction
 ) => {
   try {
-    const { name, superGroupId, status } = req.body;
+    const { name, superGroupId, description, status } = req.body;
     const info = {
       name,
       superGroupId,
+      description,
       status: status || PRODUCT_GROUP_STATUS.ACTIVE,
     };
     await validateProductGroup(info);
@@ -83,19 +92,19 @@ const updateProductGroupAction = async (
 ) => {
   try {
     const id = get(req.params, 'id');
-    const { name, superGroupId, status } = req.body;
+    const { name, superGroupId, description, status } = req.body;
     const info = {
       name,
       superGroupId,
+      description,
       status: status || PRODUCT_GROUP_STATUS.ACTIVE,
     }
-    await validateProductGroup(info);
+    await validateProductGroup(info, id);
 
     const productGroup = await productGroupService.updateProductGroup(
       id,
       omitBy(info, isNil)
     );
-
     res.send(productGroup);
   } catch (error) {
     logger.error('updateProductGroupAction', error);
