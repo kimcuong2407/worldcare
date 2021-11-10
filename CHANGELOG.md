@@ -1,3 +1,10 @@
+## [1.0.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.4...v1.0.5) (2021-11-10)
+
+
+### Bug Fixes
+
+* **product-group:** fix validation of product group ([53bced0](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/53bced056b39372e18821b7fb9f7cbb295dcc05d))
+
 ## [1.0.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.3...v1.0.4) (2021-11-08)
 
 
