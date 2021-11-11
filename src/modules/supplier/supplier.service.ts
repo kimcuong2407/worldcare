@@ -17,7 +17,7 @@ const initsupplierCode = (supplierCodeSeq: number) => {
 }
 
 const autoIncrease = (record: any) => {
-  return record.setNext('supplier_code_sequence', async (err: any, record: any) => {
+  record.setNext('supplier_code_sequence', async (err: any, record: any) => {
     if(err) {
       return new InternalServerError('Failed to increase supplierCode.');
     }
@@ -37,11 +37,8 @@ const persistSupplier = async (supplierInfo: SupplierModel) => {
     autoIncrease(supplier);
   }
 
-  const query = { name: supplier.name};
-  const doc = await SupplierCollection.findOne(query).exec();
-
   return {
-    ...get(doc, '_doc', {}),
+    ...get(supplier, '_doc', {}),
   };
 };
 
