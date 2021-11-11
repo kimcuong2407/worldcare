@@ -4,12 +4,14 @@ import supplierService from './supplier.service';
 import get from 'lodash/get';
 import appUtil from '@app/utils/app.util';
 import {NotFoundError, ValidationFailedError} from '@app/core/types/ErrorTypes';
+import { isEmpty, isNil } from 'lodash';
 
 const logger = loggerHelper.getLogger('supplier.controller');
 
 const createSupplierAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {
+      supplierCode,
       name,
       phoneNumber,
       email,
@@ -21,6 +23,7 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
     } = req.body;
 
     const supplierInfo: any = {
+      supplierCode,
       name,
       phoneNumber,
       email,
@@ -57,6 +60,14 @@ const validateSupplier = async (supplierInfo: any, isCreating: boolean) => {
     const supplier = await supplierService.getSupplierInfo({name: supplierInfo.name});
     if (supplier && Object.keys(supplier).length !== 0) {
       throw new ValidationFailedError(`Supplier with name ${supplierInfo.name} is existed.`);
+    }
+    const supplierCode = get(supplierInfo, 'supplierCode', null);
+    if (!isNil(supplierCode)) {
+      const query = { supplierCode };
+      const doc = await supplierService.getSupplierInfo(query);
+      if (!isEmpty(doc)) {
+        throw new ValidationFailedError(`The supplierCode ${supplierCode} is exieted.`);
+      }
     }
   }
 }
@@ -175,9 +186,9 @@ const deleteSupplierAction = async (req: express.Request, res: express.Response,
 
 
 export default {
+  createSupplierAction,
   fetchSuppliersAction,
   getSupplierByIdAction,
-  createSupplierAction,
   updateSupplierInfoAction,
   deleteSupplierAction,
 };
