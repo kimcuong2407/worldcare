@@ -23,10 +23,6 @@ const productAutoIncrease = (record: any, productVariants: any) => {
     record.save();
     
     productVariants.map(async (detail: any) => {
-      console.log(`Tronic create variant: ${JSON.stringify({
-        productId: increasedId,
-        ...detail,
-      })}`)
       await createProductVariant({
         productId: increasedId,
         ...detail,
@@ -43,10 +39,6 @@ const persistProduct = async (info: any) => {
     productAutoIncrease(product, productVariants);
   } else {
     productVariants.map(async (detail: any) => {
-      console.log(`Tronic create variant: ${JSON.stringify({
-        productId,
-        ...detail,
-      })}`)
       await createProductVariant({
         productId,
         ...detail,
@@ -72,13 +64,26 @@ const fetchProductList = async () => {
   return await ProductCollection.find({}).lean().exec();
 };
 const fetchProductById = async (productId: string) => {
-
+  const record = await ProductCollection.findOne({ productId }).exec();
+  return record || {};
 };
-const updateProduct = async (productId: string) => {
 
+const updateProduct = async (productId: string, info: any) => {
+  const record = await ProductCollection.findOneAndUpdate( { productId }, {$set: info }, {new: true}).exec();
+  const {createdAt, updatedAt, ...rest} = get(record, '_doc', {});
+  return {
+    ...rest,
+    createdAt: new Date(createdAt).getTime(),
+    updatedAt: new Date(updatedAt).getTime(),
+  };
 };
+
 const deleteProduct = async (productId: string) => {
+  await ProductCollection.findOneAndUpdate({
+    productId
+  }, {deletedAt: new Date(), status: PRODUCT_STATUS.INACTIVE});
 
+  return true;
 };
 
 // Variant
@@ -98,7 +103,6 @@ const variantAutoIncrease = (record: any) => {
 const persistProductVariant = async (info: any) => {
   const variantId = get(info, 'variantId', null);
   const variant = await ProductVariantCollection.create(info);
-  console.log(`Tronic: ${variant}`);
   if (isNil(variantId)) {
     variantAutoIncrease(variant);
   }
@@ -109,7 +113,6 @@ const persistProductVariant = async (info: any) => {
 }
 
 const createProductVariant = async (info: any) => {
-  console.log(`Tronic create variant: ${JSON.stringify(info)}`)
   info.status = PRODUCT_STATUS.ACTIVE;
   return await persistProductVariant(info);
 };

@@ -3,9 +3,9 @@ import loggerHelper from '@utils/logger.util';
 import { medicineModel } from './medicine.model';
 import get from 'lodash/get';
 import { PRODUCT_STATUS, PRODUCT_TYPE } from './constant';
-import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { variantModel } from './productVariant.model';
-import { isNil, size } from 'lodash';
+import { isEmpty, isNil, omitBy, size } from 'lodash';
 import productService from './product.service';
 
 const logger = loggerHelper.getLogger('Product.controller');
@@ -61,7 +61,6 @@ const createProductAction = async (
 ) => {
   try {
     const productType = get(req, 'query.productType', '');
-    console.log(productType)
     const {
       productId,
       name,
@@ -85,7 +84,7 @@ const createProductAction = async (
       transformVariant(productVariants),
     ]);
 
-    const createdProduct = await productService.createProduct({
+    const record = await productService.createProduct({
       productId,
       name,
       aliasName,
@@ -100,7 +99,7 @@ const createProductAction = async (
       });
 
     res.send({
-      createdProduct,
+      record,
     });
   } catch (error) {
     logger.error('createProductAction', error);
@@ -128,7 +127,43 @@ const updateProductAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    
+    const productType = get(req, 'query.productType', '');
+    const productId = get(req.params, 'productId');
+
+    const isExisted = await productService.fetchProductById(productId);
+    if (isEmpty(isExisted)) {
+      throw new NotFoundError();
+    }
+
+    const {
+      name,
+      aliasName,
+      barcode,
+      typeId,
+      manufacturerId,
+      groupId,
+      positionId,
+      routeAdministrationId,
+      productDetail,
+    } = req.body;
+
+    const productInfo = await transformProduct(productType, productDetail);
+
+    const record = await productService.updateProduct(productId, omitBy({
+      name,
+      aliasName,
+      barcode,
+      typeId,
+      manufacturerId,
+      groupId,
+      positionId,
+      routeAdministrationId,
+      productDetail: productInfo,
+    }, isNil));
+
+    res.send({
+      record,
+    });
   } catch (error) {
     logger.error('updateProductAction', error);
     next(error);
@@ -141,7 +176,14 @@ const deleteProductAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    
+    const productId = get(req.params, 'productId');
+    const isExisted = await productService.fetchProductById(productId);
+    if (isEmpty(isExisted)) {
+      throw new NotFoundError();
+    }
+
+    const data = await productService.deleteProduct(productId);
+    res.send(data);
   } catch (error) {
     logger.error('deleteProductAction', error);
     next(error);

@@ -34,11 +34,12 @@ const ProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product_position',
   },
-  routeAdministration: {
+  routeAdministrationId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product_route_administration',
   },
   productDetail: Object,
+  status: Boolean,
 });
 
 ProductSchema.plugin(mongooseIntl, {
