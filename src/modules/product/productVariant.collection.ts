@@ -16,19 +16,15 @@ const ProductVariantSchema = new mongoose.Schema({
   isDefault: {
     type: Boolean,
   },
-  unit: {
-    unitId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'product-unit',
-      require: true,
-    },
-    exchangeValue: Number,
-    barcode: String,
+  unitId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'product-unit',
+    require: true,
   },
-  pricing: {
-    cost: Number,
-    price: Number,
-  },
+  exchangeValue: Number,
+  barcode: String,
+  cost: Number,
+  price: Number,
   status: {
     type: String,
   }
@@ -40,6 +36,7 @@ ProductVariantSchema.plugin(AutoIncrement(mongoose), {
   id: 'variant_id_sequence',
   inc_field: 'idSequence',
   start_seq: 1,
+  disable_hooks: true
 });
 
 const ProductVariantCollection = mongoose.model(

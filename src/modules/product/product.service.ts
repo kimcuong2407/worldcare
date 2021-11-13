@@ -11,25 +11,47 @@ const initIdSquence = (idSequence: number) => {
   return s.substr(s.length - 6);
 }
 
-const productAutoIncrease = (record: any) => {
+const productAutoIncrease = (record: any, productVariants: any) => {
   record.setNext('product_id_sequence', async (err: any, record: any) => {
     if(err) {
       return new InternalServerError('Failed to increase ID.');
     }
     const increasedId = `SP${initIdSquence(record.idSequence)}`
     const doc = await ProductCollection.findOne({increasedId}).exec();
-    if(!isNil(doc)) productAutoIncrease(record);
-    record.supplierCode = increasedId;
+    if(!isNil(doc)) productAutoIncrease(record, productVariants);
+    record.productId = increasedId;
     record.save();
+    
+    productVariants.map(async (detail: any) => {
+      console.log(`Tronic create variant: ${JSON.stringify({
+        productId: increasedId,
+        ...detail,
+      })}`)
+      await createProductVariant({
+        productId: increasedId,
+        ...detail,
+      })
+    });
   });
 }
 
 const persistProduct = async (info: any) => {
   const productId = get(info, 'productId', null);
-  const product = await ProductCollection.create(info);
-
+  const product = await ProductCollection.create(omitBy(info, 'productVariants'));
+  const productVariants = get(info, 'productVariants');
   if (isNil(productId)) {
-    productAutoIncrease(info);
+    productAutoIncrease(product, productVariants);
+  } else {
+    productVariants.map(async (detail: any) => {
+      console.log(`Tronic create variant: ${JSON.stringify({
+        productId,
+        ...detail,
+      })}`)
+      await createProductVariant({
+        productId,
+        ...detail,
+      });
+    });
   }
 
   return {
@@ -39,25 +61,15 @@ const persistProduct = async (info: any) => {
 
 const createProduct = async (info: any) => {
   info.status = PRODUCT_STATUS.ACTIVE;
-  const productVariants = get(info, 'productVariants');
-  const product = await persistProduct(omitBy(info, 'productVariants'));
-  const productId = get(product, 'productId');
-
-  const variants = productVariants.map(async (detail: any) => {
-    return await createProductVariant({
-      productId,
-      detail,
-    })
-  });
+  const product = await persistProduct(info);
 
   return {
     ...product,
-    productVariants: variants,
   }
 }
 
 const fetchProductList = async () => {
-
+  return await ProductCollection.find({}).lean().exec();
 };
 const fetchProductById = async (productId: string) => {
 
@@ -75,10 +87,10 @@ const variantAutoIncrease = (record: any) => {
     if(err) {
       return new InternalServerError('Failed to increase ID.');
     }
-    const increasedId = `SP${initIdSquence(record.idSequence)}`
+    const increasedId = `VA${initIdSquence(record.idSequence)}`
     const doc = await ProductVariantCollection.findOne({increasedId}).exec();
-    if(!isNil(doc)) productAutoIncrease(record);
-    record.supplierCode = increasedId;
+    if(!isNil(doc)) variantAutoIncrease(record);
+    record.variantId = increasedId;
     record.save();
   });
 }
@@ -86,9 +98,9 @@ const variantAutoIncrease = (record: any) => {
 const persistProductVariant = async (info: any) => {
   const variantId = get(info, 'variantId', null);
   const variant = await ProductVariantCollection.create(info);
-
+  console.log(`Tronic: ${variant}`);
   if (isNil(variantId)) {
-    variantAutoIncrease(info);
+    variantAutoIncrease(variant);
   }
 
   return {
@@ -97,6 +109,7 @@ const persistProductVariant = async (info: any) => {
 }
 
 const createProductVariant = async (info: any) => {
+  console.log(`Tronic create variant: ${JSON.stringify(info)}`)
   info.status = PRODUCT_STATUS.ACTIVE;
   return await persistProductVariant(info);
 };

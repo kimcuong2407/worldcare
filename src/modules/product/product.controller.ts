@@ -17,12 +17,12 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
   switch (type) {
     case PRODUCT_TYPE.MEDICINE: {
       const medicinetDetail: medicineModel = {
-        ingredient: get(data, 'ingredient'),
-        dosage: get(data, 'dosage'),
-        medicineCode: get(data, 'medicineCode'),
-        registrationNo: get(data, 'registrationNo'),
-        weight: get(data, 'weight'),
-        packagingSize: get(data, 'packagingSize'),
+        ingredient: get(data, 'ingredient', ''),
+        dosage: get(data, 'dosage', {}),
+        medicineCode: get(data, 'medicineCode', ''),
+        registrationNo: get(data, 'registrationNo', ''),
+        weight: get(data, 'weight', {}),
+        packagingSize: get(data, 'packagingSize', ''),
       }
       return medicinetDetail;
     }
@@ -31,20 +31,20 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
 
 const transformVariant = async (data: any) => {
   let hasDefault = false;
-  const variantsInfo: [variantModel] = data.map(async (_info: any) => {
+  const variantsInfo: [variantModel] = data.map((_info: any) => {
+    const unitId = get(_info, 'unitId');
+    if (isNil(unitId)) {
+      throw new ValidationFailedError('UnitId is required.');
+    }
     const isDefault = get(_info, 'isDefault', false);
     if (isDefault) hasDefault = isDefault;
     return {
       isDefault,
-      unit: {
-        unitId: get(_info, 'unitId'),
-        exchangeValue: get(_info, 'exchangeValue', 1),
-        barcode: get(_info, 'barcode', ''),
-      },
-      pricing: {
-        cost: get(_info, 'pricing.cost', 0),
-        price: get(_info, 'pricing.price', 0),
-      },
+      unitId: get(_info, 'unitId'),
+      exchangeValue: get(_info, 'exchangeValue', 1),
+      barcode: get(_info, 'barcode', ''),
+      cost: get(_info, 'pricing.cost', 0),
+      price: get(_info, 'pricing.price', 0),
       status: PRODUCT_STATUS.ACTIVE,
     };
   });
@@ -66,10 +66,12 @@ const createProductAction = async (
       productId,
       name,
       aliasName,
-      productGroupId,
-      productPositionId,
-      routeAdministrationId,
+      barcode,
+      typeId,
       manufacturerId,
+      groupId,
+      positionId,
+      routeAdministrationId,
       productDetail,
       productVariants,
     } = req.body;
@@ -84,15 +86,17 @@ const createProductAction = async (
     ]);
 
     const createdProduct = await productService.createProduct({
-        productId,
-        name,
-        aliasName,
-        productGroupId,
-        productPositionId,
-        routeAdministrationId,
-        manufacturerId,
-        productDetail: productInfo,
-        produdctVariants: variantsInfo,
+      productId,
+      name,
+      aliasName,
+      barcode,
+      typeId,
+      manufacturerId,
+      groupId,
+      positionId,
+      routeAdministrationId,
+      productDetail: productInfo,
+      productVariants: variantsInfo,
       });
 
     res.send({
@@ -104,6 +108,49 @@ const createProductAction = async (
   }
 };
 
+const fetchProductListAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const ProductPosition = await productService.fetchProductList();
+    res.send(ProductPosition);
+  } catch (error) {
+    logger.error('fetchProductListAction', error);
+    next(error);
+  }
+};
+
+const updateProductAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    
+  } catch (error) {
+    logger.error('updateProductAction', error);
+    next(error);
+  }
+};
+
+const deleteProductAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    
+  } catch (error) {
+    logger.error('deleteProductAction', error);
+    next(error);
+  }
+};
+
 export default {
   createProductAction,
+  fetchProductListAction,
+  updateProductAction,
+  deleteProductAction,
 };
