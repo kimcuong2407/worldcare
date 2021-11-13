@@ -1,3 +1,11 @@
+## [1.0.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.5...v1.0.6) (2021-11-13)
+
+
+### Bug Fixes
+
+* **supplier:** allow supplierCode input ([0d82026](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0d82026775a529f422f11ebccd0ceb13a1fc36c3))
+* **supplier:** allow supplierCode input ([f84f067](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/f84f06761ce0855d7b1dff86beac24908d994e6f))
+
 ## [1.0.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.4...v1.0.5) (2021-11-10)
 
 
