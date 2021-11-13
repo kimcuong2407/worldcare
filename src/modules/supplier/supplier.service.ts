@@ -1,38 +1,63 @@
 import addressUtil from '@app/utils/address.util';
 import loggerHelper from '@utils/logger.util';
-import {map} from 'lodash';
+import {isNil, map} from 'lodash';
 import get from 'lodash/get';
 import SupplierCollection from './supplier.collection';
 import {SupplierModel} from './supplier.model';
 import makeQuery from '@core/database/query';
 import {SUPPLIER_STATUS} from '@modules/supplier/constant';
+import { InternalServerError } from '@app/core/types/ErrorTypes';
+import { resolve } from 'bluebird';
 
 const logger = loggerHelper.getLogger('supplier.service');
-
-const createSupplier = async (supplierInfo: SupplierModel) => {
-  logger.info(`Creating supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
-  supplierInfo.status = SUPPLIER_STATUS.ACTIVE;
-  supplierInfo.totalPurchase = 0;
-  supplierInfo.currentDebt = 0;
-
-  return await persistSupplier(supplierInfo);
-}
 
 const initsupplierCode = (supplierCodeSeq: number) => {
   let s = '000000000' + supplierCodeSeq;
   return s.substr(s.length - 6);
 }
 
-const persistSupplier = async (supplierInfo: SupplierModel) => {
-  const supplier = await SupplierCollection.create(supplierInfo);
-  supplier.supplierCode = `NCC${initsupplierCode(supplier.supplierCodeSequence)}`;
-  supplier.save();
+const autoIncrease = (record: any) => {
+  record.setNext('supplier_code_sequence', async (err: any, record: any) => {
+    if(err) {
+      return new InternalServerError('Failed to increase supplierCode.');
+    }
+    const supplierCode = `NCC${initsupplierCode(record.supplierCodeSequence)}`
+    const doc = await SupplierCollection.findOne({supplierCode}).exec();
+    if(!isNil(doc)) autoIncrease(record);
+    record.supplierCode = supplierCode;
+    record.save();
+  });
+}
 
-  const {...rest} = get(supplier, '_doc', {});
+const persistSupplier = async (supplierInfo: SupplierModel) => {
+  const supplierCode = get(supplierInfo, 'supplierCode', null);
+  const supplier = await SupplierCollection.create(supplierInfo);
+  
+  if (isNil(supplierCode)) {
+    autoIncrease(supplier);
+  }
+
   return {
-    ...rest,
+    ...get(supplier, '_doc', {}),
   };
 };
+
+const formatSupplier = (supplier: any) => {
+  if (!supplier) {
+    return {};
+  }
+  supplier.address = addressUtil.formatAddressV2(get(supplier, 'address'));
+  return supplier;
+}
+
+const createSupplier = async (supplierInfo: SupplierModel) => {
+  // logger.info(`Creating supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
+  supplierInfo.status = SUPPLIER_STATUS.ACTIVE;
+  supplierInfo.totalPurchase = 0;
+  supplierInfo.currentDebt = 0;
+
+  return await persistSupplier(supplierInfo);
+}
 
 const findSupplierByName = async (name: string) => {
   return makeQuery(SupplierCollection.find({name, deletedAt: null}).exec());
@@ -72,14 +97,6 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
   };
 }
 
-const formatSupplier = (supplier: any) => {
-  if (!supplier) {
-    return {};
-  }
-  supplier.address = addressUtil.formatAddressV2(get(supplier, 'address'));
-  return supplier;
-}
-
 const getSupplierInfo = async (query: any) => {
   const supplier = await SupplierCollection.findOne(query).exec();
   return formatSupplier(supplier);
@@ -108,8 +125,8 @@ const deleteSupplier = async (supplierCode: string) => {
 export default {
   createSupplier,
   findSupplierByName,
+  fetchSuppliers,
   getSupplierInfo,
   updateSupplierInfo,
-  deleteSupplier,
-  fetchSuppliers
+  deleteSupplier
 };
