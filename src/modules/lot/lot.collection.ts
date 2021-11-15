@@ -1,14 +1,18 @@
-import { trimEnd } from 'lodash';
 import mongoose from 'mongoose';
 
-const BatchSchema = new mongoose.Schema({
-  batchId: {
+const LotSchema = new mongoose.Schema({
+  lotNumber: {
     type: String,
     unique: true,
     required: true,
   },
   aliasName: {
     type: String,
+  },
+  productId: {
+    type: String,
+    ref: 'product',
+    required: true,
   },
   productVariantId: {
     type: String,
@@ -20,10 +24,10 @@ const BatchSchema = new mongoose.Schema({
   quanity: Number,
 });
 
-const BatchCollection = mongoose.model(
-  'batch',
-  BatchSchema,
-  'batch',
+const LotCollection = mongoose.model(
+  'lot',
+  LotSchema,
+  'lot',
 );
 
-export default BatchCollection;
+export default LotCollection;

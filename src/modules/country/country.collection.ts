@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import { MANUFACTURER_STATUS } from './constant';
+import { COUNTRY_STATUS } from './constant';
 
-const ManufacturerSchema = new mongoose.Schema(
-  {
+const CountrySchema = new mongoose.Schema({
     name: {
       type: String,
       unique: true,
@@ -16,26 +15,26 @@ const ManufacturerSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: MANUFACTURER_STATUS.ACTIVE,
+      default: COUNTRY_STATUS.ACTIVE,
     },
   },
   {
     timestamps: true,
     toJSON: {
       virtuals: true,
-    },
+   },
   }
 );
 
-ManufacturerSchema.plugin(mongooseIntl, {
+CountrySchema.plugin(mongooseIntl, {
   languages: ['vi', 'en'],
   defaultLanguage: 'vi',
 });
-ManufacturerSchema.plugin(mongoosePaginate);
+CountrySchema.plugin(mongoosePaginate);
 
-export const ManufacturerCollection = mongoose.model(
-  'manufacturer',
-  ManufacturerSchema
+export const CountryCollection = mongoose.model(
+  'country',
+  CountrySchema
 );
 
-export default ManufacturerCollection;
+export default CountryCollection;

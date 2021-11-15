@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { PRODUCT_TYPE_STATUS } from './constant';
 
 const ProductTypeSchema = new mongoose.Schema(
   {
@@ -15,6 +16,7 @@ const ProductTypeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      default: PRODUCT_TYPE_STATUS.ACTIVE,
     },
   },
   {

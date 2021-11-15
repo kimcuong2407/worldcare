@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { PRODUCT_UNIT_STATUS } from './constant';
 
 const ProductUnitSchema = new mongoose.Schema(
   {
@@ -15,6 +16,7 @@ const ProductUnitSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      default: PRODUCT_UNIT_STATUS.ACTIVE,
     },
   },
   {

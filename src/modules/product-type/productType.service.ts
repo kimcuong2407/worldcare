@@ -1,5 +1,6 @@
 import appUtil from '@app/utils/app.util';
 import { map } from 'lodash';
+import { PRODUCT_TYPE_STATUS } from './constant';
 import ProductTypeCollection from './productType.collection';
 
 const createProductType = async (info: any, language = 'vi') => {
@@ -11,7 +12,7 @@ const createProductType = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductType = async (language = 'vi', isRaw = false) => {
+const getProductTypeList = async (language = 'vi', isRaw = false) => {
   let data = await ProductTypeCollection.find({})
     .lean()
     .sort({ index: 1, createdAt: 1 });
@@ -21,13 +22,16 @@ const getProductType = async (language = 'vi', isRaw = false) => {
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const getProductTypeInfo = async (query: any) => {
-  const ProductType = await ProductTypeCollection.findOne(query).exec();
-  return ProductType;
+const getProductTypeInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductTypeCollection.findOne(query).exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updateProductType = async (id: string, ProductType: any) => {
-  const updatedProductType = await ProductTypeCollection.updateOne(
+  return await ProductTypeCollection.updateOne(
     {
       _id: id,
     },
@@ -35,18 +39,20 @@ const updateProductType = async (id: string, ProductType: any) => {
       $set: {
         ...ProductType,
       },
+    },
+    {
+      new: true,
     }
   );
-  return ProductTypeCollection.findById(id);
 };
 
 const deleteProductType = async (id: string) => {
-  return ProductTypeCollection.findByIdAndDelete(id);
+  return ProductTypeCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_TYPE_STATUS.INACTIVE});
 };
 
 export default {
   createProductType,
-  getProductType,
+  getProductTypeList,
   getProductTypeInfo,
   updateProductType,
   deleteProductType,

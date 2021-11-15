@@ -52,7 +52,7 @@ const createManufacturerAction = async (
   }
 };
 
-const fetchManufacturerAction = async (
+const fetchManufacturerListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -60,7 +60,32 @@ const fetchManufacturerAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const manufacturer = await manufacturerService.getManufacturer(
+    const manufacturer = await manufacturerService.getManufacturerList(
+      language,
+      raw
+    );
+    res.send(manufacturer);
+  } catch (error) {
+    logger.error('fetchManufacturerAction', error);
+    next(error);
+  }
+};
+
+const fetchManufacturerActionAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const manufacturer = await manufacturerService.getManufacturerInfo(
+      query,
       language,
       raw
     );
@@ -117,7 +142,8 @@ const deleteManufacturerByIdAction = async (
 
 export default {
   createManufacturerAction,
-  fetchManufacturerAction,
+  fetchManufacturerListAction,
+  fetchManufacturerInfoAction,
   updateManufacturerAction,
   deleteManufacturerByIdAction,
 };

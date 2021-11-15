@@ -53,7 +53,7 @@ const createProductUnitAction = async (
   }
 };
 
-const fetchProductUnitAction = async (
+const fetchProductUnitListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -61,7 +61,32 @@ const fetchProductUnitAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const ProductUnit = await ProductUnitService.getProductUnit(
+    const ProductUnit = await ProductUnitService.getProductUnitList(
+      language,
+      raw
+    );
+    res.send(ProductUnit);
+  } catch (error) {
+    logger.error('fetchProductUnitAction', error);
+    next(error);
+  }
+};
+
+const fetchProductUnitInfoAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const ProductUnit = await ProductUnitService.getProductUnitInfo(
+      query,
       language,
       raw
     );
@@ -118,7 +143,8 @@ const deleteProductUnitByIdAction = async (
 
 export default {
   createProductUnitAction,
-  fetchProductUnitAction,
+  fetchProductUnitListAction,
+  fetchProductUnitInfoAction,
   updateProductUnitAction,
   deleteProductUnitByIdAction,
 };

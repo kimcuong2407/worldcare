@@ -66,7 +66,7 @@ const createProductGroupAction = async (
   }
 };
 
-const fetchProductGroupAction = async (
+const fetchProductGroupListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -84,6 +84,31 @@ const fetchProductGroupAction = async (
     next(error);
   }
 };
+
+const fetchProductGroupInfoAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const productGroup = await productGroupService.getProductGroupInfo(
+      query,
+      language,
+      raw
+    );
+    res.send(productGroup);
+  } catch (error) {
+    logger.error('fetchProductGroupInfoAction', error);
+    next(error);
+  }
+}
 
 const updateProductGroupAction = async (
   req: express.Request,
@@ -131,7 +156,8 @@ const deleteProductGroupByIdAction = async (
 
 export default {
   createProductGroupAction,
-  fetchProductGroupAction,
+  fetchProductGroupListAction,
+  fetchProductGroupInfoAction,
   updateProductGroupAction,
   deleteProductGroupByIdAction,
 };

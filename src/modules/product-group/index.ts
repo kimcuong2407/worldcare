@@ -6,7 +6,8 @@ import productGroupController from './productGroup.controller';
 const productGroupRoutes = (app: express.Application): void => {
   // Product Group
   app.post('/api/v1/product-group', productGroupController.createProductGroupAction);
-  app.get('/api/v1/product-group', productGroupController.fetchProductGroupAction);
+  app.get('/api/v1/product-group', productGroupController.fetchProductGroupListAction);
+  app.get('/api/v1/product-group/:id', productGroupController.fetchProductGroupInfoAction);
   app.put('/api/v1/product-group/:id', productGroupController.updateProductGroupAction);
   app.delete('/api/v1/product-group/:id', productGroupController.deleteProductGroupByIdAction);
 };

@@ -53,7 +53,7 @@ const createProductTypeAction = async (
   }
 };
 
-const fetchProductTypeAction = async (
+const fetchProductTypeListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -61,7 +61,32 @@ const fetchProductTypeAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const ProductType = await ProductTypeService.getProductType(
+    const ProductType = await ProductTypeService.getProductTypeList(
+      language,
+      raw
+    );
+    res.send(ProductType);
+  } catch (error) {
+    logger.error('fetchProductTypeAction', error);
+    next(error);
+  }
+};
+
+const fetchProductTypeInfoAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const ProductType = await ProductTypeService.getProductTypeInfo(
+      query,
       language,
       raw
     );
@@ -118,7 +143,8 @@ const deleteProductTypeByIdAction = async (
 
 export default {
   createProductTypeAction,
-  fetchProductTypeAction,
+  fetchProductTypeListAction,
+  fetchProductTypeInfoAction,
   updateProductTypeAction,
   deleteProductTypeByIdAction,
 };
