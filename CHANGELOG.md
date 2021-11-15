@@ -1,3 +1,10 @@
+# [1.1.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.6...v1.1.0) (2021-11-15)
+
+
+### Features
+
+* jwt token ([1cffc9a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/1cffc9afa19f8492c9df585859ecf5efe40892a2))
+
 ## [1.0.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.5...v1.0.6) (2021-11-13)
 
 
