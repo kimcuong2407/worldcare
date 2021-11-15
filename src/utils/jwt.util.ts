@@ -17,10 +17,11 @@ const signToken = (payload: any) => jwt.sign(payload, privateKey, {
   expiresIn: TOKEN_EXPIRES_IN_SECONDS,
 });
 
-const issueToken = (sub: string, sessionId: string) => signToken(
+const issueToken = (sub: string, partnerId: string, sessionId: string) => signToken(
   {
     sub,
     jti: sessionId,
+    aud: partnerId,
   },
 );
 
@@ -28,9 +29,10 @@ const issueToken = (sub: string, sessionId: string) => signToken(
 const verifyToken = (token: string) => {
   try {
     const tokenDetail: any = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
-    const { jti, sub } = tokenDetail || {};
+    const { jti, sub, aud } = tokenDetail || {};
     return {
       sessionId: jti,
+      partnerId: aud,
       id: sub,
     };
   } catch (error) {

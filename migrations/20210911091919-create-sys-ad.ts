@@ -19,6 +19,7 @@ module.exports = {
         "email": "nguyen.pc@live.com",
         "password": "$2b$05$hu2IgeuXsHRcpNTyRWH.OOWBM1xthYAvEb..Qe/72uq6t/GTSoX6C",
         "branchId": 99999,
+        "partnerId": 99999,
         "groups": [group.ops[0]._id],
         "fullName": "Nguyen Pham",
         "address": { "cityId": "48", "districtId": "490", "wardId": "20195", "street": "Da nang" },
@@ -27,7 +28,7 @@ module.exports = {
       }
     );
 
-    const resources = ['user', 'userGroup'];
+    const resources = ['user', 'userGroup', 'partner', 'customer', 'tradingPartner'];
     const action = ['read', 'update', 'write', 'delete'];
     const permissions: any[] = [];
     forEach(resources, (res) => {

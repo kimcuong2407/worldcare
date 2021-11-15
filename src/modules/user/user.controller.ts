@@ -198,7 +198,7 @@ const registerAction = async (req: express.Request, res: express.Response, next:
     );
     const sessionId = uuidv4();
 
-    const token = jwtUtil.issueToken(get(createdUser, '_id'), sessionId);
+    const token = jwtUtil.issueToken(get(createdUser, '_id'), get(createdUser, 'partnerId'), sessionId);
 
     const auth = {
       userId: get(createdUser, '_id'),
