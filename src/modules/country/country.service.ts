@@ -1,7 +1,7 @@
-import appUtil from "@app/utils/app.util";
-import map from "lodash/map";
-import { COUNTRY_STATUS } from "./constant";
-import CountryCollection from "./country.collection";
+import appUtil from '@app/utils/app.util';
+import map from 'lodash/map';
+import { COUNTRY_STATUS } from './constant';
+import CountryCollection from './country.collection';
 
 const createCountry = async (info: any, language = 'vi') => {
   const created = await CountryCollection.create(info);

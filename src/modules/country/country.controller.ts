@@ -1,4 +1,4 @@
-import loggerHelper from "@app/utils/logger.util";
+import loggerHelper from '@app/utils/logger.util';
 import express from 'express';
 
 const logger = loggerHelper.getLogger('country.controller');
