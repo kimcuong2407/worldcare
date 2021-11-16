@@ -1,3 +1,10 @@
+# [1.2.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.1.0...v1.2.0) (2021-11-16)
+
+
+### Features
+
+* **clinic-service-group:** clinic service gorup management implementation ([88fad0a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/88fad0a088f87adefa929810323599196a6e9d4b))
+
 # [1.1.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.0.6...v1.1.0) (2021-11-15)
 
 
