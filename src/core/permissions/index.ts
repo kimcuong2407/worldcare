@@ -17,6 +17,7 @@ export const CLINIC_RESOURCES = {
   ...CORE_RESOURCES,
   // order: 'order',
   appointment: 'appointment',
+  clinicService: 'clinicService',
 };
 
 export const ROOT_RESOURCES = {
@@ -101,5 +102,9 @@ export const RESOURCES = [
   {
     key: ROOT_RESOURCES.cms,
     name: 'Quản lý CMS',
+  },
+  {
+    key: CLINIC_RESOURCES.clinicService,
+    name: 'Quản lý dịch vụ khám chữa bệnh',
   },
 ]

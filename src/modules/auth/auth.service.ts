@@ -40,7 +40,7 @@ const authenticate = async (login: string, password: string) => {
   if (!isPasswordMatched) {
     throw new UnAuthenticated();
   }
-  const token = jwtUtil.issueToken(get(user, '_id'), sessionId);
+  const token = jwtUtil.issueToken(get(user, '_id'), get(user, 'partnerId'), sessionId);
 
   return {
     userId: get(user, '_id'),
@@ -204,7 +204,7 @@ const staffLogin = async (login: string, password: string, branchId: Number) => 
     throw new UnauthorizedError('Bạn không có quyền truy cập vào trang này.');
   }
 
-  const token = jwtUtil.issueToken(get(user, '_id'), sessionId);
+  const token = jwtUtil.issueToken(get(user, '_id'), get(user, 'partnerId'), sessionId);
 
   return {
     userId: get(user, '_id'),

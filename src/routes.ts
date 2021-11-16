@@ -27,6 +27,7 @@ import productPositionRoutes from './modules/product-position';
 import productUnitRoutes from './modules/product-unit';
 import productRouteAdministrationRoutes from './modules/product-routeadministration';
 import manufacturerRoutes from './modules/manufacturer';
+import serviceGroupRoutes from './modules/clinic-service-group';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -57,4 +58,5 @@ export default (app: express.Application): void => {
   productUnitRoutes(app);
   productRouteAdministrationRoutes(app);
   manufacturerRoutes(app);
+  serviceGroupRoutes(app);
 };
