@@ -5,6 +5,9 @@ import isNil from 'lodash/isNil';
 import { PRODUCT_STATUS } from './constant';
 import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
+import { map } from 'lodash';
+import appUtil from '@app/utils/app.util';
+import { lang } from 'moment';
 
 const initIdSquence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -60,12 +63,20 @@ const createProduct = async (info: any) => {
   }
 }
 
-const fetchProductList = async () => {
-  return await ProductCollection.find({}).lean().exec();
+const fetchProductList = async (language = 'vi', isRaw = false) => {
+  const data = await ProductCollection.find({}).lean().exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
-const fetchProductById = async (productId: string) => {
-  const record = await ProductCollection.findOne({ productId }).exec();
-  return record || {};
+
+const fetchProductInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductCollection.findOne(query).exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updateProduct = async (productId: string, info: any) => {
@@ -137,7 +148,7 @@ export default {
   // Product
   createProduct,
   fetchProductList,
-  fetchProductById,
+  fetchProductInfo,
   updateProduct,
   deleteProduct,
 

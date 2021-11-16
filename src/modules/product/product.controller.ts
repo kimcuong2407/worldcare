@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import { PRODUCT_STATUS, PRODUCT_TYPE } from './constant';
 import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { variantModel } from './productVariant.model';
-import { isEmpty, isNil, omitBy, size } from 'lodash';
+import { isEmpty, isNil, isUndefined, omitBy, size } from 'lodash';
 import productService from './product.service';
 
 const logger = loggerHelper.getLogger('Product.controller');
@@ -18,10 +18,10 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
     case PRODUCT_TYPE.MEDICINE: {
       const medicinetDetail: medicineModel = {
         ingredient: get(data, 'ingredient', ''),
-        dosage: get(data, 'dosage', {}),
+        dosage: get(data, 'dosage', ''),
         medicineCode: get(data, 'medicineCode', ''),
         registrationNo: get(data, 'registrationNo', ''),
-        weight: get(data, 'weight', {}),
+        weight: get(data, 'weight', ''),
         packagingSize: get(data, 'packagingSize', ''),
       }
       return medicinetDetail;
@@ -113,8 +113,13 @@ const fetchProductListAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    const ProductPosition = await productService.fetchProductList();
-    res.send(ProductPosition);
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const list = await productService.fetchProductList(
+      language,
+      raw
+    );
+    res.send(list);
   } catch (error) {
     logger.error('fetchProductListAction', error);
     next(error);
@@ -130,7 +135,7 @@ const updateProductAction = async (
     const productType = get(req, 'query.productType', '');
     const productId = get(req.params, 'productId');
 
-    const isExisted = await productService.fetchProductById(productId);
+    const isExisted = await productService.fetchProductInfo(productId);
     if (isEmpty(isExisted)) {
       throw new NotFoundError();
     }
@@ -177,7 +182,7 @@ const deleteProductAction = async (
 ) => {
   try {
     const productId = get(req.params, 'productId');
-    const isExisted = await productService.fetchProductById(productId);
+    const isExisted = await productService.fetchProductInfo(productId);
     if (isEmpty(isExisted)) {
       throw new NotFoundError();
     }

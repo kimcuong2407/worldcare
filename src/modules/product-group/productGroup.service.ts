@@ -12,7 +12,7 @@ const createProductGroup = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductGroup = async (language = 'vi', isRaw = false) => {
+const getProductGroupList = async (language = 'vi', isRaw = false) => {
   let data = await ProductGroupCollection.find({})
     .lean()
     .sort({ index: 1, createdAt: 1 });
@@ -53,7 +53,7 @@ const deleteProductGroup = async (id: string,) => {
 
 export default {
   createProductGroup,
-  getProductGroup,
+  getProductGroupList,
   getProductGroupInfo,
   updateProductGroup,
   deleteProductGroup,

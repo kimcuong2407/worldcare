@@ -1,15 +1,9 @@
 export interface medicineModel {
   ingredient: String,
-  dosage: {
-    value: Number,
-    unit: String,
-  }
+  dosage: String,
   medicineCode: String,
   registrationNo: String,
-  weight: {
-    value: Number,
-    unit: String,
-  }
+  weight: String,
   packagingSize: String,
 }
 

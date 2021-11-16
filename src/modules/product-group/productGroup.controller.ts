@@ -74,11 +74,11 @@ const fetchProductGroupListAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const productGroup = await productGroupService.getProductGroup(
+    const list = await productGroupService.getProductGroupList(
       language,
       raw
     );
-    res.send(productGroup);
+    res.send(list);
   } catch (error) {
     logger.error('fetchProductGroupAction', error);
     next(error);
