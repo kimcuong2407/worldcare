@@ -38,7 +38,8 @@ const authorizationMiddleware = (rules: Array<[string, string]>) => async (req: 
     req.token = token;
     req.user = {
       id: get(user, 'id'),
-      sessionId: get(user, 'jti'),
+      sessionId: get(user, 'sessionId'),
+      partnerId: get(user, 'partnerId'),
     };
     next();
   } catch (error) {
