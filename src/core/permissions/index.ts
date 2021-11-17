@@ -28,6 +28,7 @@ export const ROOT_RESOURCES = {
   ...CLINIC_RESOURCES,
   partner: 'partner',
   cms: 'cms',
+  supplier: 'supplier'
 }
 
 export const CORE_ACTIONS = {
@@ -116,6 +117,10 @@ export const RESOURCES = [
   },
   {
     key: CLINIC_RESOURCES.purchaseReceipt,
-    name: 'Quản lý nhập kho',
+    name: 'Quản lý nhập kho'
+  },
+  {
+    key: ROOT_RESOURCES.supplier,
+    name: 'Quản lý nhà cung cấp'
   },
 ]

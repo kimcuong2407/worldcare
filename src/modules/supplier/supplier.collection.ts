@@ -9,12 +9,10 @@ const { Schema } = mongoose;
 
 const SupplierSchema = new Schema({
   supplierCode: {
-    type: String,
-    // unique: true // Not use unique from Mongo due to using custom incease
+    type: String
   },
   name: {
-    type: String,
-    unique: true
+    type: String
   },
   supplierCodeSequence: Number,
   phoneNumber: String,
@@ -32,9 +30,11 @@ const SupplierSchema = new Schema({
   currentDebt: Number,
   totalPurchase: Number,
   status: String,
+  partnerId: Number,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date,
+  __v: { type: Number, select: false }
 }, {
   timestamps: true
 });
@@ -45,7 +45,8 @@ SupplierSchema.plugin(AutoIncrement(mongoose), {
   id: 'supplier_code_sequence',
   inc_field: 'supplierCodeSequence',
   start_seq: 1,
-  disable_hooks: true
+  disable_hooks: true,
+  reference_fields: ['partnerId']
 });
 
 const SupplierCollection = mongoose.model('supplier', SupplierSchema, 'supplier');

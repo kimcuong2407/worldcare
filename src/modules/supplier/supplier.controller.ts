@@ -22,6 +22,8 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
       note
     } = req.body;
 
+    const partnerId = req.user.partnerId;
+    
     const supplierInfo: any = {
       supplierCode,
       name,
@@ -31,13 +33,15 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
       address,
       taxIdentificationNumber,
       supplierGroup,
-      note
+      note,
+      partnerId
     };
+    
 
     await validateSupplier(supplierInfo, true);
 
     const data = await supplierService.createSupplier(supplierInfo);
-    logger.info(`Created supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
+    logger.info(`Created supplier with ID=${get(data, '_id')} and name=${data.name}`);
     res.send(data);
   } catch (e) {
     logger.error('Error while creating new supplier', e);
@@ -57,7 +61,7 @@ const validateSupplier = async (supplierInfo: any, isCreating: boolean) => {
   }
 
   if (isCreating) {
-    const supplier = await supplierService.getSupplierInfo({name: supplierInfo.name});
+    const supplier = await supplierService.getSupplierInfo({name: supplierInfo.name, partnerId: supplierInfo.partnerId});
     if (supplier && Object.keys(supplier).length !== 0) {
       throw new ValidationFailedError(`Supplier with name ${supplierInfo.name} is existed.`);
     }
@@ -74,6 +78,8 @@ const validateSupplier = async (supplierInfo: any, isCreating: boolean) => {
 
 const fetchSuppliersAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    const partnerId = req.user.partnerId;
+
     const {keyword, supplierCode, name, phoneNumber, email} = req.query;
     const {page, limit} = appUtil.getPaging(req);
     const options = {
@@ -85,7 +91,8 @@ const fetchSuppliersAction = async (req: express.Request, res: express.Response,
       supplierCode,
       name,
       phoneNumber,
-      email
+      email,
+      partnerId
     }
     const data = await supplierService.fetchSuppliers(supplierQuery, options);
     res.send(data);
@@ -97,12 +104,14 @@ const fetchSuppliersAction = async (req: express.Request, res: express.Response,
 
 const getSupplierByIdAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    let supplierCode = get(req.params, 'supplierCode');
+    const partnerId = req.user.partnerId;
+    let supplierId = get(req.params, 'supplierId');
     const query: any = {
-      supplierCode,
+      _id: supplierId,
+      partnerId
     }
     const supplier = await supplierService.getSupplierInfo(query);
-    if (!supplier) {
+    if (!supplier || Object.keys(supplier).length === 0) {
       throw new NotFoundError();
     }
 
@@ -115,6 +124,8 @@ const getSupplierByIdAction = async (req: express.Request, res: express.Response
 
 const updateSupplierInfoAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    const partnerId = req.user.partnerId;
+
     const {
       name,
       phoneNumber,
@@ -139,18 +150,19 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
     await validateSupplier(supplierInfo, false);
 
-    let supplierCode = get(req.params, 'supplierCode');
+    let supplierId = get(req.params, 'supplierId');
     const query: any = {
-      supplierCode,
+      _id: supplierId,
+      partnerId
     }
     const existedSupplier = await supplierService.getSupplierInfo(query);
-    if (!existedSupplier) {
+    if (!existedSupplier || Object.keys(existedSupplier).length === 0) {
       throw new NotFoundError();
     }
 
     if (existedSupplier.name !== supplierInfo.name) {
       const supplier = await supplierService.getSupplierInfo({
-        '$and': [{name}, {supplierCode: {'$ne': supplierCode}}]
+        '$and': [{name}, {_id: {'$ne': supplierId}}, {partnerId}]
       });
       if (supplier && Object.keys(supplier).length !== 0) {
         throw new ValidationFailedError(`Supplier with name ${name} is existed.`);
@@ -167,16 +179,19 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
 const deleteSupplierAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    let supplierCode = get(req.params, 'supplierCode');
+    const partnerId = req.user.partnerId;
+
+    let supplierId = get(req.params, 'supplierId');
     const query: any = {
-      supplierCode,
+      _id: supplierId,
+      partnerId
     }
     const supplier = await supplierService.getSupplierInfo(query);
-    if (!supplier) {
+    if (!supplier || Object.keys(supplier).length === 0) {
       throw new NotFoundError();
     }
 
-    const data = await supplierService.deleteSupplier(supplierCode);
+    const data = await supplierService.deleteSupplier(supplierId);
     res.send(data);
   } catch (e) {
     logger.error('There was an error while deleting supplier', e);
