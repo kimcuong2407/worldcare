@@ -28,6 +28,8 @@ const ProductVariantSchema = new mongoose.Schema({
   status: {
     type: String,
   }
+}, {
+  timestamps: true,
 });
 
 ProductVariantSchema.plugin(mongoosePaginate);

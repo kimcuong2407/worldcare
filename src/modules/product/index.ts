@@ -9,6 +9,8 @@ const productRoutes = (app: express.Application): void => {
   // app.get('/api/v1/product/:id', productActions.fetchProductInfoAction);
   app.put('/api/v1/product/:id', productActions.updateProductAction);
   app.delete('/api/v1/product/:id', productActions.deleteProductAction);
+
+  app.get('/api/v1/product-variant', productActions.fetchProductVariantListAction);
 };
 
 export default productRoutes;

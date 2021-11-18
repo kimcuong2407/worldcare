@@ -5,9 +5,11 @@ import isNil from 'lodash/isNil';
 import { PRODUCT_STATUS } from './constant';
 import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
-import { map } from 'lodash';
+import { forEach, map, omit, size } from 'lodash';
 import appUtil from '@app/utils/app.util';
 import { lang } from 'moment';
+import Bluebird from 'bluebird';
+import { query } from 'express';
 
 const initIdSquence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -25,12 +27,7 @@ const productAutoIncrease = (record: any, productVariants: any) => {
     record.productId = increasedId;
     record.save();
     
-    productVariants.map(async (detail: any) => {
-      await createProductVariant({
-        productId: increasedId,
-        ...detail,
-      })
-    });
+    Bluebird.map(productVariants, async (detail: any) => await createVariant({ productId: increasedId, ...detail}));
   });
 }
 
@@ -41,12 +38,7 @@ const persistProduct = async (info: any) => {
   if (isNil(productId)) {
     productAutoIncrease(product, productVariants);
   } else {
-    productVariants.map(async (detail: any) => {
-      await createProductVariant({
-        productId,
-        ...detail,
-      });
-    });
+    Bluebird.map(productVariants, async (detail: any) => await createVariant({ productId, ...detail}));
   }
 
   return {
@@ -72,18 +64,23 @@ const fetchProductList = async (language = 'vi', isRaw = false) => {
 };
 
 const fetchProductInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductCollection.findOne(query).exec();
+  const data = await ProductCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const updateProduct = async (productId: string, info: any) => {
-  const record = await ProductCollection.findOneAndUpdate( { productId }, {$set: info }, {new: true}).exec();
-  const {createdAt, updatedAt, ...rest} = get(record, '_doc', {});
+const updateProduct = async (query: any, info: any) => {
+  const productVariants = get(info, 'productVariants');
+  console.log(JSON.stringify(info))
+  const record = await ProductCollection.findOneAndUpdate( query, info, {new: true}).lean().exec();
+  console.log(JSON.stringify(record))
+  const variants = await updateVariants(productVariants);
+  const {createdAt, updatedAt, ...rest} = record;
   return {
     ...rest,
+    variants,
     createdAt: new Date(createdAt).getTime(),
     updatedAt: new Date(updatedAt).getTime(),
   };
@@ -104,7 +101,7 @@ const variantAutoIncrease = (record: any) => {
       return new InternalServerError('Failed to increase ID.');
     }
     const increasedId = `VA${initIdSquence(record.idSequence)}`
-    const doc = await ProductVariantCollection.findOne({increasedId}).exec();
+    const doc = await ProductVariantCollection.findOne({increasedId}).lean().exec();
     if(!isNil(doc)) variantAutoIncrease(record);
     record.variantId = increasedId;
     record.save();
@@ -123,26 +120,96 @@ const persistProductVariant = async (info: any) => {
   }
 }
 
-const createProductVariant = async (info: any) => {
+const createVariant = async (info: any) => {
   info.status = PRODUCT_STATUS.ACTIVE;
   return await persistProductVariant(info);
 };
 
-const fetchProductVariantList = async () => {
+const createVariants = async (info: any) => {
+  const bulkQuery = await Bluebird.map(info, (v: object) => {
+    const data = omitBy(v, isNil);
+    return {
+      insertOne: {
+        document: {
+          ...data
+        }
+      }
+  }});
+  console.log(JSON.stringify(bulkQuery))
+  const created = await ProductVariantCollection.bulkWrite(bulkQuery);
+  const recordIds = created.insertedIds
+  console.log(created.insertedIds);
 
+  return await ProductVariantCollection.find({ variantId: { $in: Object.values(recordIds)}}).lean().exec();
 };
 
-const fetchProductVariantById = async (variantId: string) => {
-
+const updateVariants = async (info: any) => {
+  const bulkQuery = await Bluebird.map(info, (v: object) => {
+    const variantId = get(v, 'variantId');
+    console.log(variantId)
+    const data = omit(v, 'variantId');
+    return {
+      updateMany: {
+        filter: {
+          variantId
+        },
+        update: {
+          $set: data ,
+        }
+      }
+  }});
+  const s = await ProductVariantCollection.bulkWrite(bulkQuery);
+  console.log(s)
+  return await ProductVariantCollection.find({ variantId: { $in: await Bluebird.map(info, (v) => get(v, 'variantId'))}});
 };
 
-const updateProductVariant = async (variantId: string) => {
-
+const fetchProductVariantList = async (params: any, language='vi') => {
+  const { keyword } = params;
+  const query: any = {
+    deletedAt: null,
+  };
+  if (keyword) {
+    query['$text'] = { $search: keyword }
+  }
+  const aggregate = [
+    {
+      $match: query,
+    },
+    {
+      $lookup: {
+        from: 'product_variant',
+        let: {
+          productId: '$productId',
+          status: 'ACTIVE'
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  {
+                    $eq: [
+                      '$productId', '$$productId'
+                    ]
+                  },
+                  {
+                    $eq: [
+                      '$status', '$$status'
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'productVariants'
+      }
+    }
+  ];
+  const list = await ProductCollection.aggregate(aggregate).exec();
+  return list;
 };
 
-const deleteProductVariant = async (variantId: string) => {
-
-};
 
 export default {
   // Product
@@ -153,9 +220,9 @@ export default {
   deleteProduct,
 
   // Variant
-  createProductVariant,
+  createVariant,
+  updateVariants,
+
+  // Product Variant
   fetchProductVariantList,
-  fetchProductVariantById,
-  updateProductVariant,
-  deleteProductVariant,
 }

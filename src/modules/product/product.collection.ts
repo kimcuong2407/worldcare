@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from "mongoose-sequence";
+import { PRODUCT_STATUS } from './constant';
 
 const ProductSchema = new mongoose.Schema({
   productId: {
@@ -11,7 +12,6 @@ const ProductSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true,
   },
   aliasName: String,
   barcode: String,
@@ -39,7 +39,12 @@ const ProductSchema = new mongoose.Schema({
     ref: 'product_route_administration',
   },
   productDetail: Object,
-  status: Boolean,
+  status: {
+    type: String,
+    default: PRODUCT_STATUS.ACTIVE,
+  }
+}, {
+  timestamps: true,
 });
 
 ProductSchema.plugin(mongooseIntl, {

@@ -71,7 +71,7 @@ const fetchManufacturerListAction = async (
   }
 };
 
-const fetchManufacturerActionAction = async (
+const fetchManufacturerInfoAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction

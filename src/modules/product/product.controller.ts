@@ -5,8 +5,9 @@ import get from 'lodash/get';
 import { PRODUCT_STATUS, PRODUCT_TYPE } from './constant';
 import { NotFoundError, ValidationFailedError } from '@app/core/types/ErrorTypes';
 import { variantModel } from './productVariant.model';
-import { isEmpty, isNil, isUndefined, omitBy, size } from 'lodash';
+import { isEmpty, isNil, isUndefined, omit, omitBy, size } from 'lodash';
 import productService from './product.service';
+import Bluebird from 'bluebird';
 
 const logger = loggerHelper.getLogger('Product.controller');
 
@@ -23,7 +24,7 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
         registrationNo: get(data, 'registrationNo', ''),
         weight: get(data, 'weight', ''),
         packagingSize: get(data, 'packagingSize', ''),
-      }
+      };
       return medicinetDetail;
     }
   }
@@ -38,15 +39,17 @@ const transformVariant = async (data: any) => {
     }
     const isDefault = get(_info, 'isDefault', false);
     if (isDefault) hasDefault = isDefault;
-    return {
+    return omitBy({
+      variantId: get(_info, 'variantId', null),
+      productId: get(_info, 'productId', null),
       isDefault,
       unitId: get(_info, 'unitId'),
       exchangeValue: get(_info, 'exchangeValue', 1),
       barcode: get(_info, 'barcode', ''),
       cost: get(_info, 'pricing.cost', 0),
       price: get(_info, 'pricing.price', 0),
-      status: PRODUCT_STATUS.ACTIVE,
-    };
+      status: get(_info, 'status', PRODUCT_STATUS.ACTIVE),
+    }, isNil);
   });
   if (!hasDefault) {
     throw new ValidationFailedError('There must be at least one default variant for this product.');
@@ -133,9 +136,10 @@ const updateProductAction = async (
 ) => {
   try {
     const productType = get(req, 'query.productType', '');
-    const productId = get(req.params, 'productId');
+    const productId = get(req.params, 'id');
+    const query = { productId }
 
-    const isExisted = await productService.fetchProductInfo(productId);
+    const isExisted = await productService.fetchProductInfo(query);
     if (isEmpty(isExisted)) {
       throw new NotFoundError();
     }
@@ -150,11 +154,19 @@ const updateProductAction = async (
       positionId,
       routeAdministrationId,
       productDetail,
+      productVariants,
     } = req.body;
 
-    const productInfo = await transformProduct(productType, productDetail);
+    if (isNil(productVariants) || size(productVariants) <= 0 ) {
+      throw new ValidationFailedError('There must be at least one unit setting for this product.');
+    }
 
-    const record = await productService.updateProduct(productId, omitBy({
+    const [productInfo, variantsInfo] = await Promise.all([
+      transformProduct(productType, productDetail),
+      transformVariant(productVariants),
+    ]);
+    const productQuery = {productId};
+    const record = await productService.updateProduct(productQuery, omitBy({
       name,
       aliasName,
       barcode,
@@ -164,10 +176,14 @@ const updateProductAction = async (
       positionId,
       routeAdministrationId,
       productDetail: productInfo,
+      productVariants: variantsInfo,
     }, isNil));
 
+    // const variants = await productService.updateVariants(variantsQuery, Bluebird.map(variantsInfo, (v) => omit(variantsInfo, 'variantId')));
+    // const variants = await productService.updateVariants(variantsInfo);
+
     res.send({
-      record,
+      ...record,
     });
   } catch (error) {
     logger.error('updateProductAction', error);
@@ -181,7 +197,7 @@ const deleteProductAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    const productId = get(req.params, 'productId');
+    const productId = get(req.params, 'id');
     const isExisted = await productService.fetchProductInfo(productId);
     if (isEmpty(isExisted)) {
       throw new NotFoundError();
@@ -195,9 +211,29 @@ const deleteProductAction = async (
   }
 };
 
+const fetchProductVariantListAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    // let branchId = get(req.query, 'branchId') || req.companyId;
+    const language: string = get(req, 'language');
+    const keyword = get(req.query, 'keyword');
+    const list = await productService.fetchProductVariantList({ keyword }, language);
+    res.send(list);
+  } catch (error) {
+    logger.error('fetchProductVariantListAction', error);
+    next(error);
+  }
+}
+
 export default {
+  // Product
   createProductAction,
   fetchProductListAction,
   updateProductAction,
   deleteProductAction,
+
+  fetchProductVariantListAction,
 };
