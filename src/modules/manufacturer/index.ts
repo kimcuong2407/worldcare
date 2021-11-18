@@ -6,7 +6,8 @@ import manufacturerController from './manufacturer.controller';
 const manufacturerRoutes = (app: express.Application): void => {
   // Manufacturer
   app.post('/api/v1/manufacturer', manufacturerController.createManufacturerAction);
-  app.get('/api/v1/manufacturer', manufacturerController.fetchManufacturerAction);
+  app.get('/api/v1/manufacturer', manufacturerController.fetchManufacturerListAction);
+  app.get('/api/v1/manufacturer/:id', manufacturerController.fetchManufacturerInfoAction);
   app.put('/api/v1/manufacturer/:id', manufacturerController.updateManufacturerAction);
   app.delete('/api/v1/manufacturer/:id', manufacturerController.deleteManufacturerByIdAction);
 };

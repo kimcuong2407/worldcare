@@ -1,5 +1,6 @@
 import appUtil from '@app/utils/app.util';
 import { map } from 'lodash';
+import { PRODUCT_ROUTE_ADMINISTRATION_STATUS } from './constant';
 import ProductRouteAdministrationCollection from './productRouteAdministration.collection';
 
 const createProductRouteAdministration = async (info: any, language = 'vi') => {
@@ -13,7 +14,7 @@ const createProductRouteAdministration = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductRouteAdministration = async (
+const getProductRouteAdministrationList = async (
   language = 'vi',
   isRaw = false
 ) => {
@@ -26,18 +27,21 @@ const getProductRouteAdministration = async (
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const getProductRouteAdministrationInfo = async (query: any) => {
-  const productPosition = await ProductRouteAdministrationCollection.findOne(
+const getProductRouteAdministrationInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductRouteAdministrationCollection.findOne(
     query
   ).exec();
-  return productPosition;
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updateProductRouteAdministration = async (
   id: string,
   ProductPosition: any
 ) => {
-  const updatedProductPosition = await ProductRouteAdministrationCollection.updateOne(
+  return await ProductRouteAdministrationCollection.updateOne(
     {
       _id: id,
     },
@@ -45,18 +49,18 @@ const updateProductRouteAdministration = async (
       $set: {
         ...ProductPosition,
       },
-    }
+    },
+    { new: true }
   );
-  return ProductRouteAdministrationCollection.findById(id);
 };
 
 const deleteProductRouteAdministration = async (id: string) => {
-  return ProductRouteAdministrationCollection.findByIdAndDelete(id);
+  return ProductRouteAdministrationCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_ROUTE_ADMINISTRATION_STATUS.INACTIVE});
 };
 
 export default {
   createProductRouteAdministration,
-  getProductRouteAdministration,
+  getProductRouteAdministrationList,
   getProductRouteAdministrationInfo,
   updateProductRouteAdministration,
   deleteProductRouteAdministration,

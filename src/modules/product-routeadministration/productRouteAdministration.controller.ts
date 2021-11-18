@@ -55,7 +55,7 @@ const createProductRouteAdministrationAction = async (
   }
 };
 
-const fetchProductRouteAdministrationAction = async (
+const fetchProductRouteAdministrationListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -63,13 +63,38 @@ const fetchProductRouteAdministrationAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const ProductPosition = await productRouteAdministrationService.getProductRouteAdministration(
+    const ProductPosition = await productRouteAdministrationService.getProductRouteAdministrationList(
       language,
       raw
     );
     res.send(ProductPosition);
   } catch (error) {
     logger.error('fetchProductRouteAdministrationAction', error);
+    next(error);
+  }
+};
+
+const fetchProductRouteAdministrationInfoAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const ProductPosition = await productRouteAdministrationService.getProductRouteAdministrationInfo(
+      query,
+      language,
+      raw
+    );
+    res.send(ProductPosition);
+  } catch (error) {
+    logger.error('fetchProductRouteAdministrationInfoAction', error);
     next(error);
   }
 };
@@ -120,7 +145,8 @@ const deleteProductRouteAdministrationByIdAction = async (
 
 export default {
   createProductRouteAdministrationAction,
-  fetchProductRouteAdministrationAction,
+  fetchProductRouteAdministrationListAction,
+  fetchProductRouteAdministrationInfoAction,
   updateProductRouteAdministrationAction,
   deleteProductRouteAdministrationByIdAction,
 };

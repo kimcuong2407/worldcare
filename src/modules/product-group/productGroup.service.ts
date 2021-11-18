@@ -1,5 +1,6 @@
 import appUtil from '@app/utils/app.util';
 import { map } from 'lodash';
+import { PRODUCT_GROUP_STATUS } from './constant';
 import ProductGroupCollection from './productGroup.collection';
 
 const createProductGroup = async (info: any, language = 'vi') => {
@@ -11,7 +12,7 @@ const createProductGroup = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductGroup = async (language = 'vi', isRaw = false) => {
+const getProductGroupList = async (language = 'vi', isRaw = false) => {
   let data = await ProductGroupCollection.find({})
     .lean()
     .sort({ index: 1, createdAt: 1 });
@@ -21,16 +22,19 @@ const getProductGroup = async (language = 'vi', isRaw = false) => {
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const getProductGroupInfo = async (query: any) => {
-  const productGroup = await ProductGroupCollection.findOne(query).exec();
-  return productGroup;
+const getProductGroupInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductGroupCollection.findOne(query).exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 }
 
 const updateProductGroup = async (
   id: string,
   info: any
 ) => {
-  const updatedProductGroup = await ProductGroupCollection.updateOne(
+  return await ProductGroupCollection.findOneAndUpdate(
     {
       _id: id,
     },
@@ -38,18 +42,18 @@ const updateProductGroup = async (
       $set: {
         ...info,
       },
-    }
+    },
+    { new: true }
   );
-  return ProductGroupCollection.findById(id);
 };
 
 const deleteProductGroup = async (id: string,) => {
-  return ProductGroupCollection.findByIdAndDelete(id);
+  return ProductGroupCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_GROUP_STATUS.INACTIVE});
 }
 
 export default {
   createProductGroup,
-  getProductGroup,
+  getProductGroupList,
   getProductGroupInfo,
   updateProductGroup,
   deleteProductGroup,

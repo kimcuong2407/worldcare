@@ -53,7 +53,7 @@ const createProductPositionAction = async (
   }
 };
 
-const fetchProductPositionAction = async (
+const fetchProductPositionListAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -61,7 +61,7 @@ const fetchProductPositionAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const ProductPosition = await ProductPositionService.getProductPosition(
+    const ProductPosition = await ProductPositionService.getProductPositionList(
       language,
       raw
     );
@@ -71,6 +71,31 @@ const fetchProductPositionAction = async (
     next(error);
   }
 };
+
+const fetchProductPositionInfoAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const raw: boolean = !isUndefined(get(req.query, 'raw'));
+    const language: string = get(req, 'language');
+    const id = get(req.params, 'id');
+    if (isNil(id)) {
+      throw new ValidationFailedError('id is required.');
+    }
+    const query = { _id: id };
+    const ProductPosition = await ProductPositionService.getProductPositionInfo(
+      query,
+      language,
+      raw
+    );
+    res.send(ProductPosition);
+  } catch (error) {
+    logger.error('fetchProductPositionInfoAction', error);
+    next(error);
+  }
+}
 
 const updateProductPositionAction = async (
   req: express.Request,
@@ -118,7 +143,8 @@ const deleteProductPositionByIdAction = async (
 
 export default {
   createProductPositionAction,
-  fetchProductPositionAction,
+  fetchProductPositionListAction,
+  fetchProductPositionInfoAction,
   updateProductPositionAction,
   deleteProductPositionByIdAction,
 };

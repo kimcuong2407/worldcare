@@ -1,5 +1,6 @@
 import appUtil from '@app/utils/app.util';
 import { map } from 'lodash';
+import { MANUFACTURER_STATUS } from './constant';
 import ManufacturerCollection from './manufacturer.collection';
 
 const createManufacturer = async (info: any, language = 'vi') => {
@@ -11,7 +12,7 @@ const createManufacturer = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getManufacturer = async (language = 'vi', isRaw = false) => {
+const getManufacturerList = async (language = 'vi', isRaw = false) => {
   let data = await ManufacturerCollection.find({})
     .lean()
     .sort({ index: 1, createdAt: 1 });
@@ -21,9 +22,12 @@ const getManufacturer = async (language = 'vi', isRaw = false) => {
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const getManufacturerInfo = async (query: any) => {
-  const manufacturer = await ManufacturerCollection.findOne(query).exec();
-  return manufacturer;
+const getManufacturerInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ManufacturerCollection.findOne(query).exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updateManufacturer = async (id: string, manufacturer: any) => {
@@ -41,12 +45,12 @@ const updateManufacturer = async (id: string, manufacturer: any) => {
 };
 
 const deleteManufacturer = async (id: string) => {
-  return ManufacturerCollection.findByIdAndDelete(id);
+  return ManufacturerCollection.findOneAndUpdate({_id: id}, {status: MANUFACTURER_STATUS.INACTIVE});
 };
 
 export default {
   createManufacturer,
-  getManufacturer,
+  getManufacturerList,
   getManufacturerInfo,
   updateManufacturer,
   deleteManufacturer,

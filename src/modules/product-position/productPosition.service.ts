@@ -1,5 +1,6 @@
 import appUtil from '@app/utils/app.util';
 import { map } from 'lodash';
+import { PRODUCT_POSITION_STATUS } from './constant';
 import ProductPositionCollection from './productPosition.collection';
 
 const createProductPosition = async (info: any, language = 'vi') => {
@@ -11,7 +12,7 @@ const createProductPosition = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductPosition = async (language = 'vi', isRaw = false) => {
+const getProductPositionList = async (language = 'vi', isRaw = false) => {
   let data = await ProductPositionCollection.find({})
     .lean()
     .sort({ index: 1, createdAt: 1 });
@@ -21,13 +22,16 @@ const getProductPosition = async (language = 'vi', isRaw = false) => {
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const getProductPositionInfo = async (query: any) => {
-  const productPosition = await ProductPositionCollection.findOne(query).exec();
-  return productPosition;
+const getProductPositionInfo = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductPositionCollection.findOne(query).exec();
+  if (isRaw) {
+    return data;
+  }
+  return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
 const updateProductPosition = async (id: string, ProductPosition: any) => {
-  const updatedProductPosition = await ProductPositionCollection.updateOne(
+  return await ProductPositionCollection.updateOne(
     {
       _id: id,
     },
@@ -35,18 +39,18 @@ const updateProductPosition = async (id: string, ProductPosition: any) => {
       $set: {
         ...ProductPosition,
       },
-    }
+    },
+    { new: true }
   );
-  return ProductPositionCollection.findById(id);
 };
 
 const deleteProductPosition = async (id: string) => {
-  return ProductPositionCollection.findByIdAndDelete(id);
+  return ProductPositionCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_POSITION_STATUS.INACTIVE});
 };
 
 export default {
   createProductPosition,
-  getProductPosition,
+  getProductPositionList,
   getProductPositionInfo,
   updateProductPosition,
   deleteProductPosition,
