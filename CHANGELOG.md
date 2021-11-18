@@ -1,3 +1,16 @@
+## [1.2.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.0...v1.2.1) (2021-11-18)
+
+
+### Bug Fixes
+
+* **country:** fetch product variant and support update variant in update product ([353e349](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/353e3491c6c2afdb7002287ca536e725f367b550))
+* **country:** fix syntax ([c08ffac](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/c08ffac23324d5f485fc3057da058dba25457564))
+* **country:** fix updated schema ([cb7dfed](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/cb7dfedfd18dba8371fa557026ca501e62ca8275))
+* **product-config:** update api fetch info ([48a78bb](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/48a78bbaac1a048c8d442199b2fbb62b1d692749))
+* **product-variant:** update create api ([9ff883a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/9ff883af558eb3e9e55b9617df6c30f104d1cf76))
+* **product-variant:** update create api ([2c9f4e3](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2c9f4e30502606f0c92588253d42d922038c6d37))
+* **product-variant:** update create api ([64feb44](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/64feb441a124c4d1be8cb07b1a857d4497f1c7ca))
+
 # [1.2.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.1.0...v1.2.0) (2021-11-16)
 
 
