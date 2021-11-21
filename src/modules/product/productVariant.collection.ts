@@ -37,6 +37,7 @@ ProductVariantSchema.plugin(mongooseAggregatePaginate);
 ProductVariantSchema.plugin(AutoIncrement(mongoose), {
   id: 'variant_id_sequence',
   inc_field: 'idSequence',
+  reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true
 });

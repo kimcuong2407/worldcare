@@ -1,13 +1,44 @@
+import { InternalServerError } from "@app/core/types/ErrorTypes";
 import { AnyLengthString } from "aws-sdk/clients/comprehend";
+import get from "lodash/get";
+import isNil from "lodash/isNil";
 import { PURCHASE_ORDER_STATUS } from "./constant";
 import PurchaseOrderCollection from "./purchase-order.collection";
 
-const createPurchaseOrder = async (info: any) => {
-  const created  = await PurchaseOrderCollection.create(info);
-  const record = await PurchaseOrderCollection.findOne({
-    _id: created._id,
+
+const initIdSquence = (idSequence: number) => {
+  let s = '000000000' + idSequence;
+  return s.substr(s.length - 6);
+}
+
+const invoiceAutoIncrease = (record: any) => {
+  record.setNext('purchase_order_id_sequence', async (err: any, record: any) => {
+    if(err) {
+      return new InternalServerError('Failed to increase ID.');
+    }
+    const increasedId = `HD${initIdSquence(record.idSequence)}`
+    const doc = await PurchaseOrderCollection.findOne({increasedId}).lean().exec();
+    if(!isNil(doc)) invoiceAutoIncrease(record);
+    record.variantId = increasedId;
+    record.save();
   });
-  return record;
+}
+
+const persistsInvoice = async (info: any) => {
+  const code = get(info, 'code', null);
+  const invoice = await PurchaseOrderCollection.create(info);
+  if (isNil(code)) {
+    invoiceAutoIncrease(invoice);
+  }
+
+  return {
+    ...get(invoice, '_doc', {})
+  }
+}
+
+const createPurchaseOrder = async (info: any) => {
+  info.status = PURCHASE_ORDER_STATUS.ACTIVE;
+  return await persistsInvoice(info);
 };
 
 const fetchPurchaseOrderListByQuery = async (query: any) => {

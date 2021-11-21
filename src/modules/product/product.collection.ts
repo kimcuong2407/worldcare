@@ -55,6 +55,7 @@ ProductSchema.plugin(mongoosePaginate);
 ProductSchema.plugin(AutoIncrement(mongoose), {
   id: 'product_id_sequence',
   inc_field: 'idSequence',
+  reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true
 })

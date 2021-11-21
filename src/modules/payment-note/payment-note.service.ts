@@ -1,12 +1,44 @@
+import { InternalServerError } from "@app/core/types/ErrorTypes";
+import get from "lodash/get";
+import isNil from "lodash/isNil";
 import { PAYMENT_NOTE_STATUS } from "./constant";
 import PaymentNoteCollection from "./payment-note.collection";
 
-const createPaymentNote = async (info: any) => {
-  const created  = await PaymentNoteCollection.create(info);
-  const record = await PaymentNoteCollection.findOne({
-    _id: created._id,
+
+const initIdSquence = (idSequence: number) => {
+  let s = '000000000' + idSequence;
+  return s.substr(s.length - 6);
+}
+
+const paymentNoteAutoIncrease = (record: any, type: string) => {
+  record.setNext('variant_id_sequence', async (err: any, record: any) => {
+    if(err) {
+      return new InternalServerError('Failed to increase ID.');
+    }
+    const increasedId = `${type}${initIdSquence(record.idSequence)}`
+    const doc = await PaymentNoteCollection.findOne({increasedId}).lean().exec();
+    if(!isNil(doc)) paymentNoteAutoIncrease(record, type);
+    record.variantId = increasedId;
+    record.save();
   });
-  return record;
+}
+
+const persistsPaymnentNote = async (info: any, type: string) => {
+  const code = get(info, 'code', null);
+  const invoice = await PaymentNoteCollection.create(info);
+  if (isNil(code)) {
+    paymentNoteAutoIncrease(invoice, type);
+  }
+
+  return {
+    ...get(invoice, '_doc', {})
+  }
+}
+
+const createPaymentNote = async (info: any) => {
+  const type = get(info, 'type');
+  info.status = PAYMENT_NOTE_STATUS.ACTIVE;
+  return await persistsPaymnentNote(info, type);
 };
 
 const fetchPaymentNoteListByQuery = async (query: any) => {
