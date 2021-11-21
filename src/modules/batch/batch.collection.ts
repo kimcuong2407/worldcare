@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
-const LotSchema = new mongoose.Schema({
+const BatchSchema = new mongoose.Schema({
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   lotNumber: {
     type: String,
     unique: true,
@@ -14,7 +19,7 @@ const LotSchema = new mongoose.Schema({
     ref: 'product',
     required: true,
   },
-  productVariantId: {
+  variantId: {
     type: String,
     ref: 'product_variant',
     required: true,
@@ -22,12 +27,16 @@ const LotSchema = new mongoose.Schema({
   expirationDate: Date,
   status: String,
   quanity: Number,
+}, {
+  timestamps: true,
 });
 
+BatchSchema.plugin(mongoosePaginate);
+
 const LotCollection = mongoose.model(
-  'lot',
-  LotSchema,
-  'lot',
+  'batch',
+  BatchSchema,
+  'batch',
 );
 
 export default LotCollection;

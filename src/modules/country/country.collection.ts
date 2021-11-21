@@ -6,7 +6,6 @@ import { COUNTRY_STATUS } from './constant';
 const CountrySchema = new mongoose.Schema({
     name: {
       type: String,
-      unique: true,
       required: true,
     },
     description: {
