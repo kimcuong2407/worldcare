@@ -1,3 +1,10 @@
+# [1.3.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.2...v1.3.0) (2021-11-21)
+
+
+### Features
+
+* saerch medicine ([5a841c5](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/5a841c571e3441c9724411796af2402f8c784f8b))
+
 ## [1.2.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.1...v1.2.2) (2021-11-21)
 
 
