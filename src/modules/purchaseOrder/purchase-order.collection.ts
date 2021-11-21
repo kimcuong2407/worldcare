@@ -28,7 +28,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
-  recieverById: {
+  receiverById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   }, 
@@ -37,7 +37,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     ref: 'branch'
   },
   purchaseOrderDetail: [PurchaseOrderDetail],
-  paymentNote: {
+  paymentNoteId: {
     type: mongoose.Types.ObjectId,
     ref: 'payment_note'
   },
