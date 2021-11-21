@@ -228,6 +228,26 @@ const fetchProductVariantListAction = async (
   }
 }
 
+
+const searchMedicineAction = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    // let branchId = get(req.query, 'branchId') || req.companyId;
+    const keyword = get(req.query, 'keyword');
+    if(!keyword) {
+      throw new ValidationFailedError('Vui lòng nhập vào keyword.');
+    }
+
+    const list = await productService.searchMedicines(keyword);
+    res.send(list);
+  } catch (error) {
+    logger.error('searchMedicineAction', error);
+    next(error);
+  }
+}
 export default {
   // Product
   createProductAction,
@@ -236,4 +256,5 @@ export default {
   deleteProductAction,
 
   fetchProductVariantListAction,
+  searchMedicineAction,
 };

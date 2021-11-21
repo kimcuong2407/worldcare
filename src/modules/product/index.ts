@@ -11,6 +11,8 @@ const productRoutes = (app: express.Application): void => {
   app.delete('/api/v1/product/:id', productActions.deleteProductAction);
 
   app.get('/api/v1/product-variant', productActions.fetchProductVariantListAction);
+
+  app.get('/api/v1/medicine/search', productActions.searchMedicineAction);
 };
 
 export default productRoutes;

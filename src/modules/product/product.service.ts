@@ -10,6 +10,7 @@ import appUtil from '@app/utils/app.util';
 import { lang } from 'moment';
 import Bluebird from 'bluebird';
 import { query } from 'express';
+import MedicineCollection from './medicine.collection';
 
 const initIdSquence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -210,6 +211,15 @@ const fetchProductVariantList = async (params: any, language='vi') => {
   return list;
 };
 
+const searchMedicines = (keyword: string) => {
+  return MedicineCollection.find({
+    $text: {
+      $search: keyword
+    },
+    
+  }, {'score': {'$meta': 'textScore'}}).sort({score:{$meta:'textScore'}}).limit(10).lean().exec();
+}
+
 
 export default {
   // Product
@@ -225,4 +235,6 @@ export default {
 
   // Product Variant
   fetchProductVariantList,
+
+  searchMedicines,
 }
