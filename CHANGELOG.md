@@ -1,3 +1,11 @@
+## [1.2.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.1...v1.2.2) (2021-11-21)
+
+
+### Bug Fixes
+
+* **country:** update country controller ([881521d](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/881521db2472e8275dfc86b8f7f6d5559fb0d28b))
+* **nhapkhobanhang:** schema ([2016d60](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2016d60cb97d9befc5504c1735ad35b14902dc17))
+
 ## [1.2.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.0...v1.2.1) (2021-11-18)
 
 
