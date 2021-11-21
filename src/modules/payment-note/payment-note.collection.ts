@@ -8,16 +8,16 @@ const PaymentNoteSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'branch'
   },
-  supplier: String,
-  customer: {
+  supplierId: String,
+  customerId: {
     type: mongoose.Types.ObjectId,
     ref: 'customer',
   },
-  involvedBy: {
+  involvedById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
-  createdBy: {
+  createdById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
