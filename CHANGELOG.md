@@ -1,3 +1,19 @@
+# [1.4.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.3.0...v1.4.0) (2021-11-22)
+
+
+### Bug Fixes
+
+* **autoincrease:** support auto increase code ([0446a70](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0446a7085a9bcc963a56c5361dac92108724c1c9))
+* **branch:** update branchID ([0b3c650](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0b3c6503f2c86d5c6d6da5b1d5e634c15a1a5737))
+* **paymentnote:** apis paymentnote ([2f21745](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2f21745acfba0125eb64117c4ca96da651bfb2a9))
+* **productgroup:** add populate ([d3c4da7](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/d3c4da71429854bf74c996b19ce082b5dd492d52))
+* **purchaseorder:** apis purchaseorder ([8694e33](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/8694e330840979e11897a952b88de5d3c9df98ea))
+
+
+### Features
+
+* **purchase-receipt:** purchase receipt implementaton ([0824032](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0824032bcdbfa59a8c28d50b1bc490ceb2dc753b))
+
 # [1.3.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.2.2...v1.3.0) (2021-11-21)
 
 
