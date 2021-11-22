@@ -56,8 +56,8 @@ const createProduct = async (info: any) => {
   }
 }
 
-const fetchProductList = async (language = 'vi', isRaw = false) => {
-  const data = await ProductCollection.find({}).lean().exec();
+const fetchProductList = async (query: any, language = 'vi', isRaw = false) => {
+  const data = await ProductCollection.find(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -87,10 +87,8 @@ const updateProduct = async (query: any, info: any) => {
   };
 };
 
-const deleteProduct = async (productId: string) => {
-  await ProductCollection.findOneAndUpdate({
-    productId
-  }, {deletedAt: new Date(), status: PRODUCT_STATUS.INACTIVE});
+const deleteProduct = async (query: any) => {
+  await ProductCollection.findOneAndUpdate(query, {deletedAt: new Date(), status: PRODUCT_STATUS.INACTIVE});
 
   return true;
 };
@@ -165,8 +163,9 @@ const updateVariants = async (info: any) => {
 };
 
 const fetchProductVariantList = async (params: any, language='vi') => {
-  const { keyword } = params;
+  const { keyword, branchId } = params;
   const query: any = {
+    branchId,
     deletedAt: null,
   };
   if (keyword) {

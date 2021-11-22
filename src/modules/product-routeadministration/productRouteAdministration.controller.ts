@@ -37,11 +37,13 @@ const createProductRouteAdministrationAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const { name, description, status } = req.body;
     const info = {
       name,
       description,
       status: status || PRODUCT_ROUTE_ADMINISTRATION_STATUS.ACTIVE,
+      branchId,
     };
     await validateProductRouteAdministration(info);
 
@@ -61,9 +63,12 @@ const fetchProductRouteAdministrationListAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { branchId };
     const ProductPosition = await productRouteAdministrationService.getProductRouteAdministrationList(
+      query,
       language,
       raw
     );
@@ -80,13 +85,14 @@ const fetchProductRouteAdministrationInfoAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
     const id = get(req.params, 'id');
     if (isNil(id)) {
       throw new ValidationFailedError('id is required.');
     }
-    const query = { _id: id };
+    const query = { _id: id, branchId };
     const ProductPosition = await productRouteAdministrationService.getProductRouteAdministrationInfo(
       query,
       language,
@@ -105,6 +111,7 @@ const updateProductRouteAdministrationAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const id = get(req.params, 'id');
     const { name, description, status } = req.body;
     const info = {
@@ -115,7 +122,7 @@ const updateProductRouteAdministrationAction = async (
     await validateProductRouteAdministration(info);
 
     const ProductPosition = await productRouteAdministrationService.updateProductRouteAdministration(
-      id,
+      { _id: id, branchId },
       omitBy(info, isNil)
     );
 

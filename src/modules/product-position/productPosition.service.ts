@@ -12,8 +12,8 @@ const createProductPosition = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductPositionList = async (language = 'vi', isRaw = false) => {
-  let data = await ProductPositionCollection.find({})
+const getProductPositionList = async (query: any, language = 'vi', isRaw = false) => {
+  let data = await ProductPositionCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -30,11 +30,9 @@ const getProductPositionInfo = async (query: any, language = 'vi', isRaw = false
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const updateProductPosition = async (id: string, ProductPosition: any) => {
+const updateProductPosition = async (query: any, ProductPosition: any) => {
   return await ProductPositionCollection.updateOne(
-    {
-      _id: id,
-    },
+    query,
     {
       $set: {
         ...ProductPosition,

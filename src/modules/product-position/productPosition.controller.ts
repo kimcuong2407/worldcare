@@ -35,11 +35,13 @@ const createProductPositionAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const { name, description, status } = req.body;
     const info = {
       name,
       description,
       status: status || PRODUCT_POSITION_STATUS.ACTIVE,
+      branchId,
     };
     await validateProductPosition(info);
 
@@ -59,9 +61,12 @@ const fetchProductPositionListAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { branchId };
     const ProductPosition = await ProductPositionService.getProductPositionList(
+      query,
       language,
       raw
     );
@@ -78,13 +83,14 @@ const fetchProductPositionInfoAction = async (
   next: express.NextFunction,
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
     const id = get(req.params, 'id');
     if (isNil(id)) {
       throw new ValidationFailedError('id is required.');
     }
-    const query = { _id: id };
+    const query = { _id: id, branchId };
     const ProductPosition = await ProductPositionService.getProductPositionInfo(
       query,
       language,
@@ -103,6 +109,7 @@ const updateProductPositionAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const id = get(req.params, 'id');
     const { name, description, status } = req.body;
     const info = {
@@ -113,7 +120,7 @@ const updateProductPositionAction = async (
     await validateProductPosition(info);
 
     const ProductPosition = await ProductPositionService.updateProductPosition(
-      id,
+      { _id: id, branchId },
       omitBy(info, isNil)
     );
 

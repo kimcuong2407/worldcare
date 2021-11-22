@@ -18,6 +18,8 @@ export const CLINIC_RESOURCES = {
   // order: 'order',
   appointment: 'appointment',
   clinicService: 'clinicService',
+  inventory: 'inventory',
+  purchaseReceipt: 'purchaseReceipt'
 };
 
 export const ROOT_RESOURCES = {

@@ -15,10 +15,11 @@ const createProductRouteAdministration = async (info: any, language = 'vi') => {
 };
 
 const getProductRouteAdministrationList = async (
+  query: any,
   language = 'vi',
   isRaw = false
 ) => {
-  let data = await ProductRouteAdministrationCollection.find({})
+  let data = await ProductRouteAdministrationCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -38,13 +39,11 @@ const getProductRouteAdministrationInfo = async (query: any, language = 'vi', is
 };
 
 const updateProductRouteAdministration = async (
-  id: string,
+  query: any,
   ProductPosition: any
 ) => {
   return await ProductRouteAdministrationCollection.updateOne(
-    {
-      _id: id,
-    },
+    query,
     {
       $set: {
         ...ProductPosition,

@@ -1,4 +1,10 @@
-export enum PAYMENTNOTE_STATUS {
+export enum PAYMENT_NOTE_STATUS {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
 }
+
+export enum PAYMENT_NOTE_TYPE {
+  PAYMENT = 'PAYMENT',
+  RECEIPT = 'RECEIPT',
+}
+

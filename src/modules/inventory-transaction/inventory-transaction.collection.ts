@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import HospitalCollection from "@modules/hospital/hospital.collection";
 
-const InventoryTransactionScheam = new mongoose.Schema({
+const InventoryTransactionSchema = new mongoose.Schema({
   type: String,
   supplierId: String,
   customerId: {
@@ -8,16 +9,26 @@ const InventoryTransactionScheam = new mongoose.Schema({
     ref: 'customer',
   },
   partnerId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'partner'
   },
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   productId: String,
+  batchId: String,
   variantId: String,
   quantity: Number,
+  referenceDocId: String
 }, {
   timestamps: true,
 });
+
+const InventoryTransactionCollection = mongoose.model(
+  'inventory_transaction',
+  InventoryTransactionSchema,
+  'inventory_transaction'
+);
+
+export default InventoryTransactionCollection;

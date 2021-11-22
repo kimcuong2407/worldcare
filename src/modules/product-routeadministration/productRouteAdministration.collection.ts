@@ -18,6 +18,10 @@ const ProductRouteAdministrationSchema = new mongoose.Schema(
       type: String,
       default: PRODUCT_ROUTE_ADMINISTRATION_STATUS.ACTIVE,
     },
+    branchId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'branch'
+    },
   },
   {
     timestamps: true,

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import AutoIncrement from "mongoose-sequence";
 
 const PurchaseOrderDetail = new mongoose.Schema({
   variantId: {
@@ -22,22 +23,23 @@ const PurchaseOrderSchema = new mongoose.Schema({
   code: {
     type: String,
   },
+  idSequence: Number,
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   supplierCode: String,
 
   createdById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
-  recieverById: {
+  receiverById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   }, 
-  branchId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'branch'
-  },
   purchaseOrderDetail: [PurchaseOrderDetail],
-  paymentNote: {
+  paymentNoteId: {
     type: mongoose.Types.ObjectId,
     ref: 'payment_note'
   },
@@ -49,6 +51,13 @@ const PurchaseOrderSchema = new mongoose.Schema({
 
 
 PurchaseOrderSchema.plugin(mongoosePaginate);
+PurchaseOrderSchema.plugin(AutoIncrement(mongoose), {
+  id: 'purchase_order_id_sequence',
+  inc_field: 'idSequence',
+  reference_fields: ['branchId'],
+  start_seq: 1,
+  disable_hooks: true
+});
 
 const PurchaseOrderCollection = mongoose.model(
   'purchase_order',

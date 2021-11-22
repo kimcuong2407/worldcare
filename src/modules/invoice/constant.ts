@@ -1,0 +1,4 @@
+export enum INVOICE_STATUS {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+};

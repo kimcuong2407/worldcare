@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import AutoIncrement from "mongoose-sequence";
 
 const InvoiceDetail = new mongoose.Schema({
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   variantId: {
     type: mongoose.Types.ObjectId,
     ref: 'product_variant',
@@ -22,6 +27,7 @@ const InvoiceSchema = new mongoose.Schema({
   code: {
     type: String
   },
+  idSequence: Number,
   customerId: {
     type: mongoose.Types.ObjectId,
     ref: 'customer',
@@ -53,6 +59,13 @@ const InvoiceSchema = new mongoose.Schema({
 });
 
 InvoiceSchema.plugin(mongoosePaginate);
+InvoiceSchema.plugin(AutoIncrement(mongoose), {
+  id: 'invoice_id_sequence',
+  inc_field: 'idSequence',
+  reference_fields: ['branchId'],
+  start_seq: 1,
+  disable_hooks: true,
+})
 
 const InvoiceCollection = mongoose.model(
   'invoice',

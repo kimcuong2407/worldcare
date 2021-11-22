@@ -15,6 +15,10 @@ const ProductSchema = new mongoose.Schema({
   },
   aliasName: String,
   barcode: String,
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   typeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product_type',
@@ -55,6 +59,7 @@ ProductSchema.plugin(mongoosePaginate);
 ProductSchema.plugin(AutoIncrement(mongoose), {
   id: 'product_id_sequence',
   inc_field: 'idSequence',
+  reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true
 })
