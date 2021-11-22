@@ -13,7 +13,7 @@ const createProductGroup = async (info: any, language = 'vi') => {
 };
 
 const getProductGroupList = async (query: any, language = 'vi', isRaw = false) => {
-  let data = await ProductGroupCollection.find(query)
+  let data = await ProductGroupCollection.find(query).populate('superGroupId')
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
