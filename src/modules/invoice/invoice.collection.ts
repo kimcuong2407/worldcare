@@ -3,6 +3,10 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from "mongoose-sequence";
 
 const InvoiceDetail = new mongoose.Schema({
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   variantId: {
     type: mongoose.Types.ObjectId,
     ref: 'product_variant',

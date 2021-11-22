@@ -8,6 +8,10 @@ const ProductVariantSchema = new mongoose.Schema({
     type: String,
   },
   idSequence: Number,
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   productId: {
     type: String,
     ref: 'product',

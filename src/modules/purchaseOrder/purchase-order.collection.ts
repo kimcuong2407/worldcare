@@ -24,6 +24,10 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: String,
   },
   idSequence: Number,
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
   supplierCode: String,
 
   createdById: {
@@ -34,10 +38,6 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   }, 
-  branchId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'branch'
-  },
   purchaseOrderDetail: [PurchaseOrderDetail],
   paymentNoteId: {
     type: mongoose.Types.ObjectId,

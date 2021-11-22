@@ -20,7 +20,11 @@ const ProductGroupSchema = new mongoose.Schema({
   status: {
     type: String,
     default: PRODUCT_GROUP_STATUS.ACTIVE,
-  }
+  },
+  branchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'branch'
+  },
 }, {
   timestamps: true,
   toJSON: {

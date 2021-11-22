@@ -4,9 +4,9 @@ import express from 'express';
 import invoiceController from './invoice.controller';
 
 const InvoiceRoutes = (app:express.Application): void => {
-  app.post('/api/v1/payment-note', invoiceController.createInvoiceAction);
-  app.get('/api/v1/payment-note', invoiceController.fetchInvoiceListByQueryAction);
-  app.get('/api/v1/payment-note/:id', invoiceController.fetchInvoiceInfoByQueryAction);
-  app.put('/api/v1/payment-note/:id', invoiceController.updateInvoiceAction);
-  app.delete('/api/v1/payment-note/:id', invoiceController.deleteInvoiceAction);
+  app.post('/api/v1/invoice', invoiceController.createInvoiceAction);
+  app.get('/api/v1/invoice', invoiceController.fetchInvoiceListByQueryAction);
+  app.get('/api/v1/invoice/:id', invoiceController.fetchInvoiceInfoByQueryAction);
+  app.put('/api/v1/invoice/:id', invoiceController.updateInvoiceAction);
+  app.delete('/api/v1/invoice/:id', invoiceController.deleteInvoiceAction);
 }

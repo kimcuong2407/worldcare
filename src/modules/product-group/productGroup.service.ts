@@ -12,8 +12,8 @@ const createProductGroup = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductGroupList = async (language = 'vi', isRaw = false) => {
-  let data = await ProductGroupCollection.find({})
+const getProductGroupList = async (query: any, language = 'vi', isRaw = false) => {
+  let data = await ProductGroupCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -31,13 +31,11 @@ const getProductGroupInfo = async (query: any, language = 'vi', isRaw = false) =
 }
 
 const updateProductGroup = async (
-  id: string,
+  query: any,
   info: any
 ) => {
   return await ProductGroupCollection.findOneAndUpdate(
-    {
-      _id: id,
-    },
+    query,
     {
       $set: {
         ...info,
@@ -47,8 +45,8 @@ const updateProductGroup = async (
   );
 };
 
-const deleteProductGroup = async (id: string,) => {
-  return ProductGroupCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_GROUP_STATUS.INACTIVE});
+const deleteProductGroup = async (query: any) => {
+  return ProductGroupCollection.findOneAndUpdate(query, {status: PRODUCT_GROUP_STATUS.INACTIVE});
 }
 
 export default {

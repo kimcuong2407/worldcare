@@ -12,8 +12,8 @@ const createProductType = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getProductTypeList = async (language = 'vi', isRaw = false) => {
-  let data = await ProductTypeCollection.find({})
+const getProductTypeList = async (query: any, language = 'vi', isRaw = false) => {
+  let data = await ProductTypeCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -30,11 +30,9 @@ const getProductTypeInfo = async (query: any, language = 'vi', isRaw = false) =>
   return map(data, (d) => appUtil.mapLanguage(d, language));
 };
 
-const updateProductType = async (id: string, ProductType: any) => {
+const updateProductType = async (query: any, ProductType: any) => {
   return await ProductTypeCollection.updateOne(
-    {
-      _id: id,
-    },
+    query,
     {
       $set: {
         ...ProductType,

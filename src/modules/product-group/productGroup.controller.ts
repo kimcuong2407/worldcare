@@ -46,12 +46,14 @@ const createProductGroupAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const { name, superGroupId, description, status } = req.body;
     const info = {
       name,
       superGroupId,
       description,
       status: status || PRODUCT_GROUP_STATUS.ACTIVE,
+      branchId,
     };
     await validateProductGroup(info);
     if (!name) {
@@ -72,9 +74,12 @@ const fetchProductGroupListAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { branchId };
     const list = await productGroupService.getProductGroupList(
+      query,
       language,
       raw
     );
@@ -91,13 +96,14 @@ const fetchProductGroupInfoAction = async (
   next: express.NextFunction,
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
     const id = get(req.params, 'id');
     if (isNil(id)) {
       throw new ValidationFailedError('id is required.');
     }
-    const query = { _id: id };
+    const query = { _id: id, branchId };
     const productGroup = await productGroupService.getProductGroupInfo(
       query,
       language,
@@ -116,6 +122,7 @@ const updateProductGroupAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const id = get(req.params, 'id');
     const { name, superGroupId, description, status } = req.body;
     const info = {
@@ -127,7 +134,7 @@ const updateProductGroupAction = async (
     await validateProductGroup(info, id);
 
     const productGroup = await productGroupService.updateProductGroup(
-      id,
+      { _id: id, branchId },
       omitBy(info, isNil)
     );
     res.send(productGroup);
@@ -143,9 +150,10 @@ const deleteProductGroupByIdAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const id = get(req.params, 'id');
     const productGroup = await productGroupService.deleteProductGroup(
-      id
+      { _id: id, branchId }
     );
     res.send(productGroup);
   } catch (error) {

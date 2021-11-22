@@ -43,7 +43,7 @@ const fetchPurchaseOrderListByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const query = {};
+    const query = { branchId };
     const list = await purchaseOrderService.fetchPurchaseOrderListByQuery(query);
     return list;
   } catch (error) {

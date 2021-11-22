@@ -30,7 +30,7 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
   }
 };
 
-const transformVariant = async (data: any) => {
+const transformVariant = async (data: any, branchId: number) => {
   let hasDefault = false;
   const variantsInfo: [variantModel] = data.map((_info: any) => {
     const unitId = get(_info, 'unitId');
@@ -49,6 +49,7 @@ const transformVariant = async (data: any) => {
       cost: get(_info, 'pricing.cost', 0),
       price: get(_info, 'pricing.price', 0),
       status: get(_info, 'status', PRODUCT_STATUS.ACTIVE),
+      branchId,
     }, isNil);
   });
   if (!hasDefault) {
@@ -63,6 +64,7 @@ const createProductAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const productType = get(req, 'query.productType', '');
     const {
       productId,
@@ -84,7 +86,7 @@ const createProductAction = async (
 
     const [productInfo, variantsInfo] = await Promise.all([
       transformProduct(productType, productDetail),
-      transformVariant(productVariants),
+      transformVariant(productVariants, branchId),
     ]);
 
     const record = await productService.createProduct({
@@ -97,6 +99,7 @@ const createProductAction = async (
       groupId,
       positionId,
       routeAdministrationId,
+      branchId,
       productDetail: productInfo,
       productVariants: variantsInfo,
       });
@@ -116,9 +119,12 @@ const fetchProductListAction = async (
   next: express.NextFunction,
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { branchId };
     const list = await productService.fetchProductList(
+      branchId,
       language,
       raw
     );
@@ -135,9 +141,10 @@ const updateProductAction = async (
   next: express.NextFunction,
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const productType = get(req, 'query.productType', '');
     const productId = get(req.params, 'id');
-    const query = { productId }
+    const query = { productId, branchId }
 
     const isExisted = await productService.fetchProductInfo(query);
     if (isEmpty(isExisted)) {
@@ -163,9 +170,9 @@ const updateProductAction = async (
 
     const [productInfo, variantsInfo] = await Promise.all([
       transformProduct(productType, productDetail),
-      transformVariant(productVariants),
+      transformVariant(productVariants, branchId),
     ]);
-    const productQuery = {productId};
+    const productQuery = {productId, branchId};
     const record = await productService.updateProduct(productQuery, omitBy({
       name,
       aliasName,
@@ -197,13 +204,15 @@ const deleteProductAction = async (
   next: express.NextFunction,
 ) => {
   try {
+    const branchId = get(req, 'companyId');
     const productId = get(req.params, 'id');
-    const isExisted = await productService.fetchProductInfo(productId);
+    const query = { productId, branchId };
+    const isExisted = await productService.fetchProductInfo(query);
     if (isEmpty(isExisted)) {
       throw new NotFoundError();
     }
 
-    const data = await productService.deleteProduct(productId);
+    const data = await productService.deleteProduct(query);
     res.send(data);
   } catch (error) {
     logger.error('deleteProductAction', error);
@@ -217,10 +226,10 @@ const fetchProductVariantListAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    // let branchId = get(req.query, 'branchId') || req.companyId;
+    let branchId = get(req.query, 'branchId') || req.companyId;
     const language: string = get(req, 'language');
     const keyword = get(req.query, 'keyword');
-    const list = await productService.fetchProductVariantList({ keyword }, language);
+    const list = await productService.fetchProductVariantList({ keyword, branchId }, language);
     res.send(list);
   } catch (error) {
     logger.error('fetchProductVariantListAction', error);
