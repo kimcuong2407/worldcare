@@ -29,6 +29,7 @@ import productRouteAdministrationRoutes from './modules/product-routeadministrat
 import manufacturerRoutes from './modules/manufacturer';
 import serviceGroupRoutes from './modules/clinic-service-group';
 import productRoutes from './modules/product';
+import purchaseReceiptRoutes from './modules/purchase-receipt';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -61,4 +62,5 @@ export default (app: express.Application): void => {
   manufacturerRoutes(app);
   serviceGroupRoutes(app);
   productRoutes(app);
+  purchaseReceiptRoutes(app);
 };

@@ -26,7 +26,7 @@ const BatchSchema = new mongoose.Schema({
   },
   expirationDate: Date,
   status: String,
-  quanity: Number,
+  quantity: Number,
 }, {
   timestamps: true,
 });

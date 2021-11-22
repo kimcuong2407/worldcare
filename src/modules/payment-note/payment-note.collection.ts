@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import AutoIncrement from "mongoose-sequence";
+import AutoIncrement from 'mongoose-sequence';
 
 const PaymentNoteSchema = new mongoose.Schema({
   code: String,
-  idSequence: Number,
+  paymentNoteCodeSequence: Number,
   type: String,
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   supplierId: String,
@@ -26,8 +26,8 @@ const PaymentNoteSchema = new mongoose.Schema({
   paymentMethod: String,
   paymentDetail: Object,
   paymentAmount: Number,
-  paymentPreAmount: Number,
-  totalPayment: Number,
+  paymentPreAmount: Number, // Paid 
+  totalPayment: Number, // Total amount => Need to pay
   status: String,
   deletedAt: Date,
 }, {
@@ -36,11 +36,10 @@ const PaymentNoteSchema = new mongoose.Schema({
 
 PaymentNoteSchema.plugin(mongoosePaginate);
 PaymentNoteSchema.plugin(AutoIncrement(mongoose), {
-  id: 'payment_id_sequence',
-  inc_field: 'idSequence',
-  reference_fields: ['branchId'],
+  id: 'payment_note_code_sequence',
+  inc_field: 'paymentNoteCodeSequence',
   start_seq: 1,
-  disable_hooks: true
+  reference_fields: ['branchId']
 });
 
 const PaymentNoteCollection = mongoose.model(
