@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import HospitalCollection from "@modules/hospital/hospital.collection";
 
 const InventoryTransactionSchema = new mongoose.Schema({
   type: String,
@@ -20,7 +19,8 @@ const InventoryTransactionSchema = new mongoose.Schema({
   batchId: String,
   variantId: String,
   quantity: Number,
-  referenceDocId: String
+  referenceDocId: String,
+  deletedAt: Date
 }, {
   timestamps: true,
 });

@@ -1,8 +1,12 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import AutoIncrement from "mongoose-sequence";
+import AutoIncrement from 'mongoose-sequence';
 
 const PurchaseOrderDetail = new mongoose.Schema({
+  branchId: {
+    type: Number,
+    ref: 'branch'
+  },
   variantId: {
     type: mongoose.Types.ObjectId,
     ref: 'product_variant',
@@ -11,7 +15,13 @@ const PurchaseOrderDetail = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'batch',
   },
-  saleOFF: Number,
+  productId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'product'
+  },
+  discountValue: Number,
+  discountPercent: Number,
+  discountType: String,
   cost: Number,
   price: Number,
   quantity: Number,
@@ -23,13 +33,12 @@ const PurchaseOrderSchema = new mongoose.Schema({
   code: {
     type: String,
   },
-  idSequence: Number,
+  codeSequence: Number,
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
-  supplierCode: String,
-
+  supplierId: String,
   createdById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
@@ -43,7 +52,13 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'payment_note'
   },
+  invoiceId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'invoice'
+  },
+  saleChannel: String,
   status: String,
+  note: String,
   deletedAt: Date,
 }, {
   timestamps: true,
@@ -52,8 +67,8 @@ const PurchaseOrderSchema = new mongoose.Schema({
 
 PurchaseOrderSchema.plugin(mongoosePaginate);
 PurchaseOrderSchema.plugin(AutoIncrement(mongoose), {
-  id: 'purchase_order_id_sequence',
-  inc_field: 'idSequence',
+  id: 'purchase_order_code_sequence',
+  inc_field: 'codeSequence',
   reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true

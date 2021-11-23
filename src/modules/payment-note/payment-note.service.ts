@@ -1,29 +1,31 @@
-import { InternalServerError } from "@app/core/types/ErrorTypes";
-import get from "lodash/get";
-import isNil from "lodash/isNil";
-import { PAYMENT_NOTE_STATUS } from "./constant";
-import PaymentNoteCollection from "./payment-note.collection";
+import { InternalServerError } from '@app/core/types/ErrorTypes';
+import get from 'lodash/get';
+import isNil from 'lodash/isNil';
+import { PAYMENT_NOTE_STATUS } from './constant';
+import PaymentNoteCollection from './payment-note.collection';
 
 
-const initIdSquence = (idSequence: number) => {
+const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
   return s.substr(s.length - 6);
 }
 
 const paymentNoteAutoIncrease = (record: any, type: string) => {
-  record.setNext('variant_id_sequence', async (err: any, record: any) => {
+  record.setNext('payment_note_code_sequence', async (err: any, record: any) => {
     if(err) {
       return new InternalServerError('Failed to increase ID.');
     }
-    const increasedId = `${type}${initIdSquence(record.idSequence)}`
-    const doc = await PaymentNoteCollection.findOne({increasedId}).lean().exec();
+    const paymentNoteCode = `${type}${initIdSequence(record.codeSequence)}`
+    const doc = await PaymentNoteCollection
+      .findOne({code: paymentNoteCode, branchId: get(record, '_doc.branchId')})
+      .lean().exec();
     if(!isNil(doc)) paymentNoteAutoIncrease(record, type);
-    record.variantId = increasedId;
+    record.variantId = paymentNoteCode;
     record.save();
   });
 }
 
-const persistsPaymnentNote = async (info: any, type: string) => {
+const persistsPaymentNote = async (info: any, type: string) => {
   const code = get(info, 'code', null);
   const invoice = await PaymentNoteCollection.create(info);
   if (isNil(code)) {
@@ -38,7 +40,7 @@ const persistsPaymnentNote = async (info: any, type: string) => {
 const createPaymentNote = async (info: any) => {
   const type = get(info, 'type');
   info.status = PAYMENT_NOTE_STATUS.ACTIVE;
-  return await persistsPaymnentNote(info, type);
+  return await persistsPaymentNote(info, type);
 };
 
 const fetchPaymentNoteListByQuery = async (query: any) => {

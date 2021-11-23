@@ -1,6 +1,6 @@
 export enum PURCHASE_ORDER_STATUS {
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
+  DRAFT = 'DRAFT',
+  COMPLETED = 'COMPLETED',
 }
 
 export default {};

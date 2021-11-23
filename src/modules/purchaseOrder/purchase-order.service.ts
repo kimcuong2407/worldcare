@@ -1,44 +1,52 @@
-import { InternalServerError } from "@app/core/types/ErrorTypes";
-import { AnyLengthString } from "aws-sdk/clients/comprehend";
-import get from "lodash/get";
-import isNil from "lodash/isNil";
-import { PURCHASE_ORDER_STATUS } from "./constant";
-import PurchaseOrderCollection from "./purchase-order.collection";
+import { InternalServerError } from '@app/core/types/ErrorTypes';
+import { AnyLengthString } from 'aws-sdk/clients/comprehend';
+import get from 'lodash/get';
+import isNil from 'lodash/isNil';
+import { PURCHASE_ORDER_STATUS } from './constant';
+import PurchaseOrderCollection from './purchase-order.collection';
 
 
-const initIdSquence = (idSequence: number) => {
+const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
   return s.substr(s.length - 6);
 }
 
-const invoiceAutoIncrease = (record: any) => {
-  record.setNext('purchase_order_id_sequence', async (err: any, record: any) => {
-    if(err) {
-      return new InternalServerError('Failed to increase ID.');
-    }
-    const increasedId = `HD${initIdSquence(record.idSequence)}`
-    const doc = await PurchaseOrderCollection.findOne({increasedId}).lean().exec();
-    if(!isNil(doc)) invoiceAutoIncrease(record);
-    record.variantId = increasedId;
-    record.save();
-  });
+const purchaseOrderAutoIncrease = async (record: any) => {
+  return await new Promise((resolve, reject) => {
+    record.setNext('purchase_order_code_sequence', async (err: any, record: any) => {
+      if (err) {
+        reject(err)
+      }
+      const purchaseOrderCode = `DH${initIdSequence(record.codeSequence)}`
+      const doc = await PurchaseOrderCollection
+        .findOne({code: purchaseOrderCode, branchId: get(record, '_doc').branchId})
+        .lean().exec();
+      if (!isNil(doc)) {
+        await purchaseOrderAutoIncrease(record);
+      }
+      record.code = purchaseOrderCode;
+      await record.save();
+      resolve();
+    });
+  }).catch(() => {
+    throw new InternalServerError('Failed to increase purchase order ID.');
+  })
 }
 
-const persistsInvoice = async (info: any) => {
+const persistsPurchaseOrder = async (info: any) => {
   const code = get(info, 'code', null);
-  const invoice = await PurchaseOrderCollection.create(info);
+  const purchaseOrder = await PurchaseOrderCollection.create(info);
   if (isNil(code)) {
-    invoiceAutoIncrease(invoice);
+    await purchaseOrderAutoIncrease(purchaseOrder);
   }
 
   return {
-    ...get(invoice, '_doc', {})
+    ...get(purchaseOrder, '_doc', {})
   }
 }
 
 const createPurchaseOrder = async (info: any) => {
-  info.status = PURCHASE_ORDER_STATUS.ACTIVE;
-  return await persistsInvoice(info);
+  return await persistsPurchaseOrder(info);
 };
 
 const fetchPurchaseOrderListByQuery = async (query: any) => {
@@ -70,7 +78,6 @@ const deletePurchaseOrder = async (query: any) => {
     query,
     {
       $set: {
-        status: PURCHASE_ORDER_STATUS.INACTIVE,
         deletedAt: new Date()
       },
     },
@@ -84,4 +91,5 @@ export default {
   fetchPurchaseOrderInfoByQuery,
   updatePurchaseOrder,
   deletePurchaseOrder,
+  purchaseOrderAutoIncrease
 };

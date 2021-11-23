@@ -11,7 +11,7 @@ const createInvoiceAction = async (
   next: express.NextFunction,
 ) => {
   try {
-    const branchId = get(req, 'branchId');
+    const branchId = get(req, 'companyId');
     const {
       customerId,
       soldById,

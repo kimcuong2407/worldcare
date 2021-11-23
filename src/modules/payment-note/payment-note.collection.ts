@@ -5,7 +5,10 @@ import AutoIncrement from 'mongoose-sequence';
 const PaymentNoteSchema = new mongoose.Schema({
   code: String,
   paymentNoteCodeSequence: Number,
-  type: String,
+  type: String, // Payment or Receipt
+  transactionType: String, // PCPN, TTHD...
+  // Bases on transaction type to get corresponding reference document
+  referenceDocId: String,
   branchId: {
     type: Number,
     ref: 'branch'
@@ -29,7 +32,7 @@ const PaymentNoteSchema = new mongoose.Schema({
   paymentPreAmount: Number, // Paid 
   totalPayment: Number, // Total amount => Need to pay
   status: String,
-  deletedAt: Date,
+  deletedAt: Date
 }, {
   timestamps: true,
 });
@@ -39,7 +42,7 @@ PaymentNoteSchema.plugin(AutoIncrement(mongoose), {
   id: 'payment_note_code_sequence',
   inc_field: 'paymentNoteCodeSequence',
   start_seq: 1,
-  reference_fields: ['branchId']
+  reference_fields: ['branchId', 'transactionType']
 });
 
 const PaymentNoteCollection = mongoose.model(

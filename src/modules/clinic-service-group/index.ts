@@ -1,7 +1,7 @@
 import express from 'express';
 import serviceGroupActions from './clinicServiceGroup.controller';
-import middleware from "@core/middleware";
-import {CORE_ACTIONS, CLINIC_RESOURCES} from "@core/permissions";
+import middleware from '@core/middleware';
+import {CORE_ACTIONS, CLINIC_RESOURCES} from '@core/permissions';
 
 const serviceGroupRoutes = (app: express.Application): void => {
   app.post('/api/v1/clinic-service-group', middleware.authorization([

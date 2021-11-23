@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import mongooseIntl from 'mongoose-intl';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import AutoIncrement from "mongoose-sequence";
+import AutoIncrement from 'mongoose-sequence';
 import { PRODUCT_STATUS } from './constant';
 
 const ProductSchema = new mongoose.Schema({
