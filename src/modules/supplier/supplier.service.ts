@@ -104,7 +104,7 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
 }
 
 const getSupplierInfo = async (query: any) => {
-  const supplier = await SupplierCollection.findOne(query).exec();
+  const supplier = await SupplierCollection.findOne(query).lean().exec();
   return formatSupplier(supplier);
 };
 

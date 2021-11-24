@@ -12,8 +12,8 @@ const createManufacturer = async (info: any, language = 'vi') => {
   return data;
 };
 
-const getManufacturerList = async (language = 'vi', isRaw = false) => {
-  let data = await ManufacturerCollection.find({})
+const getManufacturerList = async (query: any, language = 'vi', isRaw = false) => {
+  let data = await ManufacturerCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -23,7 +23,7 @@ const getManufacturerList = async (language = 'vi', isRaw = false) => {
 };
 
 const getManufacturerInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ManufacturerCollection.findOne(query).exec();
+  const data = await ManufacturerCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -39,13 +39,12 @@ const updateManufacturer = async (id: string, manufacturer: any) => {
       $set: {
         ...manufacturer,
       },
-    }
-  );
-  return ManufacturerCollection.findById(id);
+    }, { new: true }
+  ).lean().exec();
 };
 
 const deleteManufacturer = async (id: string) => {
-  return ManufacturerCollection.findOneAndUpdate({_id: id}, {status: MANUFACTURER_STATUS.INACTIVE});
+  return ManufacturerCollection.findOneAndUpdate({_id: id}, {status: MANUFACTURER_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec();
 };
 
 export default {

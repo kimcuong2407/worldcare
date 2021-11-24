@@ -23,7 +23,7 @@ const getProductUnitList = async (query: any, language = 'vi', isRaw = false) =>
 };
 
 const getProductUnitInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductUnitCollection.findOne(query).exec();
+  const data = await ProductUnitCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -39,11 +39,11 @@ const updateProductUnit = async (query: any, ProductUnit: any) => {
       },
     },
     { new: true }
-  );
+  ).lean().exec();
 };
 
 const deleteProductUnit = async (id: string) => {
-  return ProductUnitCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_UNIT_STATUS.INACTIVE});
+  return ProductUnitCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_UNIT_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
 };
 
 export default {

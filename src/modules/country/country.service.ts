@@ -12,8 +12,8 @@ const createCountry = async (info: any, language = 'vi') => {
   return data;
 };
 
-const fetchCountryList = async (language = 'vi', isRaw = false) => {
-  let data = await CountryCollection.find({})
+const fetchCountryList = async (query: any, language = 'vi', isRaw = false) => {
+  let data = await CountryCollection.find(query)
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -23,7 +23,7 @@ const fetchCountryList = async (language = 'vi', isRaw = false) => {
 };
 
 const fetchCountryInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await CountryCollection.findOne(query).exec();
+  const data = await CountryCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -41,11 +41,11 @@ const updateCountry = async (id: string, info: any) => {
       },
     },
     { new: true }
-  );
+  ).lean().exec();
 };
 
 const deleteCountry = async (id: string) => {
-  return CountryCollection.findOneAndUpdate({_id: id}, {status: COUNTRY_STATUS.INACTIVE})
+  return CountryCollection.findOneAndUpdate({_id: id}, {status: COUNTRY_STATUS.DELETED, deleteAt: new Date()}, { new: true }).lean().exec()
 };
 
 

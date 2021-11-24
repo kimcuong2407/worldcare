@@ -1,6 +1,7 @@
 export enum MANUFACTURER_STATUS {
   ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
 };
 
 export default {};

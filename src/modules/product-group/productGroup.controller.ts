@@ -77,7 +77,7 @@ const fetchProductGroupListAction = async (
     const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const query = { branchId };
+    const query = { branchId, status: { $ne: PRODUCT_GROUP_STATUS.DELETED } };
     const list = await productGroupService.getProductGroupList(
       query,
       language,
@@ -129,7 +129,7 @@ const updateProductGroupAction = async (
       name,
       superGroupId,
       description,
-      status: status || PRODUCT_GROUP_STATUS.ACTIVE,
+      status: status,
     }
     await validateProductGroup(info, id);
 

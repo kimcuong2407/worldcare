@@ -64,7 +64,7 @@ const fetchProductPositionListAction = async (
     const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const query = { branchId };
+    const query = { branchId, status: { $ne: PRODUCT_POSITION_STATUS.DELETED } };
     const ProductPosition = await ProductPositionService.getProductPositionList(
       query,
       language,
@@ -115,7 +115,7 @@ const updateProductPositionAction = async (
     const info = {
       name,
       description,
-      status: status || PRODUCT_POSITION_STATUS.ACTIVE,
+      status: status,
     };
     await validateProductPosition(info);
 

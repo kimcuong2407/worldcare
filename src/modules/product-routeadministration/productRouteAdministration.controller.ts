@@ -66,7 +66,7 @@ const fetchProductRouteAdministrationListAction = async (
     const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const query = { branchId };
+    const query = { branchId, status: { $ne: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED } };
     const ProductPosition = await productRouteAdministrationService.getProductRouteAdministrationList(
       query,
       language,
@@ -117,7 +117,7 @@ const updateProductRouteAdministrationAction = async (
     const info = {
       name,
       description,
-      status: status || PRODUCT_ROUTE_ADMINISTRATION_STATUS.ACTIVE,
+      status: status,
     };
     await validateProductRouteAdministration(info);
 
