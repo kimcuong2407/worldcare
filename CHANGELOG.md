@@ -1,3 +1,10 @@
+# [1.5.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.4.0...v1.5.0) (2021-11-24)
+
+
+### Features
+
+* **sale:** direct and order product implementation ([f1cdd97](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/f1cdd97ec16ebe6bc71573df5486dd412537a7f6))
+
 # [1.4.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.3.0...v1.4.0) (2021-11-22)
 
 
