@@ -10,6 +10,7 @@ export interface SupplierModel {
   address: Address;
   note: string;
   currentDebt: number;
+  partnerId: number;
   totalPurchase: number;
   status: string;
   createdBy: string;

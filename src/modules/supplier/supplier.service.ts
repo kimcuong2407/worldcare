@@ -7,26 +7,32 @@ import {SupplierModel} from './supplier.model';
 import makeQuery from '@core/database/query';
 import {SUPPLIER_STATUS} from '@modules/supplier/constant';
 import { InternalServerError } from '@app/core/types/ErrorTypes';
-import { resolve } from 'bluebird';
 
 const logger = loggerHelper.getLogger('supplier.service');
 
-const initsupplierCode = (supplierCodeSeq: number) => {
+const initSupplierCode = (supplierCodeSeq: number) => {
   let s = '000000000' + supplierCodeSeq;
   return s.substr(s.length - 6);
 }
 
 const autoIncrease = (record: any) => {
-  record.setNext('supplier_code_sequence', async (err: any, record: any) => {
-    if(err) {
-      return new InternalServerError('Failed to increase supplierCode.');
-    }
-    const supplierCode = `NCC${initsupplierCode(record.supplierCodeSequence)}`
-    const doc = await SupplierCollection.findOne({supplierCode}).exec();
-    if(!isNil(doc)) autoIncrease(record);
-    record.supplierCode = supplierCode;
-    record.save();
-  });
+  return new Promise(((resolve, reject) => {
+    record.setNext('supplier_code_sequence', async (err: any, record: any) => {
+      if (err) {
+        reject(err);
+      }
+      const supplierCode = `NCC${initSupplierCode(record.supplierCodeSequence)}`
+      const doc = await SupplierCollection.findOne({supplierCode, partnerId: record.partnerId}).exec();
+      if (!isNil(doc)) {
+        await autoIncrease(record);
+      }
+      record.supplierCode = supplierCode;
+      await record.save();
+      resolve(record);
+    });
+  })).catch(() => {
+    throw new InternalServerError('Failed to increase supplierCode.');
+  })
 }
 
 const persistSupplier = async (supplierInfo: SupplierModel) => {
@@ -34,7 +40,7 @@ const persistSupplier = async (supplierInfo: SupplierModel) => {
   const supplier = await SupplierCollection.create(supplierInfo);
   
   if (isNil(supplierCode)) {
-    autoIncrease(supplier);
+    await autoIncrease(supplier);
   }
 
   return {
@@ -51,7 +57,6 @@ const formatSupplier = (supplier: any) => {
 }
 
 const createSupplier = async (supplierInfo: SupplierModel) => {
-  // logger.info(`Creating supplier with ID=${supplierInfo.supplierCode} and name =${supplierInfo.name}`);
   supplierInfo.status = SUPPLIER_STATUS.ACTIVE;
   supplierInfo.totalPurchase = 0;
   supplierInfo.currentDebt = 0;
@@ -66,7 +71,8 @@ const findSupplierByName = async (name: string) => {
 const fetchSuppliers = async (queryInput: any, options: any) => {
 
   const query: any = {
-    deletedAt: null,
+    status: SUPPLIER_STATUS.ACTIVE,
+    partnerId: queryInput.partnerId
   }
   if (queryInput.keyword) {
     query['$text'] = {$search: queryInput.keyword}
@@ -114,10 +120,13 @@ const updateSupplierInfo = async (query: any, supplierInfo: any) => {
   };
 };
 
-const deleteSupplier = async (supplierCode: string) => {
+const deleteSupplier = async (supplierId: string) => {
   await SupplierCollection.findOneAndUpdate({
-    supplierCode: supplierCode,
-  }, {deletedAt: new Date()});
+    _id: supplierId,
+  }, {
+    deletedAt: new Date(),
+    status: SUPPLIER_STATUS.DELETED
+  });
 
   return true;
 };
