@@ -1,3 +1,10 @@
+## [1.5.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.0...v1.5.1) (2021-11-24)
+
+
+### Bug Fixes
+
+* **supplier:** update supplier schema. update crud enpoints ([f733cec](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/f733cec27dc77c01d64a2877ba10168a3e54cce1))
+
 # [1.5.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.4.0...v1.5.0) (2021-11-24)
 
 
