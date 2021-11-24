@@ -1,3 +1,11 @@
+## [1.5.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.1...v1.5.2) (2021-11-24)
+
+
+### Bug Fixes
+
+* **configs:** rix bug in configs ([ed7124a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/ed7124a4b1e3857c0748a82d48033cde28c44efc))
+* **supplier:** fix fetch empty info ([e2077bf](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/e2077bfb2d949b0fe09bdd8fc383d11fc3b07f1d))
+
 ## [1.5.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.0...v1.5.1) (2021-11-24)
 
 
