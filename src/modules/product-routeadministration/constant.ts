@@ -1,6 +1,7 @@
 export enum PRODUCT_ROUTE_ADMINISTRATION_STATUS {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
 }
 
 export default {};

@@ -25,6 +25,7 @@ const ProductGroupSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'branch'
   },
+  deletedAt: Date,
 }, {
   timestamps: true,
   toJSON: {

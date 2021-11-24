@@ -64,7 +64,7 @@ const fetchProductUnitListAction = async (
     const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const query = { branchId };
+    const query = { branchId, status: { $ne: PRODUCT_UNIT_STATUS.DELETED } };
     const ProductUnit = await ProductUnitService.getProductUnitList(
       query,
       language,

@@ -64,7 +64,7 @@ const fetchProductTypeListAction = async (
     const branchId = get(req, 'companyId');
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
-    const query = { branchId };
+    const query = { branchId, status: { $ne: PRODUCT_TYPE_STATUS.DELETED } };
     const ProductType = await ProductTypeService.getProductTypeList(
       query,
       language,
@@ -115,7 +115,7 @@ const updateProductTypeAction = async (
     const info = {
       name,
       description,
-      status: status || PRODUCT_TYPE_STATUS.ACTIVE,
+      status: status,
     };
     await validateProductType(info);
     const query = { _id: id, branchId };

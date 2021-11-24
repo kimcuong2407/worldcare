@@ -16,6 +16,7 @@ const CountrySchema = new mongoose.Schema({
       type: String,
       default: COUNTRY_STATUS.ACTIVE,
     },
+    deletedAt: Date,
   },
   {
     timestamps: true,

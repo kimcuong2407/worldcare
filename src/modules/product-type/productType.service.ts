@@ -23,7 +23,7 @@ const getProductTypeList = async (query: any, language = 'vi', isRaw = false) =>
 };
 
 const getProductTypeInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductTypeCollection.findOne(query).exec();
+  const data = await ProductTypeCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -41,11 +41,11 @@ const updateProductType = async (query: any, ProductType: any) => {
     {
       new: true,
     }
-  );
+  ).lean().exec();
 };
 
 const deleteProductType = async (id: string) => {
-  return ProductTypeCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_TYPE_STATUS.INACTIVE});
+  return ProductTypeCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_TYPE_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
 };
 
 export default {

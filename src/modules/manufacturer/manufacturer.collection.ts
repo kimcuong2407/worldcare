@@ -18,6 +18,7 @@ const ManufacturerSchema = new mongoose.Schema(
       type: String,
       default: MANUFACTURER_STATUS.ACTIVE,
     },
+    deletedAt: Date,
   },
   {
     timestamps: true,

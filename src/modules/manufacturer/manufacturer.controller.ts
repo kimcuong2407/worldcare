@@ -18,7 +18,7 @@ const validateManufacturer = async (info: any) => {
   }
   const data = await manufacturerService.getManufacturerInfo({name});
   if (data && Object.keys(data).length != 0) {
-    throw new ValidationFailedError(`Product Group with ${name} is already existed.`);
+    throw new ValidationFailedError(`Manufacturer with ${name} is already existed.`);
   }
 
   const status = get(info, 'status', MANUFACTURER_STATUS.ACTIVE);
@@ -60,7 +60,9 @@ const fetchManufacturerListAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { status: { $ne: MANUFACTURER_STATUS.DELETED }};
     const manufacturer = await manufacturerService.getManufacturerList(
+      query,
       language,
       raw
     );
@@ -107,7 +109,7 @@ const updateManufacturerAction = async (
     const info = {
       name,
       description,
-      status: status || MANUFACTURER_STATUS.ACTIVE,
+      status: status,
     }
     await validateManufacturer(info);
 

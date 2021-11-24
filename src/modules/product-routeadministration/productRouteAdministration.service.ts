@@ -31,7 +31,7 @@ const getProductRouteAdministrationList = async (
 const getProductRouteAdministrationInfo = async (query: any, language = 'vi', isRaw = false) => {
   const data = await ProductRouteAdministrationCollection.findOne(
     query
-  ).exec();
+  ).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -50,11 +50,11 @@ const updateProductRouteAdministration = async (
       },
     },
     { new: true }
-  );
+  ).lean().exec();
 };
 
 const deleteProductRouteAdministration = async (id: string) => {
-  return ProductRouteAdministrationCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_ROUTE_ADMINISTRATION_STATUS.INACTIVE});
+  return ProductRouteAdministrationCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED, deletedAt: new Date()}).lean().exec;
 };
 
 export default {

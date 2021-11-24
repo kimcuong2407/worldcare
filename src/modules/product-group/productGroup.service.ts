@@ -23,7 +23,7 @@ const getProductGroupList = async (query: any, language = 'vi', isRaw = false) =
 };
 
 const getProductGroupInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductGroupCollection.findOne(query).exec();
+  const data = await ProductGroupCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -42,11 +42,11 @@ const updateProductGroup = async (
       },
     },
     { new: true }
-  );
+  ).lean().exec();
 };
 
 const deleteProductGroup = async (query: any) => {
-  return ProductGroupCollection.findOneAndUpdate(query, {status: PRODUCT_GROUP_STATUS.INACTIVE});
+  return ProductGroupCollection.findOneAndUpdate(query, {status: PRODUCT_GROUP_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
 }
 
 export default {

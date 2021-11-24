@@ -31,6 +31,7 @@ import serviceGroupRoutes from './modules/clinic-service-group';
 import productRoutes from './modules/product';
 import purchaseReceiptRoutes from './modules/purchase-receipt';
 import saleRoutes from './modules/sale';
+import countryRoutes from './modules/country';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -65,4 +66,5 @@ export default (app: express.Application): void => {
   productRoutes(app);
   purchaseReceiptRoutes(app);
   saleRoutes(app);
+  countryRoutes(app);
 };

@@ -36,7 +36,9 @@ const fetchCountryListAction = async (
   try {
     const raw: boolean = !isUndefined(get(req.query, 'raw'));
     const language: string = get(req, 'language');
+    const query = { status: { $ne: COUNTRY_STATUS.DELETED } };
     const record = await countryService.fetchCountryList(
+      query,
       language,
       raw
     );
@@ -83,7 +85,7 @@ const updateCountryAction = async (
     const info = {
       name,
       description,
-      status: status || COUNTRY_STATUS.ACTIVE,
+      status: status,
     };
 
     const record = await countryService.updateCountry(

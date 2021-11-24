@@ -23,7 +23,7 @@ const getProductPositionList = async (query: any, language = 'vi', isRaw = false
 };
 
 const getProductPositionInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductPositionCollection.findOne(query).exec();
+  const data = await ProductPositionCollection.findOne(query).lean().exec();
   if (isRaw) {
     return data;
   }
@@ -39,11 +39,11 @@ const updateProductPosition = async (query: any, ProductPosition: any) => {
       },
     },
     { new: true }
-  );
+  ).lean().exec();
 };
 
 const deleteProductPosition = async (id: string) => {
-  return ProductPositionCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_POSITION_STATUS.INACTIVE});
+  return ProductPositionCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_POSITION_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
 };
 
 export default {
