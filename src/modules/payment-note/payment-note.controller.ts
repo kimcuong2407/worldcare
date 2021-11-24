@@ -1,7 +1,7 @@
-import loggerHelper from "@app/utils/logger.util";
+import loggerHelper from '@app/utils/logger.util';
 import express from 'express';
-import get from "lodash/get";
-import paymentNoteService from "./payment-note.service";
+import get from 'lodash/get';
+import paymentNoteService from './payment-note.service';
 
 const logger = loggerHelper.getLogger('payment-note.controller');
 

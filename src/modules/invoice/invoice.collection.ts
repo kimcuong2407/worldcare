@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import AutoIncrement from "mongoose-sequence";
+import AutoIncrement from 'mongoose-sequence';
 
 const InvoiceDetail = new mongoose.Schema({
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   variantId: {
@@ -15,25 +15,29 @@ const InvoiceDetail = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'batch'
   },
-  saleOFF: Number,
+  productId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'product'
+  },
+  discountValue: Number,
+  discountPercent: Number,
+  discountType: String,
   cost: Number,
   price: Number,
   quantity: Number
-}, {
-  timestamps: true
 });
 
 const InvoiceSchema = new mongoose.Schema({
   code: {
     type: String
   },
-  idSequence: Number,
+  codeSequence: Number,
   customerId: {
     type: mongoose.Types.ObjectId,
     ref: 'customer',
   },
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   soldById: {
@@ -48,20 +52,27 @@ const InvoiceSchema = new mongoose.Schema({
     type: String,
   },
   invoiceDetail: [InvoiceDetail],
-  paymentNote: {
+  paymentNoteId: {
     type: mongoose.Types.ObjectId,
     ref: 'payment_note'
   },
   status: String,
-  deletedAt: Date,
-},{
+  purchaseOrderId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'purchase_order'
+  },
+  discountValue: Number,
+  discountPercent: Number,
+  discountType: String,
+  deletedAt: Date
+}, {
   timestamps: true,
 });
 
 InvoiceSchema.plugin(mongoosePaginate);
 InvoiceSchema.plugin(AutoIncrement(mongoose), {
-  id: 'invoice_id_sequence',
-  inc_field: 'idSequence',
+  id: 'invoice_code_sequence',
+  inc_field: 'codeSequence',
   reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true,

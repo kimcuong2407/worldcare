@@ -19,7 +19,8 @@ export const CLINIC_RESOURCES = {
   appointment: 'appointment',
   clinicService: 'clinicService',
   inventory: 'inventory',
-  purchaseReceipt: 'purchaseReceipt'
+  purchaseReceipt: 'purchaseReceipt',
+  sale: 'sale',
 };
 
 export const ROOT_RESOURCES = {
@@ -108,5 +109,13 @@ export const RESOURCES = [
   {
     key: CLINIC_RESOURCES.clinicService,
     name: 'Quản lý dịch vụ khám chữa bệnh',
+  },
+  {
+    key: CLINIC_RESOURCES.sale,
+    name: 'Quản lý bán hảng',
+  },
+  {
+    key: CLINIC_RESOURCES.purchaseReceipt,
+    name: 'Quản lý nhập kho',
   },
 ]

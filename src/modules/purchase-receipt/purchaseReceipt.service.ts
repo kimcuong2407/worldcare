@@ -4,10 +4,9 @@ import PurchaseReceiptCollection from './purchaseReceipt.collection';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
-import {PAYMENT_NOTE_TYPE} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_TYPE, TRANSACTION_TYPE} from '@modules/payment-note/constant';
 import LotCollection from '@modules/batch/batch.collection';
-import {PURCHASE_RECEIPT_STATUS} from "@modules/purchase-receipt/constant";
-import SupplierCollection from "@modules/supplier/supplier.collection";
+import {PURCHASE_RECEIPT_STATUS} from '@modules/purchase-receipt/constant';
 
 const logger = loggerHelper.getLogger('purchaseReceipt.service');
 
@@ -31,26 +30,29 @@ const createPurchaseReceipt = async (purchaseReceiptInfo: any) => {
     status: purchaseReceiptInfo.status,
     supplierId,
     note: purchaseReceiptInfo.note,
-    involvedById: purchaseReceiptInfo.involvedById
+    involvedById: purchaseReceiptInfo.involvedById,
+    paymentNoteIds: undefined as any,
+    totalQuantity: undefined as any,
+    subTotal: undefined as any
   }
 
   if (paymentNoteId) {
-    purchaseReceipt.paymentNoteIds = [paymentNoteId];
+    purchaseReceipt.paymentNoteIds.push(paymentNoteId);
   }
 
   let totalQuantity = 0;
   await asyncForEach(purchaseReceiptInfo.purchaseItems, async item => {
-    totalQuantity += item.batches.map(batch => batch.quantity).reduce((a, b) => a + b, 0);
+    totalQuantity += item.batches.map((batch: any) => batch.quantity).reduce((a: any, b: any) => a + b, 0);
   })
   purchaseReceipt.totalQuantity = totalQuantity;
-  purchaseReceipt.subTotal = purchaseReceiptInfo.purchaseItems.reduce((a, b) => a + b.price, 0)
+  purchaseReceipt.subTotal = purchaseReceiptInfo.purchaseItems.reduce((a: any, b: any) => a + b.price, 0)
 
   const createdPurchaseReceipt = await PurchaseReceiptCollection.create(purchaseReceipt);
   createdPurchaseReceipt.code = initCode('PN', createdPurchaseReceipt.purchaseReceiptCodeSequence);
   await createdPurchaseReceipt.save()
   logger.info(`Created Purchase receipt with code[${createdPurchaseReceipt.code}]`)
 
-  const purchaseReceiptId = get(get(createdPurchaseReceipt, '_doc'), '_id');
+  const purchaseReceiptId = get(createdPurchaseReceipt, '_doc._id');
 
   await createInventoryTransaction(purchaseReceiptInfo, supplierId, partnerId, branchId, purchaseReceiptId, createdPurchaseReceipt);
 
@@ -84,7 +86,7 @@ async function createInventoryTransaction(purchaseReceiptInfo: any, supplierId: 
             quantity: get(batchDoc, '_doc').quantity + batch.quantity
           }).exec();
         }
-        inventoryTransactionIds.push(get(get(inventoryTransaction, '_doc'), '_id'));
+        inventoryTransactionIds.push(get(inventoryTransaction, '_doc._id'));
       }
     });
 
@@ -109,9 +111,9 @@ async function createPaymentNote(payment: any, branchId: any, supplierId: any, p
     };
 
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = initCode('PCPN', paymentNote.paymentNoteCodeSequence);
+    paymentNote.code = initCode(TRANSACTION_TYPE.PCPN, paymentNote.paymentNoteCodeSequence);
     await paymentNote.save();
-    const paymentNoteId = get(get(paymentNote, '_doc'), '_id');
+    const paymentNoteId = get(paymentNote, '_doc._id');
     logger.info(`Created payment note with code[${paymentNote.code}]`)
     return paymentNoteId;
   }
@@ -136,6 +138,9 @@ const updatePurchaseReceipt = async (purchaseReceiptInfo: any) => {
     status: purchaseReceiptInfo.status,
     note: purchaseReceiptInfo.note,
     involvedById: purchaseReceiptInfo.involvedById,
+    paymentNoteIds: undefined as any,
+    totalQuantity: undefined as any,
+    subTotal: undefined as any
   }
 
   const purchaseReceiptDoc = await PurchaseReceiptCollection.findOne({_id: purchaseReceiptInfo.purchaseReceiptId}).exec();
@@ -150,14 +155,14 @@ const updatePurchaseReceipt = async (purchaseReceiptInfo: any) => {
 
   let totalQuantity = 0;
   await asyncForEach(purchaseReceiptInfo.purchaseItems, async item => {
-    totalQuantity += item.batches.map(batch => batch.quantity).reduce((a, b) => a + b, 0);
+    totalQuantity += item.batches.map((batch: any) => batch.quantity).reduce((a: any, b: any) => a + b, 0);
   })
   willBeUpdatePurchaseReceipt.totalQuantity = totalQuantity;
-  willBeUpdatePurchaseReceipt.subTotal = purchaseReceiptInfo.purchaseItems.reduce((a, b) => a + b.price, 0)
+  willBeUpdatePurchaseReceipt.subTotal = purchaseReceiptInfo.purchaseItems.reduce((a: any, b: { price: any; }) => a + b.price, 0)
 
   const updatedPurchaseReceipt = await PurchaseReceiptCollection
     .findOneAndUpdate({_id: purchaseReceiptInfo.purchaseReceiptId}, willBeUpdatePurchaseReceipt).exec();
-  const purchaseReceiptId = get(get(updatedPurchaseReceipt, '_doc'), '_id');
+  const purchaseReceiptId = get(updatedPurchaseReceipt, '_doc._id');
 
   if (purchaseReceiptInfo.status === PURCHASE_RECEIPT_STATUS.COMPLETED && existedStatus === PURCHASE_RECEIPT_STATUS.DRAFT) {
     await createInventoryTransaction(purchaseReceiptInfo, supplierId, partnerId, branchId, purchaseReceiptId, updatedPurchaseReceipt);
@@ -170,7 +175,7 @@ const updatePurchaseReceipt = async (purchaseReceiptInfo: any) => {
 };
 
 const fetchPurchaseReceipts = async (queryInput: any, options: any) => {
-  let query = {};
+  let query = {} as any;
   if (queryInput.keyword) {
     query['$text'] = {$search: queryInput.keyword}
   }

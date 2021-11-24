@@ -1,32 +1,40 @@
-import { InternalServerError } from "@app/core/types/ErrorTypes";
-import get from "lodash/get";
-import isNil from "lodash/isNil";
-import { INVOICE_STATUS } from "./constant";
-import InvoiceCollection from "./invoice.collection";
+import { InternalServerError } from '@app/core/types/ErrorTypes';
+import get from 'lodash/get';
+import isNil from 'lodash/isNil';
+import InvoiceCollection from './invoice.collection';
 
-const initIdSquence = (idSequence: number) => {
+const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
   return s.substr(s.length - 6);
 }
 
-const invoiceAutoIncrease = (record: any) => {
-  record.setNext('variant_id_sequence', async (err: any, record: any) => {
-    if(err) {
-      return new InternalServerError('Failed to increase ID.');
-    }
-    const increasedId = `HD${initIdSquence(record.idSequence)}`
-    const doc = await InvoiceCollection.findOne({increasedId}).lean().exec();
-    if(!isNil(doc)) invoiceAutoIncrease(record);
-    record.variantId = increasedId;
-    record.save();
-  });
+const invoiceAutoIncrease = async (record: any) => {
+  await new Promise((resolve, reject) => {
+    record.setNext('invoice_code_sequence', async (err: any, record: any) => {
+      if (err) {
+        reject(err)
+      }
+      const invoiceCode = `HD${initIdSequence(record.codeSequence)}`;
+      const doc = await InvoiceCollection
+        .findOne({code: invoiceCode, branchId: get(record, '_doc').branchId})
+        .lean().exec();
+      if (!isNil(doc)) {
+        await invoiceAutoIncrease(record);
+      }
+      record.code = invoiceCode;
+      await record.save();
+      resolve();
+    });
+  }).catch(() => {
+    return new InternalServerError('Failed to increase ID.');
+  })
 }
 
 const persistsInvoice = async (info: any) => {
   const code = get(info, 'code', null);
   const invoice = await InvoiceCollection.create(info);
   if (isNil(code)) {
-    invoiceAutoIncrease(invoice);
+    await invoiceAutoIncrease(invoice);
   }
 
   return {
@@ -35,7 +43,6 @@ const persistsInvoice = async (info: any) => {
 }
 
 const createInvoice = async (info: any) => {
-  info.status = INVOICE_STATUS.ACTIVE;
   return await persistsInvoice(info);
 };
 
@@ -68,7 +75,6 @@ const deleteInvoice = async (query: any) => {
     query,
     {
       $set: {
-        status: INVOICE_STATUS.INACTIVE,
         deletedAt: new Date()
       },
     },
@@ -82,4 +88,5 @@ export default {
   fetchInvoiceInfoByQuery,
   updateInvoice,
   deleteInvoice,
+  invoiceAutoIncrease
 };
