@@ -18,7 +18,7 @@ const SupplierSchema = new Schema({
   phoneNumber: String,
   email: String,
   company: String,
-  supplierGroup: String,
+  supplierGroupId: String,
   taxIdentificationNumber: String,
   address: {
     street: String,
@@ -36,7 +36,16 @@ const SupplierSchema = new Schema({
   deletedAt: Date,
   __v: { type: Number, select: false }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
+});
+
+SupplierSchema.virtual('supplierGroup', {
+  ref: 'supplier_group', // the collection/model name
+  localField: 'supplierGroupId',
+  foreignField: '_id',
+  justOne: true, // default is false
 });
 
 SupplierSchema.plugin(mongoosePaginate);

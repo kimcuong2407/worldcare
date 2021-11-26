@@ -33,6 +33,7 @@ import purchaseReceiptRoutes from './modules/purchase-receipt';
 import saleRoutes from './modules/sale';
 import countryRoutes from './modules/country';
 import clinicServiceRoutes from './modules/clinic-service';
+import supplierGroupRoutes from './modules/supplier-group';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -69,4 +70,5 @@ export default (app: express.Application): void => {
   purchaseReceiptRoutes(app);
   saleRoutes(app);
   countryRoutes(app);
+  supplierGroupRoutes(app)
 };

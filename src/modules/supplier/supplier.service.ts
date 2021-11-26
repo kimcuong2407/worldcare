@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import SupplierCollection from './supplier.collection';
 import {SupplierModel} from './supplier.model';
 import makeQuery from '@core/database/query';
-import {SUPPLIER_STATUS} from '@modules/supplier/constant';
+import {SUPPLIER_GROUP_STATUS} from '@modules/supplier/constant';
 import { InternalServerError } from '@app/core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('supplier.service');
@@ -57,7 +57,7 @@ const formatSupplier = (supplier: any) => {
 }
 
 const createSupplier = async (supplierInfo: SupplierModel) => {
-  supplierInfo.status = SUPPLIER_STATUS.ACTIVE;
+  supplierInfo.status = SUPPLIER_GROUP_STATUS.ACTIVE;
   supplierInfo.totalPurchase = 0;
   supplierInfo.currentDebt = 0;
 
@@ -71,7 +71,7 @@ const findSupplierByName = async (name: string) => {
 const fetchSuppliers = async (queryInput: any, options: any) => {
 
   const query: any = {
-    status: SUPPLIER_STATUS.ACTIVE,
+    status: SUPPLIER_GROUP_STATUS.ACTIVE,
     partnerId: queryInput.partnerId
   }
   if (queryInput.keyword) {
@@ -94,7 +94,10 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
     ...options,
     sort: {
       name: 1,
-    }
+    },
+    populate: [
+      { path: 'supplierGroup'},
+    ],
   });
   const {docs, ...rest} = suppliers
   return {
@@ -104,8 +107,10 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
 }
 
 const getSupplierInfo = async (query: any) => {
-  const supplier = await SupplierCollection.findOne(query).lean().exec();
-  return formatSupplier(supplier);
+  const supplier = await SupplierCollection.findOne(query)
+    .populate('supplierGroup')
+    .exec();
+  return formatSupplier(get(supplier, '_doc'));
 };
 
 const updateSupplierInfo = async (query: any, supplierInfo: any) => {
@@ -125,7 +130,7 @@ const deleteSupplier = async (supplierId: string) => {
     _id: supplierId,
   }, {
     deletedAt: new Date(),
-    status: SUPPLIER_STATUS.DELETED
+    status: SUPPLIER_GROUP_STATUS.DELETED
   });
 
   return true;
