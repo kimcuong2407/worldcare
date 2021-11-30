@@ -1,11 +1,11 @@
-
 export interface SupplierModel {
   supplierCode: string;
   name: string;
   phoneNumber: string;
   email: string;
   company: string;
-  supplierGroup: string;
+  supplierGroup?: any;
+  supplierGroupId?: string;
   taxIdentificationNumber: string;
   address: Address;
   note: string;

@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import appUtil from '@app/utils/app.util';
 import {NotFoundError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import { isEmpty, isNil } from 'lodash';
+import SupplierGroupCollection from '@modules/supplier-group/supplierGroup.collection';
 
 const logger = loggerHelper.getLogger('supplier.controller');
 
@@ -18,8 +19,8 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
       company,
       address,
       taxIdentificationNumber,
-      supplierGroup,
-      note
+      note,
+      supplierGroupId
     } = req.body;
 
     const partnerId = req.user.partnerId;
@@ -32,9 +33,9 @@ const createSupplierAction = async (req: express.Request, res: express.Response,
       company,
       address,
       taxIdentificationNumber,
-      supplierGroup,
       note,
-      partnerId
+      partnerId,
+      supplierGroupId
     };
     
 
@@ -58,6 +59,15 @@ const validateSupplier = async (supplierInfo: any, isCreating: boolean) => {
   }
   if (!supplierInfo.phoneNumber) {
     throw new ValidationFailedError('Supplier phone number is required.');
+  }
+  if (supplierInfo.supplierGroupId) {
+    const supplierGroup = await SupplierGroupCollection.findOne({
+      _id: supplierInfo.supplierGroupId,
+      partnerId: supplierInfo.partnerId
+    });
+    if (isNil(supplierGroup)) {
+      throw new ValidationFailedError('Supplier group does not exist.');
+    }
   }
 
   if (isCreating) {
@@ -133,8 +143,8 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
       company,
       address,
       taxIdentificationNumber,
-      supplierGroup,
-      note
+      note,
+      supplierGroupId
     } = req.body;
 
     const supplierInfo: any = {
@@ -144,8 +154,8 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
       company,
       address,
       taxIdentificationNumber,
-      supplierGroup,
-      note
+      note,
+      supplierGroupId
     };
 
     await validateSupplier(supplierInfo, false);

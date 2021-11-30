@@ -1,4 +1,4 @@
-export enum SUPPLIER_GROUP_STATUS {
+export enum SUPPLIER_STATUS {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE', 
   DELETED = 'DELETED', 
