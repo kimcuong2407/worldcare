@@ -1,3 +1,11 @@
+# [1.6.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.2...v1.6.0) (2021-11-30)
+
+
+### Features
+
+* **clinic-service:** clinic service implementation ([049494b](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/049494ba1c7d3c93aa9266265aaef3219004a703))
+* **supplier-group:** supplier group implementation ([94e4f8e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/94e4f8e3e5f5f82a9719838cf8c7bf0898bfec98))
+
 ## [1.5.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.1...v1.5.2) (2021-11-24)
 
 
