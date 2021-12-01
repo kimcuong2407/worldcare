@@ -461,6 +461,26 @@ const deleteProductAndVariantActionV2 = async (
   }
 }
 
+const searchProductVariant = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const branchId = req.companyId;
+    const keyword = get(req.query, 'keyword');
+    if(!keyword) {
+      throw new ValidationFailedError('Vui lòng nhập vào keyword.');
+    }
+
+    const list = await productService.searchProductVariants(keyword, branchId);
+    res.send(list);
+  } catch (error) {
+    logger.error('searchProductVariant', error);
+    next(error);
+  }
+}
+
 export default {
   // Product
   createProductAction,
@@ -476,4 +496,6 @@ export default {
   fetchProductInfoActionV2,
   updateProductAndVariantActionV2,
   deleteProductAndVariantActionV2,
+  
+  searchProductVariant,
 };

@@ -8,7 +8,6 @@ const BatchSchema = new mongoose.Schema({
   },
   lotNumber: {
     type: String,
-    unique: true,
     required: true,
   },
   aliasName: {
