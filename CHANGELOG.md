@@ -1,3 +1,10 @@
+## [1.6.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.0...v1.6.1) (2021-12-01)
+
+
+### Bug Fixes
+
+* **country:** update country schema same as kiotViet and fix fetchById ([da865c3](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/da865c3b661465530b31b3a48925b584b4e6e28a))
+
 # [1.6.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.5.2...v1.6.0) (2021-11-30)
 
 
