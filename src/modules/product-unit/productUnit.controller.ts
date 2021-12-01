@@ -10,13 +10,14 @@ import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('ProductUnit.controller');
 
-const validateProductUnit = async (info: any) => {
+const validateProductUnit = async (info: any, id?: string) => {
   // Name is required and unique
   const name = get(info, 'name', null);
   if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
-  const data = await ProductUnitService.getProductUnitInfo({ name });
+  const query = isNil(id) ? { name, status: { $ne: PRODUCT_UNIT_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: PRODUCT_UNIT_STATUS.DELETED } };
+  const data = await ProductUnitService.getProductUnitInfo(query);
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(
       `Product Unit with ${name} is already existed.`
@@ -117,7 +118,7 @@ const updateProductUnitAction = async (
       description,
       status: status || PRODUCT_UNIT_STATUS.ACTIVE,
     };
-    await validateProductUnit(info);
+    await validateProductUnit(info, id);
     const query = { _id: id, branchId }
     const ProductUnit = await ProductUnitService.updateProductUnit(
       query,

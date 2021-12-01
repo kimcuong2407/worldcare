@@ -13,7 +13,7 @@ const ProductVariantSchema = new mongoose.Schema({
     ref: 'branch'
   },
   productId: {
-    type: String,
+    type: mongoose.Types.ObjectId,
     ref: 'product',
     required: true,
   },
@@ -22,7 +22,7 @@ const ProductVariantSchema = new mongoose.Schema({
   },
   unitId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'product-unit',
+    ref: 'product_unit',
     require: true,
   },
   exchangeValue: Number,
@@ -34,8 +34,30 @@ const ProductVariantSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
+  toObject: {
+    virtuals: true,
+  }
 });
 
+ProductVariantSchema.virtual('branch', {
+  ref: 'branch',
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true
+});
+ProductVariantSchema.virtual('product', {
+  ref: 'product',
+  localField: 'productId',
+  foreignField: '_id',
+  justOne: true,
+});
+ProductVariantSchema.virtual('productUnit', {
+  ref: 'product_unit',
+  localField: 'unitId',
+  foreignField: '_id',
+  justOne: true,
+})
+ProductVariantSchema.index({ variantId: 1, productId: 1});
 ProductVariantSchema.plugin(mongoosePaginate);
 ProductVariantSchema.plugin(mongooseAggregatePaginate);
 ProductVariantSchema.plugin(AutoIncrement(mongoose), {

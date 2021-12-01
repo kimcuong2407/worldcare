@@ -10,12 +10,13 @@ import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('ProductPosition.controller');
 
-const validateProductPosition = async (info: any) => {
+const validateProductPosition = async (info: any, id?: string) => {
   // Name is required and unique
   const name = get(info, 'name', null);
   if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
+  const query = isNil(id) ? { name, status: { $ne: PRODUCT_POSITION_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: PRODUCT_POSITION_STATUS.DELETED } };
   const data = await ProductPositionService.getProductPositionInfo({ name });
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(
@@ -117,7 +118,7 @@ const updateProductPositionAction = async (
       description,
       status: status,
     };
-    await validateProductPosition(info);
+    await validateProductPosition(info, id);
 
     const ProductPosition = await ProductPositionService.updateProductPosition(
       { _id: id, branchId },

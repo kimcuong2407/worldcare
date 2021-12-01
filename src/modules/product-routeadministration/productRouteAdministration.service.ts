@@ -42,7 +42,7 @@ const updateProductRouteAdministration = async (
   query: any,
   ProductPosition: any
 ) => {
-  return await ProductRouteAdministrationCollection.updateOne(
+  return ProductRouteAdministrationCollection.findOneAndUpdate(
     query,
     {
       $set: {
@@ -54,7 +54,7 @@ const updateProductRouteAdministration = async (
 };
 
 const deleteProductRouteAdministration = async (id: string) => {
-  return ProductRouteAdministrationCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED, deletedAt: new Date()}).lean().exec;
+  return ProductRouteAdministrationCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec;
 };
 
 export default {

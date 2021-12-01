@@ -31,7 +31,7 @@ const getProductPositionInfo = async (query: any, language = 'vi', isRaw = false
 };
 
 const updateProductPosition = async (query: any, ProductPosition: any) => {
-  return await ProductPositionCollection.updateOne(
+  return ProductPositionCollection.findOneAndUpdate(
     query,
     {
       $set: {
@@ -43,7 +43,7 @@ const updateProductPosition = async (query: any, ProductPosition: any) => {
 };
 
 const deleteProductPosition = async (id: string) => {
-  return ProductPositionCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_POSITION_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
+  return ProductPositionCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_POSITION_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec();
 };
 
 export default {

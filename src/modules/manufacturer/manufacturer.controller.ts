@@ -10,13 +10,14 @@ import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('manufacturer.controller');
 
-const validateManufacturer = async (info: any) => {
+const validateManufacturer = async (info: any, id?: string) => {
   // Name is required and unique
   const name = get(info, 'name', null);
   if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
-  const data = await manufacturerService.getManufacturerInfo({name});
+  const query = isNil(id) ? { name, status: { $ne: MANUFACTURER_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: MANUFACTURER_STATUS.DELETED } };
+  const data = await manufacturerService.getManufacturerInfo(query);
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(`Manufacturer with ${name} is already existed.`);
   }
@@ -111,7 +112,7 @@ const updateManufacturerAction = async (
       description,
       status: status,
     }
-    await validateManufacturer(info);
+    await validateManufacturer(info, id);
 
     const manufacturer = await manufacturerService.updateManufacturer(
       id,

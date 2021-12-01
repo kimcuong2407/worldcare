@@ -10,14 +10,15 @@ import { isUndefined } from 'lodash';
 
 const logger = loggerHelper.getLogger('ProductPosition.controller');
 
-const validateProductRouteAdministration = async (info: any) => {
+const validateProductRouteAdministration = async (info: any, id?: string) => {
   // Name is required and unique
   const name = get(info, 'name', null);
   if (isNil(name)) {
     throw new ValidationFailedError('Name is required.');
   }
+  const query = isNil(id) ? { name, status: { $ne: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: PRODUCT_ROUTE_ADMINISTRATION_STATUS.DELETED } };
   const data = await productRouteAdministrationService.getProductRouteAdministrationInfo(
-    { name }
+    query
   );
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(
@@ -119,7 +120,7 @@ const updateProductRouteAdministrationAction = async (
       description,
       status: status,
     };
-    await validateProductRouteAdministration(info);
+    await validateProductRouteAdministration(info, id);
 
     const ProductPosition = await productRouteAdministrationService.updateProductRouteAdministration(
       { _id: id, branchId },

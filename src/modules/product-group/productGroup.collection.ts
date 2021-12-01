@@ -30,7 +30,17 @@ const ProductGroupSchema = new mongoose.Schema({
   timestamps: true,
   toJSON: {
     virtuals: true,
+  },
+  toObject: {
+    virtuals: true,
   }
+});
+
+ProductGroupSchema.virtual('superGroup', {
+  ref: 'product_group',
+  localField: 'superGroupId',
+  foreignField: '_id',
+  justOne: true
 });
 
 ProductGroupSchema.plugin(mongooseIntl, { languages: ['vi', 'en'], defaultLanguage: 'vi' });

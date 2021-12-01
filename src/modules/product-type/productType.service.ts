@@ -31,7 +31,7 @@ const getProductTypeInfo = async (query: any, language = 'vi', isRaw = false) =>
 };
 
 const updateProductType = async (query: any, ProductType: any) => {
-  return await ProductTypeCollection.updateOne(
+  return ProductTypeCollection.findOneAndUpdate(
     query,
     {
       $set: {
@@ -45,7 +45,7 @@ const updateProductType = async (query: any, ProductType: any) => {
 };
 
 const deleteProductType = async (id: string) => {
-  return ProductTypeCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_TYPE_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
+  return ProductTypeCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_TYPE_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec();
 };
 
 export default {

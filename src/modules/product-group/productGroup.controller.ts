@@ -13,14 +13,11 @@ const logger = loggerHelper.getLogger('productGroup.controller');
 const validateProductGroup = async (info: any, id?: String) => {
   // Name is required and unique
   const name = get(info, 'name', null);
-  console.log(isNil(id), id)
-  if (isNil(id)) {
-    if (isNil(name)) {
-      throw new ValidationFailedError('Name is required.');
-    }
+  if (isNil(name)) {
+    throw new ValidationFailedError('Name is required.');
   }
-  
-  const data = await productGroupService.getProductGroupInfo({name});
+  const query = isNil(id) ? { name, status: { $ne: PRODUCT_GROUP_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: PRODUCT_GROUP_STATUS.DELETED } };
+  const data = await productGroupService.getProductGroupInfo(query);
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(`Product Group with ${name} is already existed.`);
   }

@@ -31,7 +31,7 @@ const getProductUnitInfo = async (query: any, language = 'vi', isRaw = false) =>
 };
 
 const updateProductUnit = async (query: any, ProductUnit: any) => {
-  return await ProductUnitCollection.updateOne(
+  return ProductUnitCollection.findOneAndUpdate(
     query,
     {
       $set: {
@@ -43,7 +43,7 @@ const updateProductUnit = async (query: any, ProductUnit: any) => {
 };
 
 const deleteProductUnit = async (id: string) => {
-  return ProductUnitCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_UNIT_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
+  return ProductUnitCollection.findOneAndUpdate({_id: id}, {status: PRODUCT_UNIT_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec();
 };
 
 export default {

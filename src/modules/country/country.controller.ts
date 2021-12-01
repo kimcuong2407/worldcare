@@ -14,10 +14,11 @@ const createCountryAction = async (
 ) => {
   try {
     const {
-      name, description
+      name, internationalName, description
     } = req.body;
     const info = {
       name,
+      internationalName,
       description,
     };
     const record = await countryService.createCountry(info);
@@ -81,9 +82,10 @@ const updateCountryAction = async (
 ) => {
   try {
     const id = get(req.params, 'id');
-    const { name, description, status } = req.body;
+    const { name, internationalName, description, status } = req.body;
     const info = {
       name,
+      internationalName,
       description,
       status: status,
     };

@@ -22,7 +22,7 @@ const productAutoIncrease = (record: any, productVariants: any) => {
     if(err) {
       return new InternalServerError('Failed to increase ID.');
     }
-    const increasedId = `SP${initIdSquence(record.idSequence)}`
+    const increasedId = `PRODUCT${initIdSquence(record.idSequence)}`
     const doc = await ProductCollection.findOne({increasedId}).exec();
     if(!isNil(doc)) productAutoIncrease(record, productVariants);
     record.productId = increasedId;
@@ -99,7 +99,7 @@ const variantAutoIncrease = (record: any) => {
     if(err) {
       return new InternalServerError('Failed to increase ID.');
     }
-    const increasedId = `VA${initIdSquence(record.idSequence)}`
+    const increasedId = `SP${initIdSquence(record.idSequence)}`
     const doc = await ProductVariantCollection.findOne({increasedId}).lean().exec();
     if(!isNil(doc)) variantAutoIncrease(record);
     record.variantId = increasedId;

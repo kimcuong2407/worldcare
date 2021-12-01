@@ -7,13 +7,13 @@ const createProductGroup = async (info: any, language = 'vi') => {
   const createProductGroup = await ProductGroupCollection.create(info);
   const data = await ProductGroupCollection.findOne({
     _id: createProductGroup._id,
-  });
+  }).populate('superGroup');
   data.setLanguage(language);
   return data;
 };
 
 const getProductGroupList = async (query: any, language = 'vi', isRaw = false) => {
-  let data = await ProductGroupCollection.find(query).populate('superGroupId')
+  let data = await ProductGroupCollection.find(query).populate('superGroup')
     .lean()
     .sort({ index: 1, createdAt: 1 });
   if (isRaw) {
@@ -23,7 +23,7 @@ const getProductGroupList = async (query: any, language = 'vi', isRaw = false) =
 };
 
 const getProductGroupInfo = async (query: any, language = 'vi', isRaw = false) => {
-  const data = await ProductGroupCollection.findOne(query).lean().exec();
+  const data = await ProductGroupCollection.findOne(query).populate('superGroup').lean().exec();
   if (isRaw) {
     return data;
   }
@@ -34,7 +34,7 @@ const updateProductGroup = async (
   query: any,
   info: any
 ) => {
-  return await ProductGroupCollection.findOneAndUpdate(
+  return ProductGroupCollection.findOneAndUpdate(
     query,
     {
       $set: {
@@ -46,7 +46,7 @@ const updateProductGroup = async (
 };
 
 const deleteProductGroup = async (query: any) => {
-  return ProductGroupCollection.findOneAndUpdate(query, {status: PRODUCT_GROUP_STATUS.DELETED, deletedAt: new Date()}).lean().exec();
+  return ProductGroupCollection.findOneAndUpdate(query, {status: PRODUCT_GROUP_STATUS.DELETED, deletedAt: new Date()}, { new: true }).lean().exec();
 }
 
 export default {

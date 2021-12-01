@@ -31,7 +31,7 @@ const getManufacturerInfo = async (query: any, language = 'vi', isRaw = false) =
 };
 
 const updateManufacturer = async (id: string, manufacturer: any) => {
-  const updatedManufacturer = await ManufacturerCollection.updateOne(
+  return ManufacturerCollection.findOneAndUpdate(
     {
       _id: id,
     },
