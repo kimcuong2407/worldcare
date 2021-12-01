@@ -35,7 +35,7 @@ const getProductRouteAdministrationInfo = async (query: any, language = 'vi', is
   if (isRaw) {
     return data;
   }
-  return map(data, (d) => appUtil.mapLanguage(d, language));
+  return appUtil.mapLanguage(data, language);
 };
 
 const updateProductRouteAdministration = async (

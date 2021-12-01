@@ -27,7 +27,7 @@ const fetchCountryInfo = async (query: any, language = 'vi', isRaw = false) => {
   if (isRaw) {
     return data;
   }
-  return map(data, (d) => appUtil.mapLanguage(d, language));
+  return appUtil.mapLanguage(data, language);
 };
 
 const updateCountry = async (id: string, info: any) => {

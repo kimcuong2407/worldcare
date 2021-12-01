@@ -69,7 +69,7 @@ const fetchProductInfo = async (query: any, language = 'vi', isRaw = false) => {
   if (isRaw) {
     return data;
   }
-  return map(data, (d) => appUtil.mapLanguage(d, language));
+  return appUtil.mapLanguage(data, language);
 };
 
 const updateProduct = async (query: any, info: any) => {

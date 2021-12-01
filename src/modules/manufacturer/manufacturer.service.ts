@@ -27,7 +27,7 @@ const getManufacturerInfo = async (query: any, language = 'vi', isRaw = false) =
   if (isRaw) {
     return data;
   }
-  return map(data, (d) => appUtil.mapLanguage(d, language));
+  return appUtil.mapLanguage(data, language);
 };
 
 const updateManufacturer = async (id: string, manufacturer: any) => {

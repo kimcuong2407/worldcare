@@ -8,6 +8,9 @@ const CountrySchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    internationalName: {
+      type: String,
+    },
     description: {
       type: String,
       default: '',
