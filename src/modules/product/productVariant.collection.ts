@@ -2,12 +2,14 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
+import { VARIANT_CODE_SEQUENCE } from './constant';
 
 const ProductVariantSchema = new mongoose.Schema({
-  variantId: {
+  variantCode: {
     type: String,
   },
-  idSequence: Number,
+  codeSequence: Number,
+  variantSearch: [String],
   branchId: {
     type: mongoose.Types.ObjectId,
     ref: 'branch'
@@ -57,16 +59,17 @@ ProductVariantSchema.virtual('productUnit', {
   foreignField: '_id',
   justOne: true,
 })
-ProductVariantSchema.index({ variantId: 1, productId: 1});
+
 ProductVariantSchema.plugin(mongoosePaginate);
 ProductVariantSchema.plugin(mongooseAggregatePaginate);
 ProductVariantSchema.plugin(AutoIncrement(mongoose), {
-  id: 'variant_id_sequence',
-  inc_field: 'idSequence',
+  id: VARIANT_CODE_SEQUENCE,
+  inc_field: 'codeSequence',
   reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true
 });
+ProductVariantSchema.index({ variantCode: 'text', variantSearch: 'text'})
 
 const ProductVariantCollection = mongoose.model(
   'product_variant',
