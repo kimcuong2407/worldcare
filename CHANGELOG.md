@@ -1,3 +1,11 @@
+## [1.6.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.1...v1.6.2) (2021-12-02)
+
+
+### Bug Fixes
+
+* **config:** fix update active config only and change productCode format ([4ebb8c4](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/4ebb8c420b40933bb3b082d79df34c8238e140aa))
+* **product:** update api as requirement after meeting ([313a785](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/313a785daaa2d9d3d346ab071be3690000de6a59))
+
 ## [1.6.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.0...v1.6.1) (2021-12-01)
 
 
