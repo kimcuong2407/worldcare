@@ -4,7 +4,7 @@ import PaymentNoteCollection from '@modules/payment-note/payment-note.collection
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import InvoiceCollection from '@modules/invoice/invoice.collection';
 import PurchaseOrderCollection from '@modules/purchaseOrder/purchase-order.collection';
-import LotCollection from '@modules/batch/batch.collection';
+import BatchCollection from '@modules/batch/batch.collection';
 import invoiceService from '@modules/invoice/invoice.service'
 import purchaseOrderService from '@modules/purchaseOrder/purchase-order.service'
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service'
@@ -22,7 +22,7 @@ const checkBatchQuantity = async (items: any) => {
     throw new ValidationFailedError('Invoice detail is not valid.');
   }
   for (const detailItem of items) {
-    const batchDoc = await LotCollection.findById(detailItem.batchId);
+    const batchDoc = await BatchCollection.findById(detailItem.batchId);
     if (isNil(batchDoc)) {
       throw new ValidationFailedError(`Batch ID ${detailItem.batchId} does not exist.`);
     }
@@ -144,9 +144,9 @@ async function createInventoryTransaction(type: string, inputInfo: any, referenc
     }
     const inventoryTransaction = await InventoryTransactionCollection.create(inventoryTransactionInfo);
     logger.info(`Created InventoryTransaction with ID[${inventoryTransaction['_doc']['_id']}]`)
-    const batchDoc = await LotCollection.findOne({_id: detailItem.batchId}).exec();
+    const batchDoc = await BatchCollection.findOne({_id: detailItem.batchId}).exec();
     if (!isNil(batchDoc)) {
-      await LotCollection.findOneAndUpdate({_id: detailItem.batchId}, {
+      await BatchCollection.findOneAndUpdate({_id: detailItem.batchId}, {
         quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
       }).exec();
     }

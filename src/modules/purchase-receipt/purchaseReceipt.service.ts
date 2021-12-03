@@ -5,7 +5,7 @@ import PaymentNoteCollection from '@modules/payment-note/payment-note.collection
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
 import {PAYMENT_NOTE_TYPE, TRANSACTION_TYPE} from '@modules/payment-note/constant';
-import LotCollection from '@modules/batch/batch.collection';
+import BatchCollection from '@modules/batch/batch.collection';
 import {PURCHASE_RECEIPT_STATUS} from '@modules/purchase-receipt/constant';
 
 const logger = loggerHelper.getLogger('purchaseReceipt.service');
@@ -80,9 +80,9 @@ async function createInventoryTransaction(purchaseReceiptInfo: any, supplierId: 
           referenceDocId: purchaseReceiptId
         }
         const inventoryTransaction = await InventoryTransactionCollection.create(inventoryTransactionInfo);
-        const batchDoc = await LotCollection.findOne({_id: batch.batchId}).exec();
+        const batchDoc = await BatchCollection.findOne({_id: batch.batchId}).exec();
         if (!isNil(batchDoc)) {
-          await LotCollection.findOneAndUpdate({_id: batch.batchId}, {
+          await BatchCollection.findOneAndUpdate({_id: batch.batchId}, {
             quantity: get(batchDoc, '_doc').quantity + batch.quantity
           }).exec();
         }

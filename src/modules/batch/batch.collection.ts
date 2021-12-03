@@ -33,10 +33,10 @@ const BatchSchema = new mongoose.Schema({
 
 BatchSchema.plugin(mongoosePaginate);
 
-const LotCollection = mongoose.model(
+const BatchCollection = mongoose.model(
   'batch',
   BatchSchema,
   'batch',
 );
 
-export default LotCollection;
+export default BatchCollection;
