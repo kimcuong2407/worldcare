@@ -1,3 +1,11 @@
+## [1.6.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.2...v1.6.3) (2021-12-03)
+
+
+### Bug Fixes
+
+* **banch:** refactor branchId type ([fcf8682](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/fcf868264b9b1b206e8babde73158ca52efe01ee))
+* **batch:** recorrect batch collection name ([7b2079e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/7b2079ede21c44ba96dcbe76fb23c94aad0950e5))
+
 ## [1.6.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.1...v1.6.2) (2021-12-02)
 
 
