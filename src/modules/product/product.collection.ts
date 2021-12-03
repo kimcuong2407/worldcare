@@ -33,7 +33,7 @@ const ProductSchema = new mongoose.Schema({
   aliasName: String,
   barcode: String,
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   typeId: {

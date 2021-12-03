@@ -3,7 +3,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 const BatchSchema = new mongoose.Schema({
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   lotNumber: {

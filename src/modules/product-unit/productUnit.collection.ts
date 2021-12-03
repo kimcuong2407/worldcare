@@ -19,7 +19,7 @@ const ProductUnitSchema = new mongoose.Schema(
       default: PRODUCT_UNIT_STATUS.ACTIVE,
     },
     branchId: {
-      type: mongoose.Types.ObjectId,
+      type: Number,
       ref: 'branch'
     },
     deletedAt: Date,

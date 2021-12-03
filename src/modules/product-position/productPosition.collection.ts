@@ -19,7 +19,7 @@ const ProductPositionSchema = new mongoose.Schema(
       default: PRODUCT_POSITION_STATUS.ACTIVE,
     },
     branchId: {
-      type: mongoose.Types.ObjectId,
+      type: Number,
       ref: 'branch'
     },
     deletedAt: Date,

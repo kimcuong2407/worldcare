@@ -11,7 +11,7 @@ const ProductVariantSchema = new mongoose.Schema({
   codeSequence: Number,
   variantSearch: [String],
   branchId: {
-    type: mongoose.Types.ObjectId,
+    type: Number,
     ref: 'branch'
   },
   productId: {
