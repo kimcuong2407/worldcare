@@ -461,6 +461,22 @@ const deleteProductAndVariantActionV2 = async (
   }
 }
 
+const fetchProductVariantQuantityActionV2 = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const _id = get(req, 'params.id');
+    const query = { variantId: _id };
+    const record = await productService.fetchProductVariantQuantityV2(query);
+    res.send(record);
+  } catch (error) {
+    logger.error('fetchProductVariantQuantityActionV2', error);
+    next(error);
+  }
+}
+
 const searchProductVariant = async (
   req: express.Request,
   res: express.Response,
@@ -496,6 +512,7 @@ export default {
   fetchProductInfoActionV2,
   updateProductAndVariantActionV2,
   deleteProductAndVariantActionV2,
+  fetchProductVariantQuantityActionV2,
   
   searchProductVariant,
 };

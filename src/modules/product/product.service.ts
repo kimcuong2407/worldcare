@@ -5,11 +5,14 @@ import isNil from 'lodash/isNil';
 import { PRODUCT_CODE_PREFIX, PRODUCT_CODE_SEQUENCE, PRODUCT_STATUS, PRODUCT_VARIANT_STATUS, VARIANT_CODE_PREFIX, VARIANT_CODE_SEQUENCE } from './constant';
 import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
-import { forEach, map, omit, size, union, unionBy, uniq } from 'lodash';
+import { forEach, map, omit, reduce, size, union, unionBy, uniq } from 'lodash';
 import appUtil from '@app/utils/app.util';
 import Bluebird from 'bluebird';
 import MedicineCollection from './medicine.collection';
 import LotCollection from '@modules/batch/batch.collection';
+import BatchCollection from '@modules/batch/batch.collection';
+import { query } from 'winston';
+import PurchaseOrderCollection from '../purchaseOrder/purchase-order.collection';
 
 // @Tuan.NG:> setup code sequence
 
@@ -308,8 +311,21 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
     if (keyword) {
       query['$text'] = { $search: keyword };
     }
-    const productVariants = await ProductVariantCollection.find(query)
+    const variants = await ProductVariantCollection.find(query)
     .populate('productUnit').lean().exec();
+    const productVariants = await Bluebird.map(variants, async (v) => {
+      const variantId = get(v, '_id');
+      const batchQuery = { variantId };
+      const batch = [{quantity: 1}, {quantity: 2}];
+      const totalQuantity = await Bluebird.reduce(batch, (total, b) => {
+        return total += get(b, 'quantity', 0);
+      }, 0);
+      return {
+        ...v,
+        batch,
+        totalQuantity,
+      };
+    });
     return {
       ...product,
       productVariants,
@@ -383,6 +399,10 @@ const deleteProductAndVariantV2 = async (query: any) => {
   return true;
 }
 
+const fetchProductVariantQuantityV2 = async (query: any) => {
+  const quantityOrder = await PurchaseOrderCollection.find(query).lean().exec();
+};
+
 const searchProductVariants = async (keyword: string, branchId: number) => {
   const productVariants = await ProductVariantCollection.find({
     $text: {
@@ -426,6 +446,7 @@ export default {
   fetchProductInfoV2,
   updateProductAndVariantV2,
   deleteProductAndVariantV2,
+  fetchProductVariantQuantityV2,
   
   searchProductVariants
 }

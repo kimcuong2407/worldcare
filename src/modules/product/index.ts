@@ -22,6 +22,8 @@ const productRoutes = (app: express.Application): void => {
   app.get('/api/v2/product/:id', productActions.fetchProductInfoActionV2);
   app.put('/api/v2/product/:id', productActions.updateProductAndVariantActionV2);
   app.delete('/api/v2/product/:id', productActions.deleteProductAndVariantActionV2);
+  app.get('/api/v2/product-variant/quantity', productActions.fetchProductVariantQuantityActionV2);
+
   app.get('/api/v1/product-variant/search', middleware.authorization([
     [ROOT_RESOURCES.sale, CORE_ACTIONS.read]
   ]), productActions.searchProductVariant);
