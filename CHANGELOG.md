@@ -1,3 +1,10 @@
+# [1.7.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.3...v1.7.0) (2021-12-04)
+
+
+### Features
+
+* **product-variant:** search product variants implemenentation ([35644c1](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/35644c19617dede826e9742713a17b630e52ae09))
+
 ## [1.6.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.2...v1.6.3) (2021-12-03)
 
 
