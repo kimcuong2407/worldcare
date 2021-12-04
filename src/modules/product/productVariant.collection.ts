@@ -36,9 +36,8 @@ const ProductVariantSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true,
-  toObject: {
-    virtuals: true,
-  }
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
 });
 
 ProductVariantSchema.virtual('branch', {
@@ -53,6 +52,14 @@ ProductVariantSchema.virtual('product', {
   foreignField: '_id',
   justOne: true,
 });
+
+ProductVariantSchema.virtual('unit', {
+  ref: 'product_unit', // the collection/model name
+  localField: 'unitId',
+  foreignField: '_id',
+  justOne: true, // default is false
+});
+
 ProductVariantSchema.virtual('productUnit', {
   ref: 'product_unit',
   localField: 'unitId',

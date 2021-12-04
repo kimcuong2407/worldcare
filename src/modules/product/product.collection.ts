@@ -113,6 +113,7 @@ ProductSchema.plugin(mongooseIntl, {
   languages: ['vi', 'en'],
   defaultLanguage: 'vi',
 });
+ProductSchema.index({ name: 'text', productId: 'text'})
 ProductSchema.plugin(mongoosePaginate);
 ProductSchema.plugin(AutoIncrement(mongoose), {
   id: PRODUCT_CODE_SEQUENCE,

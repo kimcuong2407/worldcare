@@ -1,4 +1,4 @@
-import { InternalServerError } from '@app/core/types/ErrorTypes';
+import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import omitBy from 'lodash/omitBy'
 import isNil from 'lodash/isNil';
@@ -7,10 +7,9 @@ import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
 import { forEach, map, omit, size, union, unionBy, uniq } from 'lodash';
 import appUtil from '@app/utils/app.util';
-import { lang } from 'moment';
 import Bluebird from 'bluebird';
-import { query } from 'express';
 import MedicineCollection from './medicine.collection';
+import LotCollection from '@modules/batch/batch.collection';
 
 // @Tuan.NG:> setup code sequence
 
@@ -370,7 +369,10 @@ const updateProductAndVariantV2 = async (info: any) => {
 };
 
 const deleteProductAndVariantV2 = async (query: any) => {
-  const product = await ProductCollection.findOneAndUpdate(query, {deletedAt: new Date(), status: PRODUCT_STATUS.DELETED}).lean().exec();
+  const product = await ProductCollection.findOneAndUpdate(query, {
+    deletedAt: new Date(),
+    status: PRODUCT_STATUS.DELETED
+  }).lean().exec();
   const productId = get(product, '_id');
   const variantQuery = {productId};
   await ProductVariantCollection.updateMany(variantQuery, {
@@ -379,6 +381,26 @@ const deleteProductAndVariantV2 = async (query: any) => {
   });
 
   return true;
+}
+
+const searchProductVariants = async (keyword: string, branchId: number) => {
+  const productVariants = await ProductVariantCollection.find({
+    $text: {
+      $search: keyword
+    },
+    status: PRODUCT_VARIANT_STATUS.ACTIVE
+  }).limit(10)
+    .populate('unit')
+    .populate('product')
+    .lean().exec();
+  for (const productVariant of productVariants) {
+    productVariant.batches = await LotCollection.find({
+      variantId: productVariant['_id']
+    }).sort({expirationDate: 1}).lean().exec();
+    productVariant.availableQuantity = productVariant.batches.map((batch: any) => batch.quantity).reduce((a: any, b: any) => a + b, 0);
+  }
+
+  return productVariants
 }
 
 export default {
@@ -404,4 +426,6 @@ export default {
   fetchProductInfoV2,
   updateProductAndVariantV2,
   deleteProductAndVariantV2,
+  
+  searchProductVariants
 }
