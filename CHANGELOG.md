@@ -1,3 +1,11 @@
+## [1.7.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.7.0...v1.7.1) (2021-12-05)
+
+
+### Bug Fixes
+
+* **product:** fix country and omiss match field path ([66cfcd6](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/66cfcd6698f402cca236e9d9c9def8bf6714e38e))
+* **product:** update total in fetch list ([9387b78](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/9387b7840b22e92255509c2a1cb52d62bcae541f))
+
 # [1.7.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.6.3...v1.7.0) (2021-12-04)
 
 
