@@ -13,6 +13,9 @@ import LotCollection from '@modules/batch/batch.collection';
 import BatchCollection from '@modules/batch/batch.collection';
 import { query } from 'winston';
 import PurchaseOrderCollection from '../purchaseOrder/purchase-order.collection';
+import InventoryTransactionCollection from '../inventory-transaction/inventory-transaction.collection';
+import { ORDER_STATUS } from '../orders/constant';
+import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';
 
 // @Tuan.NG:> setup code sequence
 
@@ -302,6 +305,7 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
     const product = await ProductCollection.findOne({_id: id})
     .populate('branch')
     .populate('manufacturer')
+    .populate('country')
     .populate('productType')
     .populate('productGroup')
     .populate('productPosition')
@@ -341,6 +345,7 @@ const fetchProductInfoV2 = async (query: any, language = 'vi', isRaw = false) =>
   const product = await ProductCollection.findOne(query)
   .populate('branch')
   .populate('manufacturer')
+  .populate('country')
   .populate('productType')
   .populate('productGroup')
   .populate('productPosition')
@@ -369,6 +374,7 @@ const updateProductAndVariantV2 = async (info: any) => {
   })
   .populate('branch')
   .populate('manufacturer')
+  .populate('country')
   .populate('productType')
   .populate('productGroup')
   .populate('productPosition')
@@ -399,7 +405,10 @@ const deleteProductAndVariantV2 = async (query: any) => {
   return true;
 }
 
-const fetchProductVariantQuantityV2 = async (query: any) => {
+const fetchProductVariantQuantityV2 = async (params: any) => {
+  const { variantId } = params;
+  const query = { variantId, type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT }
+  const allOrderTransactions = await InventoryTransactionCollection.find(query).lean().exec();
   const quantityOrder = await PurchaseOrderCollection.find(query).lean().exec();
 };
 

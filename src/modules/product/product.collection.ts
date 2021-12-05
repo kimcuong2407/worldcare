@@ -46,6 +46,11 @@ const ProductSchema = new mongoose.Schema({
     ref: 'manufacturer',
     required: true,
   },
+  countryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'country',
+    required: true,
+  },
   groupId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'product_group',
@@ -81,6 +86,12 @@ ProductSchema.virtual('branch', {
 ProductSchema.virtual('manufacturer', {
   ref: 'manufacturer',
   localField: 'manufacturerId',
+  foreignField: '_id',
+  justOne: true,
+});
+ProductSchema.virtual('country', {
+  ref: 'country',
+  localField: 'countryId',
   foreignField: '_id',
   justOne: true,
 });

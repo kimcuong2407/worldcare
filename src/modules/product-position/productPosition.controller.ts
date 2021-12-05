@@ -17,7 +17,7 @@ const validateProductPosition = async (info: any, id?: string) => {
     throw new ValidationFailedError('Name is required.');
   }
   const query = isNil(id) ? { name, status: { $ne: PRODUCT_POSITION_STATUS.DELETED } } : { _id: { $ne: id }, name, status: { $ne: PRODUCT_POSITION_STATUS.DELETED } };
-  const data = await ProductPositionService.getProductPositionInfo({ name });
+  const data = await ProductPositionService.getProductPositionInfo(query);
   if (data && Object.keys(data).length != 0) {
     throw new ValidationFailedError(
       `Product Position with ${name} is already existed.`

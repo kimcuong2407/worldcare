@@ -60,8 +60,8 @@ const transformVariant = async (searchProductSchema: any, data: any, branchId: n
       unitId: get(_info, 'unitId'),
       exchangeValue: get(_info, 'exchangeValue', 1),
       barcode: get(_info, 'barcode', ''),
-      cost: get(_info, 'pricing.cost', 0),
-      price: get(_info, 'pricing.price', 0),
+      cost: get(_info, 'cost', 0),
+      price: get(_info, 'price', 0),
       status: get(_info, 'status', PRODUCT_VARIANT_STATUS.ACTIVE),
       branchId,
     }, isNil);
@@ -287,6 +287,7 @@ const createProductAndVariantActionV2 = async (
       barcode,
       typeId,
       manufacturerId,
+      countryId,
       groupId,
       positionId,
       routeAdministrationId,
@@ -319,6 +320,7 @@ const createProductAndVariantActionV2 = async (
       barcode,
       typeId,
       manufacturerId,
+      countryId,
       groupId,
       positionId,
       routeAdministrationId,
@@ -392,6 +394,7 @@ const updateProductAndVariantActionV2 = async (
       typeId,
       branchId,
       manufacturerId,
+      countryId,
       groupId,
       positionId,
       routeAdministrationId,
@@ -428,6 +431,7 @@ const updateProductAndVariantActionV2 = async (
       barcode,
       typeId,
       manufacturerId,
+      countryId,
       groupId,
       positionId,
       routeAdministrationId,
@@ -468,8 +472,8 @@ const fetchProductVariantQuantityActionV2 = async (
 ) => {
   try {
     const _id = get(req, 'params.id');
-    const query = { variantId: _id };
-    const record = await productService.fetchProductVariantQuantityV2(query);
+    const params = { variantId: _id }; 
+    const record = await productService.fetchProductVariantQuantityV2(params);
     res.send(record);
   } catch (error) {
     logger.error('fetchProductVariantQuantityActionV2', error);
@@ -484,7 +488,7 @@ const searchProductVariant = async (
 ) => {
   try {
     const branchId = req.companyId;
-    const keyword = get(req.query, 'keyword');
+    const keyword = get(req, 'query.keyword');
     if(!keyword) {
       throw new ValidationFailedError('Vui lòng nhập vào keyword.');
     }
