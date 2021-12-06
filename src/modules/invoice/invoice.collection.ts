@@ -65,6 +65,10 @@ const InvoiceSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'purchase_order'
   },
+  prescriptionId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'prescription_v2'
+  },
   discountValue: Number,
   discountPercent: Number,
   discountType: String,

@@ -8,6 +8,7 @@ import BatchCollection from '@modules/batch/batch.collection';
 import invoiceService from '@modules/invoice/invoice.service'
 import saleOrderService from '@modules/sale-orders/sale-order.service'
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service'
+import prescriptionService from '@modules/prescription-v2/prescription.service'
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
 import {PAYMENT_NOTE_TYPE, TRANSACTION_TYPE} from '@modules/payment-note/constant';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
@@ -64,7 +65,14 @@ const createInvoice = async (invoiceInfo: any) => {
     paymentNoteId: undefined as any,
     discountValue: invoiceInfo.discountValue,
     discountPercent: invoiceInfo.discountPercent,
-    discountType: invoiceInfo.discountType
+    discountType: invoiceInfo.discountType,
+    prescriptionId: undefined as any
+  }
+
+  if (invoiceInfo.isPrescriptionFilled && !isNil(invoiceInfo.prescription)) {
+    invoiceInfo.prescription.branchId = invoiceInfo.branchId;
+    const prescription = await prescriptionService.persistPrescription(invoiceInfo.prescription);
+    invoice.prescriptionId = get(prescription, '_id')
   }
 
   if (paymentNote) {

@@ -82,7 +82,9 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
       discountPercent,
       discountType,
       payment,
-      note
+      note,
+      prescription,
+      isPrescriptionFilled
     } = req.body;
 
     if (type !== SALE_TYPE.DIRECT && type !== SALE_TYPE.ORDER) {
@@ -109,6 +111,8 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
         console.log('Direct selling')
         const invoiceInfo = {
           ...baseInfo,
+          prescription,
+          isPrescriptionFilled,
           // TODO: hardcode sale channel. update when sale channel feature implementation is finished
           saleChannel: SALE_CHANNELS.DIRECT
         };
