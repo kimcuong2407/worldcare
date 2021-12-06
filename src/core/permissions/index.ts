@@ -4,7 +4,7 @@ export const CORE_RESOURCES = {
   employee: 'employee',
   user: 'user',
   userGroup: 'userGroup',
-  // customer: 'customer',
+  customer: 'customer',
   // patient: 'patient',
 }
 

@@ -1,0 +1,11 @@
+export enum CUSTOMER_V2_STATUS {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE', 
+  DELETED = 'DELETED', 
+}
+export enum CUSTOMER_V2_TYPE {
+  INDIVIDUAL = 'INDIVIDUAL',
+  COMPANY = 'COMPANY'
+}
+
+export default {};
