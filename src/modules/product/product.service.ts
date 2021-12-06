@@ -385,14 +385,28 @@ const deleteProductAndVariantV2 = async (query: any) => {
 
 const searchProductVariants = async (keyword: string, branchId: number) => {
   const productVariants = await ProductVariantCollection.find({
-    $text: {
-      $search: keyword
-    },
+    $or: [
+      {
+        variantSearch: {
+          $elemMatch: {
+            $regex: '.*' + keyword + '.*', $options: 'i'
+          }
+        }
+      }, {
+        variantCode: {
+          $regex: '.*' + keyword + '.*', $options: 'i'
+        }
+      }
+    ],
+    branchId,
     status: PRODUCT_VARIANT_STATUS.ACTIVE
   }).limit(10)
     .populate('unit')
     .populate('product')
     .lean().exec();
+  if (!productVariants || productVariants.length === 0) {
+    return [];
+  }
   for (const productVariant of productVariants) {
     productVariant.batches = await LotCollection.find({
       variantId: productVariant['_id']
