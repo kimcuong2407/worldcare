@@ -20,6 +20,7 @@ const SupplierGroupSchema = new Schema({
   timestamps: true
 });
 
+SupplierGroupSchema.index({ name: 'text'})
 SupplierGroupSchema.plugin(mongoosePaginate);
 
 const SupplierGroupCollection = mongoose.model('supplier_group', SupplierGroupSchema, 'supplier_group');

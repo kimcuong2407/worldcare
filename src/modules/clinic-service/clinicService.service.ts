@@ -83,7 +83,8 @@ const fetchClinicServicesByGroupIdAndPartnerId = async (serviceGroupId: string, 
 const findClinicService = async (serviceId: string, branchId: number) => {
   const query = {
     _id: serviceId,
-    branchId
+    branchId,
+    deletedAt: null
   }
   return await getClinicServiceInfo(query);
 };

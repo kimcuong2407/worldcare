@@ -48,7 +48,8 @@ const fetchServiceGroups = async (companyId: number) => {
 const findServiceGroupInfoByGroupIdAndBranchId = async (serviceGroupId: string, branchId: number) => {
   const query = {
     _id: serviceGroupId,
-    branchId
+    branchId,
+    deletedAt: null
   }
   return await getServiceGroupInfo(query);
 };

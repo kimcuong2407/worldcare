@@ -48,6 +48,7 @@ SupplierSchema.virtual('supplierGroup', {
   justOne: true, // default is false
 });
 
+SupplierSchema.index({ name: 'text', supplierCode: 'text'})
 SupplierSchema.plugin(mongoosePaginate);
 SupplierSchema.plugin(mongooseAggregatePaginate);
 SupplierSchema.plugin(AutoIncrement(mongoose), {

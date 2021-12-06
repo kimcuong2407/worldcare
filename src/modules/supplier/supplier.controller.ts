@@ -118,7 +118,8 @@ const getSupplierByIdAction = async (req: express.Request, res: express.Response
     let supplierId = get(req.params, 'supplierId');
     const query: any = {
       _id: supplierId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const supplier = await supplierService.getSupplierInfo(query);
     if (!supplier || Object.keys(supplier).length === 0) {
@@ -163,7 +164,8 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
     let supplierId = get(req.params, 'supplierId');
     const query: any = {
       _id: supplierId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const existedSupplier = await supplierService.getSupplierInfo(query);
     if (!existedSupplier || Object.keys(existedSupplier).length === 0) {
@@ -172,7 +174,7 @@ const updateSupplierInfoAction = async (req: express.Request, res: express.Respo
 
     if (existedSupplier.name !== supplierInfo.name) {
       const supplier = await supplierService.getSupplierInfo({
-        '$and': [{name}, {_id: {'$ne': supplierId}}, {partnerId}]
+        '$and': [{name}, {_id: {'$ne': supplierId}}, {partnerId}, {deletedAt: null}]
       });
       if (supplier && Object.keys(supplier).length !== 0) {
         throw new ValidationFailedError(`Supplier with name ${name} is existed.`);
@@ -194,7 +196,8 @@ const deleteSupplierAction = async (req: express.Request, res: express.Response,
     let supplierId = get(req.params, 'supplierId');
     const query: any = {
       _id: supplierId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const supplier = await supplierService.getSupplierInfo(query);
     if (!supplier || Object.keys(supplier).length === 0) {
