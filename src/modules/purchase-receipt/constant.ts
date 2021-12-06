@@ -1,4 +1,0 @@
-export enum PURCHASE_RECEIPT_STATUS {
-  COMPLETED = 'COMPLETED',
-  DRAFT = 'DRAFT',
-}

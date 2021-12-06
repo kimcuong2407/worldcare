@@ -1,13 +1,13 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
-import purchaseReceiptService from './purchaseReceipt.service';
+import purchaseOrderService from './purchaseOrder.service';
 import {isNil} from 'lodash';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import appUtil from '@utils/app.util';
 
-const logger = loggerHelper.getLogger('purchaseReceipt.controller');
+const logger = loggerHelper.getLogger('purchaseOrder.controller');
 
-const createPurchaseReceipt = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const createPurchaseOrder = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const branchId = req.companyId;
     const partnerId = req.user.partnerId;
@@ -24,7 +24,7 @@ const createPurchaseReceipt = async (req: express.Request, res: express.Response
     } = req.body;
 
     // Create purchase receipt
-    const purchaseReceiptInfo = {
+    const purchaseOrderInfo = {
       purchaseItems,
       supplierId,
       payment,
@@ -38,25 +38,25 @@ const createPurchaseReceipt = async (req: express.Request, res: express.Response
       discountType
     }
 
-    const purchaseReceipt = await purchaseReceiptService.createPurchaseReceipt(purchaseReceiptInfo);
-    res.send(purchaseReceipt);
+    const purchaseOrder = await purchaseOrderService.createPurchaseOrder(purchaseOrderInfo);
+    res.send(purchaseOrder);
   } catch (e) {
-    logger.error('createPurchaseReceipt', e);
+    logger.error('createPurchaseOrder', e);
     next(e);
   }
 };
 
-const updatePurchaseReceipt = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const updatePurchaseOrder = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const branchId = req.companyId;
     const partnerId = req.user.partnerId;
 
-    const purchaseReceiptId = req.params.purchaseReceiptId;
-    const purchaseReceipt = await purchaseReceiptService.getPurchaseReceipt({
-      _id: purchaseReceiptId,
+    const purchaseOrderId = req.params.purchaseOrderId;
+    const purchaseOrder = await purchaseOrderService.getPurchaseOrder({
+      _id: purchaseOrderId,
       branchId
     })
-    if (isNil(purchaseReceipt)) {
+    if (isNil(purchaseOrder)) {
       throw new ValidationFailedError('Can not find Purchase receipt.');
     }
 
@@ -73,8 +73,8 @@ const updatePurchaseReceipt = async (req: express.Request, res: express.Response
     } = req.body;
 
     // Update purchase receipt
-    const purchaseReceiptInfo = {
-      purchaseReceiptId,
+    const purchaseOrderInfo = {
+      purchaseOrderId,
       purchaseItems,
       supplierId,
       payment,
@@ -87,15 +87,15 @@ const updatePurchaseReceipt = async (req: express.Request, res: express.Response
       discountType
     }
 
-    const data = await purchaseReceiptService.updatePurchaseReceipt(purchaseReceiptInfo);
+    const data = await purchaseOrderService.updatePurchaseOrder(purchaseOrderInfo);
     res.send(data);
   } catch (e) {
-    logger.error('updatePurchaseReceipt', e);
+    logger.error('updatePurchaseOrder', e);
     next(e);
   }
 };
 
-const fetchPurchaseReceipt = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const fetchPurchaseOrder = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const {keyword} = req.query;
     const {page, limit} = appUtil.getPaging(req);
@@ -106,7 +106,7 @@ const fetchPurchaseReceipt = async (req: express.Request, res: express.Response,
     const query: any = {
       keyword
     }
-    const data = await purchaseReceiptService.fetchPurchaseReceipts(query, options);
+    const data = await purchaseOrderService.fetchPurchaseOrders(query, options);
     res.send(data);
   } catch (e) {
     logger.error('Error while creating new supplier', e);
@@ -114,19 +114,19 @@ const fetchPurchaseReceipt = async (req: express.Request, res: express.Response,
   }
 };
 
-const fetchPurchaseReceiptById = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const fetchPurchaseOrderById = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const branchId = req.companyId;
-    const purchaseReceiptId = req.params.purchaseReceiptId;
-    const purchaseReceipt = await purchaseReceiptService.getPurchaseReceipt({
-      _id: purchaseReceiptId,
+    const purchaseOrderId = req.params.purchaseOrderId;
+    const purchaseOrder = await purchaseOrderService.getPurchaseOrder({
+      _id: purchaseOrderId,
       branchId
     })
-    if (isNil(purchaseReceipt)) {
+    if (isNil(purchaseOrder)) {
       throw new ValidationFailedError('Can not find Purchase receipt.');
     }
-    const data = await purchaseReceiptService.findById({
-      _id: purchaseReceiptId,
+    const data = await purchaseOrderService.findById({
+      _id: purchaseOrderId,
       branchId
     });
     res.send(data);
@@ -137,8 +137,8 @@ const fetchPurchaseReceiptById = async (req: express.Request, res: express.Respo
 };
 
 export default {
-  create: createPurchaseReceipt,
-  update: updatePurchaseReceipt,
-  fetch: fetchPurchaseReceipt,
-  getById: fetchPurchaseReceiptById
+  create: createPurchaseOrder,
+  update: updatePurchaseOrder,
+  fetch: fetchPurchaseOrder,
+  getById: fetchPurchaseOrderById
 };

@@ -19,6 +19,10 @@ const InvoiceDetail = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'product'
   },
+  branch: Object,
+  variant: Object,
+  batch: Object,
+  product: Object,
   discountValue: Number,
   discountPercent: Number,
   discountType: String,
@@ -57,7 +61,7 @@ const InvoiceSchema = new mongoose.Schema({
     ref: 'payment_note'
   },
   status: String,
-  purchaseOrderId: {
+  saleOrderId: {
     type: mongoose.Types.ObjectId,
     ref: 'purchase_order'
   },

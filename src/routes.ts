@@ -29,7 +29,7 @@ import productRouteAdministrationRoutes from './modules/product-routeadministrat
 import manufacturerRoutes from './modules/manufacturer';
 import serviceGroupRoutes from './modules/clinic-service-group';
 import productRoutes from './modules/product';
-import purchaseReceiptRoutes from './modules/purchase-receipt';
+import purchaseOrderRoutes from './modules/purchase-order';
 import saleRoutes from './modules/sale';
 import countryRoutes from './modules/country';
 import clinicServiceRoutes from './modules/clinic-service';
@@ -67,8 +67,8 @@ export default (app: express.Application): void => {
   serviceGroupRoutes(app);
   clinicServiceRoutes(app);
   productRoutes(app);
-  purchaseReceiptRoutes(app);
+  purchaseOrderRoutes(app);
   saleRoutes(app);
   countryRoutes(app);
-  supplierGroupRoutes(app)
+  supplierGroupRoutes(app);
 };

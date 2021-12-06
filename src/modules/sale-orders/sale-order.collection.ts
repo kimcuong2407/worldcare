@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 
-const PurchaseOrderDetail = new mongoose.Schema({
+const SaleOrderDetail = new mongoose.Schema({
   branchId: {
     type: Number,
     ref: 'branch'
@@ -29,7 +29,7 @@ const PurchaseOrderDetail = new mongoose.Schema({
   timestamps: true
 });
 
-const PurchaseOrderSchema = new mongoose.Schema({
+const SaleOrderSchema = new mongoose.Schema({
   code: {
     type: String,
   },
@@ -47,7 +47,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   }, 
-  purchaseOrderDetail: [PurchaseOrderDetail],
+  saleOrderDetail: [SaleOrderDetail],
   paymentNoteId: {
     type: mongoose.Types.ObjectId,
     ref: 'payment_note'
@@ -65,19 +65,19 @@ const PurchaseOrderSchema = new mongoose.Schema({
 })
 
 
-PurchaseOrderSchema.plugin(mongoosePaginate);
-PurchaseOrderSchema.plugin(AutoIncrement(mongoose), {
-  id: 'purchase_order_code_sequence',
+SaleOrderSchema.plugin(mongoosePaginate);
+SaleOrderSchema.plugin(AutoIncrement(mongoose), {
+  id: 'sale_order_code_sequence',
   inc_field: 'codeSequence',
   reference_fields: ['branchId'],
   start_seq: 1,
   disable_hooks: true
 });
 
-const PurchaseOrderCollection = mongoose.model(
-  'purchase_order',
-  PurchaseOrderSchema,
-  'purchase_order'
+const SaleOrderCollection = mongoose.model(
+  'sale_order',
+  SaleOrderSchema,
+  'sale_order'
 );
 
-export default PurchaseOrderCollection;
+export default SaleOrderCollection;

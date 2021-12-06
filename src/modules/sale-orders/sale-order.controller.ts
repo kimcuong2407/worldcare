@@ -3,12 +3,12 @@ import loggerHelper from '@utils/logger.util';
 import express from 'express';
 import { isNil } from 'lodash';
 import get from 'lodash/get';
-import purchaseOrderService from './purchase-order.service';
+import saleOrderService from './sale-order.service';
 
 const logger = loggerHelper.getLogger('purchase-order.controller');
 
 
-const createPurchaseOrderAction = async (
+const createSaleOrderAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -19,16 +19,16 @@ const createPurchaseOrderAction = async (
       supplierCode,
       createdById,
       receiverById,
-      purchaseOrderDetail,
+      saleOrderDetail,
     } = req.body;
     const info = {
       branchId,
       supplierCode,
       createdById,
       receiverById,
-      purchaseOrderDetail,
+      saleOrderDetail,
     }
-    const record = await purchaseOrderService.createPurchaseOrder(info);
+    const record = await saleOrderService.createSaleOrder(info);
     res.send(record);
   } catch (error) {
     logger.error('', error);
@@ -36,7 +36,7 @@ const createPurchaseOrderAction = async (
   }
 };
 
-const fetchPurchaseOrderListByQueryAction = async (
+const fetchSaleOrderListByQueryAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -44,7 +44,7 @@ const fetchPurchaseOrderListByQueryAction = async (
   try {
     const branchId = get(req, 'companyId');
     const query = { branchId };
-    const list = await purchaseOrderService.fetchPurchaseOrderListByQuery(query);
+    const list = await saleOrderService.fetchSaleOrderListByQuery(query);
     return list;
   } catch (error) {
     logger.error('', error);
@@ -52,7 +52,7 @@ const fetchPurchaseOrderListByQueryAction = async (
   }
 };
 
-const fetchPurchaseOrderInfoByQueryAction = async (
+const fetchSaleOrderInfoByQueryAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -61,7 +61,7 @@ const fetchPurchaseOrderInfoByQueryAction = async (
     const branchId = get(req, 'companyId')  ;
     const id  = get(req, 'id');
     if (isNil(id)) throw new ValidationFailedError('id is required.');
-    const record = await purchaseOrderService.fetchPurchaseOrderInfoByQuery({ _id: id, branchId });
+    const record = await saleOrderService.fetchSaleOrderInfoByQuery({ _id: id, branchId });
     res.send(record);
   } catch (error) {
     logger.error('', error);
@@ -69,7 +69,7 @@ const fetchPurchaseOrderInfoByQueryAction = async (
   }
 };
 
-const updatePurchaseOrderAction = async (
+const updateSaleOrderAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -81,14 +81,14 @@ const updatePurchaseOrderAction = async (
     const {
       createdById,
       receiverById,
-      purchaseOrderDetail,
+      saleOrderDetail,
     } = req.body;
     const info = {
       createdById,
       receiverById,
-      purchaseOrderDetail,
+      saleOrderDetail,
     };
-    const record = await purchaseOrderService.updatePurchaseOrder({ _id: id, branchId }, info);
+    const record = await saleOrderService.updateSaleOrder({ _id: id, branchId }, info);
     res.send(record);
   } catch (error) {
     logger.error('', error);
@@ -96,7 +96,7 @@ const updatePurchaseOrderAction = async (
   }
 };
 
-const deletePurchaseOrderAction = async (
+const deleteSaleOrderAction = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -104,7 +104,7 @@ const deletePurchaseOrderAction = async (
   try {
     const branchId = get(req, 'companyId') ;
     const id = get(req, 'id');
-    const record = await purchaseOrderService.deletePurchaseOrder({ _id: id, branchId });
+    const record = await saleOrderService.deleteSaleOrder({ _id: id, branchId });
     return record;
   } catch (error) {
     logger.error('', error);
@@ -114,9 +114,9 @@ const deletePurchaseOrderAction = async (
 
 
 export default {
-  createPurchaseOrderAction,
-  fetchPurchaseOrderListByQueryAction,
-  fetchPurchaseOrderInfoByQueryAction,
-  updatePurchaseOrderAction,
-  deletePurchaseOrderAction,
+  createSaleOrderAction,
+  fetchSaleOrderListByQueryAction,
+  fetchSaleOrderInfoByQueryAction,
+  updateSaleOrderAction,
+  deleteSaleOrderAction,
 };

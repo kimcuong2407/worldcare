@@ -4,10 +4,10 @@ import {isNil, get} from 'lodash';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import appUtil from '@utils/app.util';
 import saleService from './sale.service';
-import purchaseOrderService from '../purchaseOrder/purchase-order.service';
+import saleOrderService from '../sale-orders/sale-order.service';
 import {SALE_CHANNELS, SALE_TYPE} from './constant';
 
-const logger = loggerHelper.getLogger('purchaseReceipt.controller');
+const logger = loggerHelper.getLogger('purchaseOrder.controller');
 
 const updateSaleTransaction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -49,14 +49,14 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
     const saleId = req.params.saleId;
     switch (type) {
       case SALE_TYPE.ORDER:
-        const purchaseOrder = await purchaseOrderService.fetchPurchaseOrderInfoByQuery({
+        const saleOrder = await saleOrderService.fetchSaleOrderInfoByQuery({
           _id: saleId,
           branchId
         });
-        if (isNil(purchaseOrder) || Object.keys(purchaseOrder).length === 0) {
+        if (isNil(saleOrder) || Object.keys(saleOrder).length === 0) {
           throw new ValidationFailedError('Purchase order can not be found.');
         }
-        const result = await saleService.updatePurchaseOrder(saleId, baseInfo);
+        const result = await saleService.updateSaleOrder(saleId, baseInfo);
         res.send(result);
         break;
       case SALE_TYPE.DIRECT:
@@ -123,7 +123,7 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
           // TODO: hardcode sale channel. update when sale channel feature implementation is finished
           saleChannel: SALE_CHANNELS.ORDER
         }
-        const orderRecord = await saleService.createPurchaseOrder(orderInfo);
+        const orderRecord = await saleService.createSaleOrder(orderInfo);
         res.send(orderRecord);
         break;
     }
