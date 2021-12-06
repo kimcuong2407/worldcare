@@ -35,6 +35,7 @@ import countryRoutes from './modules/country';
 import clinicServiceRoutes from './modules/clinic-service';
 import supplierGroupRoutes from './modules/supplier-group';
 import customerV2Routes from './modules/customer-v2';
+import batchRoutes from './modules/batch';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -73,4 +74,5 @@ export default (app: express.Application): void => {
   countryRoutes(app);
   supplierGroupRoutes(app);
   customerV2Routes(app);
+  batchRoutes(app);
 };
