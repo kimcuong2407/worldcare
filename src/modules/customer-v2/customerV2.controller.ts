@@ -205,10 +205,26 @@ const deleteCustomerAction = async (req: express.Request, res: express.Response,
 }
 
 
+const searchCustomersAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const partnerId = req.user.partnerId;
+
+    const {keyword} = req.query;
+
+    const data = await customerService.searchCustomer(keyword as any, partnerId);
+    res.send(data);
+  } catch (e) {
+    logger.error('There was an error while fetching customers', e);
+    next(e);
+  }
+};
+
+
 export default {
   createCustomerAction,
   fetchCustomersAction,
   getCustomerByIdAction,
   updateCustomerInfoAction,
-  deleteCustomerAction
+  deleteCustomerAction,
+  searchCustomersAction
 };

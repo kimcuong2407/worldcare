@@ -4,7 +4,7 @@ import {isNil, map} from 'lodash';
 import get from 'lodash/get';
 import CustomerV2Collection from './customerV2.collection';
 import {CUSTOMER_V2_STATUS} from './constant';
-import { InternalServerError } from '@app/core/types/ErrorTypes';
+import {InternalServerError} from '@app/core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('customerV2.service');
 
@@ -66,7 +66,10 @@ const fetchCustomers = async (queryInput: any, options: any) => {
     partnerId: queryInput.partnerId
   }
   if (queryInput.keyword) {
-    query['$text'] = {$search: queryInput.keyword}
+    query['$or'] = [
+      {code: {$regex: '.*' + queryInput.keyword + '.*', $options: 'i'}},
+      {name: {$regex: '.*' + queryInput.keyword + '.*', $options: 'i'}},
+    ]
   }
   if (queryInput.code) {
     query['code'] = queryInput.code;
@@ -122,10 +125,22 @@ const deleteCustomer = async (customerId: string) => {
   return true;
 };
 
+const searchCustomer = async (keyword: string, partnerId: number) => {
+  return await CustomerV2Collection.find({
+    $or: [
+      { code: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { name: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+    ],
+    partnerId,
+    deletedAt: null
+  }).limit(10).lean().exec();
+}
+
 export default {
   createCustomer,
   fetchCustomers,
   getCustomerInfo,
   updateCustomerInfo,
-  deleteCustomer
+  deleteCustomer,
+  searchCustomer
 };
