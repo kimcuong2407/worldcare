@@ -1,3 +1,20 @@
+# [1.8.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.7.1...v1.8.0) (2021-12-07)
+
+
+### Bug Fixes
+
+* **product-variant:** add branchId in product variant search query ([5d28da4](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/5d28da45f4a30c85935cb8708cf81f1e19f82381))
+* **sale:** change module name. purchase order to sale order. purchase receipt to purchase order ([05cfc3d](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/05cfc3d8fed522cf3cd92a6a6b36733dbeea94c8))
+* **supplier:** add index fields. remove deleted records in finding query ([9d9ad4d](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/9d9ad4df89899e255ae78d9e8029dd202787dcff))
+
+
+### Features
+
+* **batch:** fetch and create API implementation ([266845c](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/266845c01747fa9e8a04c070c348f9fd498869a1))
+* **customer-v2:** customer v2 implementation ([208afbb](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/208afbbd5e3bcdd6e2fb8f5dde7611e839aad588))
+* **customer-v2:** search customer implementation ([27bac7f](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/27bac7f123ad8b1d4a4d24e85c3443d846534be1))
+* **prescription-v2:** implement prescription with sale direct ([822514a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/822514a97704acbc0459b39b654d5d90e7752247))
+
 ## [1.7.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.7.0...v1.7.1) (2021-12-05)
 
 
