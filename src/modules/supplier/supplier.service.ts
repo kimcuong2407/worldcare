@@ -71,7 +71,7 @@ const findSupplierByName = async (name: string) => {
 const fetchSuppliers = async (queryInput: any, options: any) => {
 
   const query: any = {
-    status: SUPPLIER_GROUP_STATUS.ACTIVE,
+    deletedAt: null,
     partnerId: queryInput.partnerId
   }
   if (queryInput.keyword) {

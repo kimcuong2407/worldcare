@@ -64,7 +64,8 @@ const getSupplierGroupByIdAction = async (req: express.Request, res: express.Res
     let supplierGroupId = get(req.params, 'supplierGroupId');
     const query: any = {
       _id: supplierGroupId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const supplier = await supplierGroupService.getSupplierGroupInfo(query);
     if (!supplier || Object.keys(supplier).length === 0) {
@@ -98,7 +99,8 @@ const updateSupplierGroupInfoAction = async (req: express.Request, res: express.
     let supplierGroupId = get(req.params, 'supplierGroupId');
     const query: any = {
       _id: supplierGroupId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const existedSupplierGroup = await supplierGroupService.getSupplierGroupInfo(query);
     if (!existedSupplierGroup || Object.keys(existedSupplierGroup).length === 0) {
@@ -120,7 +122,8 @@ const deleteSupplierGroupAction = async (req: express.Request, res: express.Resp
     let supplierGroupId = get(req.params, 'supplierGroupId');
     const query: any = {
       _id: supplierGroupId,
-      partnerId
+      partnerId,
+      deletedAt: null
     }
     const supplierGroup = await supplierGroupService.getSupplierGroupInfo(query);
     if (!supplierGroup || Object.keys(supplierGroup).length === 0) {

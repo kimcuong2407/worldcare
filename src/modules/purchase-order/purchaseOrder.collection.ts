@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 
-const PurchaseReceiptItemSchema = new mongoose.Schema({
+const PurchaseOrderItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Types.ObjectId,
     ref: 'product',
@@ -32,9 +32,9 @@ const PurchaseReceiptItemSchema = new mongoose.Schema({
 });
 
 // Phieu nhap kho
-const PurchaseReceiptSchema = new mongoose.Schema({
+const PurchaseOrderSchema = new mongoose.Schema({
   code: String,
-  purchaseReceiptCodeSequence: Number,
+  purchaseOrderCodeSequence: Number,
   paymentNoteIds: [
     {
       type: mongoose.Types.ObjectId,
@@ -47,7 +47,7 @@ const PurchaseReceiptSchema = new mongoose.Schema({
       ref: 'inventory_transaction',
     }
   ],
-  purchaseReceiptItems: [PurchaseReceiptItemSchema],
+  purchaseOrderItems: [PurchaseOrderItemSchema],
   totalQuantity: Number,
   totalProduct: Number,
   subTotal: Number,
@@ -74,38 +74,38 @@ const PurchaseReceiptSchema = new mongoose.Schema({
   toObject: {virtuals: true}
 });
 
-PurchaseReceiptItemSchema.virtual('product', {
+PurchaseOrderItemSchema.virtual('product', {
   ref: 'product', // the collection/model name
   localField: 'productId',
   foreignField: '_id',
   justOne: true, // default is false
 });
-PurchaseReceiptItemSchema.virtual('productVariant', {
+PurchaseOrderItemSchema.virtual('productVariant', {
   ref: 'product_variant', // the collection/model name
   localField: 'variantId',
   foreignField: '_id',
   justOne: true, // default is false
 });
 
-PurchaseReceiptSchema.virtual('supplier', {
+PurchaseOrderSchema.virtual('supplier', {
   ref: 'supplier', // the collection/model name
   localField: 'supplierId',
   foreignField: '_id',
   justOne: true, // default is false
 });
 
-PurchaseReceiptSchema.plugin(mongoosePaginate);
-PurchaseReceiptSchema.plugin(AutoIncrement(mongoose), {
-  id: 'purchase_receipt_sequence',
-  inc_field: 'purchaseReceiptCodeSequence',
+PurchaseOrderSchema.plugin(mongoosePaginate);
+PurchaseOrderSchema.plugin(AutoIncrement(mongoose), {
+  id: 'purchase_order_sequence',
+  inc_field: 'purchaseOrderCodeSequence',
   start_seq: 1,
   reference_fields: ['branchId']
 });
 
-const PurchaseReceiptCollection = mongoose.model(
-  'purchase_receipt',
-  PurchaseReceiptSchema,
-  'purchase_receipt'
+const PurchaseOrderCollection = mongoose.model(
+  'purchase_order',
+  PurchaseOrderSchema,
+  'purchase_order'
 );
 
-export default PurchaseReceiptCollection;
+export default PurchaseOrderCollection;
