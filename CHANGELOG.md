@@ -1,3 +1,10 @@
+# [1.9.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.8.0...v1.9.0) (2021-12-08)
+
+
+### Features
+
+* country api ([3b9ba1e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/3b9ba1eabc6ac42b25bd39f5d8bbc6a301cdd9c8))
+
 # [1.8.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.7.1...v1.8.0) (2021-12-07)
 
 
