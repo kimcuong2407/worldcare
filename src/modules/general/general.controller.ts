@@ -60,6 +60,20 @@ const fetchHomepageContentAction = async (req: express.Request, res: express.Res
 };
 
 
+const fetchCountryAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const keyword: string = get(req.query, 'keyword');
+
+    const countries = await generalService.findCountry(keyword);
+    res.send(countries);
+  } catch (e) {
+    logger.error('fetchCountryAction', e);
+    next(e);
+  }
+};
+
+
 export default {
-  fetchHomepageContentAction
+  fetchHomepageContentAction,
+  fetchCountryAction,
 }

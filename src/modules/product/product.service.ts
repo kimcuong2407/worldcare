@@ -12,7 +12,7 @@ import MedicineCollection from './medicine.collection';
 import LotCollection from '@modules/batch/batch.collection';
 import BatchCollection from '@modules/batch/batch.collection';
 import { query } from 'winston';
-import PurchaseOrderCollection from '../purchaseOrder/purchase-order.collection';
+import PurchaseOrderCollection from '../purchase-order/purchaseOrder.collection';
 import InventoryTransactionCollection from '../inventory-transaction/inventory-transaction.collection';
 import { ORDER_STATUS } from '../orders/constant';
 import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';

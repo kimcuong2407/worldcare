@@ -1,3 +1,4 @@
+import makeQuery from '@app/core/database/query';
 import appUtil from '@app/utils/app.util';
 import express from 'express';
 import get from 'lodash/get';
@@ -5,6 +6,7 @@ import loggerHelper from '@utils/logger.util';
 import map from 'lodash/map';
 import pick from 'lodash/pick';
 import SpecialityCollection from '../configuration/speciality.collection';
+import CountryCollection from './country.collection';
 
 const logger = loggerHelper.getLogger('general.controller');
 
@@ -75,7 +77,18 @@ const getSpecialityAndHospital = async (serviceType: string, language = 'vi') =>
   }
 };
 
+const findCountry = (keyword: string) => {
+  const query: any = {};
+  if(keyword) {
+    query['$text'] = {
+      '$search': keyword
+    };
+  }
+
+  return makeQuery(CountryCollection.find(query).exec());
+}
 
 export default {
   getSpecialityAndHospital,
+  findCountry,
 }

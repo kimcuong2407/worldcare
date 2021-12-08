@@ -198,7 +198,7 @@ const getEmployeeByBranchId = async (queryInput: any, options: any) => {
   }
   if (keyword) {
     query['$text'] = {
-      '$search': 'pham'
+      '$search': keyword
     };
   }
   const aggregation: any = [

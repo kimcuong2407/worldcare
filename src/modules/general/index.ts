@@ -9,6 +9,8 @@ const generalRoutes = (app: express.Application): void => {
   // app.put('/api/v1/contact/:id', middleware.authenticate, generalActions.updateAppointmentAction);
   // app.get('/api/v1/contact/:id', middleware.authenticate, generalActions.getAppointmentByIdAction);
   app.get('/api/v1/homepage', generalActions.fetchHomepageContentAction);
+  app.get('/api/v1/country', generalActions.fetchCountryAction);
+
 };
 
 export default generalRoutes;

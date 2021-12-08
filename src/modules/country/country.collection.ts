@@ -36,7 +36,7 @@ CountrySchema.plugin(mongooseIntl, {
 CountrySchema.plugin(mongoosePaginate);
 
 export const CountryCollection = mongoose.model(
-  'country',
+  'country_obsolete',
   CountrySchema
 );
 
