@@ -1,7 +1,7 @@
-import { InternalServerError } from '@app/core/types/ErrorTypes';
+import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
-import { PAYMENT_NOTE_STATUS } from './constant';
+import {PAYMENT_NOTE_STATUS} from './constant';
 import PaymentNoteCollection from './payment-note.collection';
 
 
@@ -51,8 +51,12 @@ const fetchPaymentNoteListByQuery = async (query: any) => {
 };
 
 const fetchPaymentNoteInfoByQuery = async (query: any) => {
-  const record = await PaymentNoteCollection.findOne(query).lean().exec();
-  return record;
+  return await PaymentNoteCollection
+    .findOne(query)
+    .populate('referenceDoc')
+    .populate('branch')
+    .populate('user')
+    .lean().exec();
 };
 
 const updatePaymentNote = async (query: any, info: any) => {

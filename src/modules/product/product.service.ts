@@ -12,7 +12,7 @@ import MedicineCollection from './medicine.collection';
 import LotCollection from '@modules/batch/batch.collection';
 import BatchCollection from '@modules/batch/batch.collection';
 import { query } from 'winston';
-import PurchaseOrderCollection from '../purchase-order/purchaseOrder.collection';
+import SaleOrderCollection from '../sale-orders/sale-order.collection';
 import InventoryTransactionCollection from '../inventory-transaction/inventory-transaction.collection';
 import { ORDER_STATUS } from '../orders/constant';
 import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';
@@ -409,7 +409,7 @@ const fetchProductVariantQuantityV2 = async (params: any) => {
   const { variantId } = params;
   const query = { variantId, type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT }
   const allOrderTransactions = await InventoryTransactionCollection.find(query).lean().exec();
-  const quantityOrder = await PurchaseOrderCollection.find(query).lean().exec();
+  const quantityOrder = await SaleOrderCollection.find(query).lean().exec();
 };
 
 const searchProductVariants = async (keyword: string, branchId: number) => {

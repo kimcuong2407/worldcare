@@ -1,14 +1,33 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
 
-const PaymentNoteSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+
+const PaymentNoteSchema = new Schema({
   code: String,
   paymentNoteCodeSequence: Number,
-  type: String, // Payment or Receipt
-  transactionType: String, // PCPN, TTHD...
+  type: { 
+    type: String,
+    enum: [
+      PAYMENT_NOTE_TYPE.PAYMENT,
+      PAYMENT_NOTE_TYPE.RECEIPT
+    ]
+  },
+  transactionType: { 
+    type: String,
+    enum: [
+      PaymentNoteConstants.PCPN.symbol,
+      PaymentNoteConstants.TTHD.symbol,
+      PaymentNoteConstants.TTDH.symbol
+    ]
+  },
   // Bases on transaction type to get corresponding reference document
   referenceDocId: String,
+  referenceDocName: String,
+  note: String,
   branchId: {
     type: Number,
     ref: 'branch'
@@ -16,7 +35,7 @@ const PaymentNoteSchema = new mongoose.Schema({
   supplierId: String,
   customerId: {
     type: mongoose.Types.ObjectId,
-    ref: 'customer',
+    ref: 'customer_v2',
   },
   involvedById: {
     type: mongoose.Types.ObjectId,
@@ -24,20 +43,52 @@ const PaymentNoteSchema = new mongoose.Schema({
   },
   createdById: {
     type: mongoose.Types.ObjectId,
-    ref: 'employee',
+    ref: 'user',
   },
   paymentMethod: String,
   paymentDetail: Object,
   paymentAmount: Number,
-  paymentPreAmount: Number, // Paid 
+  paymentPreAmount: Number, // Paid  61ae347da9673d2da37cd972
   totalPayment: Number, // Total amount => Need to pay
   status: String,
-  deletedAt: Date
+  deletedAt: Date,
+  __v: { type: Number, select: false }
 }, {
   timestamps: true,
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
 });
 
+PaymentNoteSchema.virtual('customer', {
+  ref: 'customer_v2',
+  localField: 'customerId',
+  foreignField: '_id',
+  justOne: true
+})
+
+PaymentNoteSchema.virtual('referenceDoc', {
+  refPath: 'referenceDocName',
+  localField: 'referenceDocId',
+  foreignField: '_id',
+  justOne: true
+})
+
+PaymentNoteSchema.virtual('branch', {
+  ref: 'branch',
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true
+})
+
+PaymentNoteSchema.virtual('createdBy', {
+  ref: 'user',
+  localField: 'createdById',
+  foreignField: '_id',
+  justOne: true
+})
+
 PaymentNoteSchema.plugin(mongoosePaginate);
+PaymentNoteSchema.plugin(mongooseAggregatePaginate);
 PaymentNoteSchema.plugin(AutoIncrement(mongoose), {
   id: 'payment_note_code_sequence',
   inc_field: 'paymentNoteCodeSequence',

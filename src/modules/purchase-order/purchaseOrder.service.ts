@@ -4,7 +4,7 @@ import PurchaseOrderCollection from './purchaseOrder.collection';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
-import {PAYMENT_NOTE_TYPE, TRANSACTION_TYPE} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
 import BatchCollection from '@modules/batch/batch.collection';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 
@@ -17,7 +17,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNoteId = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
+  const paymentNote = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
 
   const purchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -36,8 +36,8 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
     subTotal: undefined as any
   }
 
-  if (paymentNoteId) {
-    purchaseOrder.paymentNoteIds = [paymentNoteId];
+  if (!isNil(paymentNote)) {
+    purchaseOrder.paymentNoteIds = [get(paymentNote, '_doc._id')];
   }
 
   let totalQuantity = 0;
@@ -53,6 +53,8 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   logger.info(`Created Purchase receipt with code[${createdPurchaseOrder.code}]`)
 
   const purchaseOrderId = get(createdPurchaseOrder, '_doc._id');
+  paymentNote.referenceDocId = purchaseOrderId;
+  paymentNote.save();
 
   await createInventoryTransaction(purchaseOrderInfo, supplierId, partnerId, branchId, purchaseOrderId, createdPurchaseOrder);
 
@@ -108,14 +110,15 @@ async function createPaymentNote(payment: any, branchId: any, supplierId: any, p
       paymentDetail: payment.detail,
       paymentAmount: payment.amount,
       totalPayment: payment.totalPayment,
+      transactionType: PaymentNoteConstants.PCPN.symbol,
+      referenceDocName: PaymentNoteConstants.PCPN.referenceDocName
     };
 
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = initCode(TRANSACTION_TYPE.PCPN, paymentNote.paymentNoteCodeSequence);
+    paymentNote.code = initCode(PaymentNoteConstants.PCPN.symbol, paymentNote.paymentNoteCodeSequence);
     await paymentNote.save();
-    const paymentNoteId = get(paymentNote, '_doc._id');
     logger.info(`Created payment note with code[${paymentNote.code}]`)
-    return paymentNoteId;
+    return paymentNote;
   }
   return null;
 }
@@ -127,7 +130,7 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNoteId = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
+  const paymentNote = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
 
   const willBeUpdatePurchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -146,11 +149,11 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
   const purchaseOrderDoc = await PurchaseOrderCollection.findOne({_id: purchaseOrderInfo.purchaseOrderId}).exec();
   const existed = get(purchaseOrderDoc, '_doc');
   const existedStatus = clone(existed.status);
-  if (paymentNoteId && existed.paymentNoteIds.length > 0) {
-    existed.paymentNoteIds.push(paymentNoteId);
+  if (!isNil(paymentNote) && existed.paymentNoteIds.length > 0) {
+    existed.paymentNoteIds.push(get(paymentNote, '_doc._id'));
     willBeUpdatePurchaseOrder.paymentNoteIds = existed.paymentNoteIds
-  } else if (paymentNoteId) {
-    willBeUpdatePurchaseOrder.paymentNoteIds = [paymentNoteId]
+  } else if (!isNil(paymentNote)) {
+    willBeUpdatePurchaseOrder.paymentNoteIds = [get(paymentNote, '_doc._id')]
   }
 
   let totalQuantity = 0;
