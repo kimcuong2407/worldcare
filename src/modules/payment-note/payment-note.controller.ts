@@ -64,10 +64,10 @@ const fetchPaymentNoteInfoByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const id = get(req, 'id');
+    const id = get(req.params, 'id');
     const query = { _id: id, branchId };
     const record = await paymentNoteService.fetchPaymentNoteInfoByQuery(query);
-    return record;
+    res.send(record);
   } catch (error) {
     logger.error('fetchPaymentNoteInfoByQueryAction', error);
     next(error);
@@ -80,30 +80,24 @@ const updatePaymentNoteAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const id = get(req, 'id');
+    const id = get(req.params, 'id');
     const query = { _id: id, branchId };
     const {
-      supplierId,
-      customerId,
       involvedById,
-      createdById,
       paymentMethod,
       paymentDetail,
-      paymentAmount,
-      totalPayment,
+      note,
+      createdAt
     } =req.body;
     const info = {
-      supplierId,
-      customerId,
       involvedById,
-      createdById,
       paymentMethod,
       paymentDetail,
-      paymentAmount,
-      totalPayment,
+      note,
+      createdAt
     };
     const record = await paymentNoteService.updatePaymentNote(query, info);
-    return record;
+    res.send(record);
   } catch (error) {
     logger.error('updatePaymentNoteAction', error);
     next(error);
@@ -116,10 +110,10 @@ const deletePaymentNoteAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const id = get(req, 'id');
+    const id = get(req.params, 'id');
     const query = { _id: id, branchId };
-    const record = await paymentNoteService.fetchPaymentNoteInfoByQuery(query);
-    return record;
+    const record = await paymentNoteService.deletePaymentNote(query);
+    res.send(record);
   } catch (error) {
     logger.error('deletePaymentNoteAction', error);
     next(error);

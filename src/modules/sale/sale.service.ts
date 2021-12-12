@@ -10,7 +10,7 @@ import saleOrderService from '@modules/sale-orders/sale-order.service'
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service'
 import prescriptionService from '@modules/prescription-v2/prescription.service'
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
-import {PAYMENT_NOTE_TYPE, TRANSACTION_TYPE} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import {INVOICE_STATUS} from '@modules/invoice/constant';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
@@ -50,7 +50,7 @@ const createInvoice = async (invoiceInfo: any) => {
   // 0. Check quantity status
 
   // 1. Create payment note.
-  const paymentNote = await createPaymentNote(payment, invoiceInfo, TRANSACTION_TYPE.TTHD);
+  const paymentNote = await createPaymentNote(payment, invoiceInfo, PaymentNoteConstants.TTHD);
 
   // 2. Create invoice record.
   const invoice = {
@@ -114,7 +114,7 @@ const createSaleOrder = async (saleOrderInfo: any) => {
   // 0. Check quantity status
 
   // 1. Create payment note.
-  const paymentNote = await createPaymentNote(payment, saleOrderInfo, TRANSACTION_TYPE.TTDH);
+  const paymentNote = await createPaymentNote(payment, saleOrderInfo, PaymentNoteConstants.TTDH);
 
   // 2. Create sale order record.
   const saleOrder = {
@@ -172,11 +172,12 @@ async function createInventoryTransaction(type: string, inputInfo: any, referenc
   }
 }
 
-async function createPaymentNote(payment: any, info: any, transactionType: string) {
+async function createPaymentNote(payment: any, info: any, transactionType: PaymentNoteConstants.TransactionType) {
   if (payment.amount && payment.amount > 0) {
     const paymentNoteInfo = {
       type: PAYMENT_NOTE_TYPE.RECEIPT,
-      transactionType,
+      transactionType: transactionType.symbol,
+      referenceDocName: transactionType.referenceDocName,
       branchId: info.branchId,
       involvedById: info.involvedById,
       createdById: info.createdBy,
@@ -187,7 +188,7 @@ async function createPaymentNote(payment: any, info: any, transactionType: strin
     };
 
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = initCode(transactionType, paymentNote.paymentNoteCodeSequence);
+    paymentNote.code = initCode(transactionType.symbol, paymentNote.paymentNoteCodeSequence);
     logger.info(`Saving payment note with code[${paymentNote.code}]`)
     await paymentNote.save();
     logger.info(`Created payment note with code[${paymentNote.code}]`)

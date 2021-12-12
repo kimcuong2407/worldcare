@@ -47,7 +47,7 @@ const ProductSchema = new mongoose.Schema({
     required: true,
   },
   countryId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     ref: 'country',
     required: true,
   },

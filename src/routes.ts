@@ -36,6 +36,8 @@ import clinicServiceRoutes from './modules/clinic-service';
 import supplierGroupRoutes from './modules/supplier-group';
 import customerV2Routes from './modules/customer-v2';
 import batchRoutes from './modules/batch';
+import generalLedgerRoutes from './modules/general-ledger';
+import paymentNoteRoutes from './modules/payment-note';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -75,4 +77,6 @@ export default (app: express.Application): void => {
   supplierGroupRoutes(app);
   customerV2Routes(app);
   batchRoutes(app);
+  generalLedgerRoutes(app);
+  paymentNoteRoutes(app);
 };
