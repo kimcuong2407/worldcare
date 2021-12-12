@@ -1,3 +1,15 @@
+# [1.10.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.9.0...v1.10.0) (2021-12-12)
+
+
+### Bug Fixes
+
+* **country:** update schema type for field countryId ([3116422](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/31164229166c486c647bab0cb5cb29ebdcee8f45))
+
+
+### Features
+
+* **general-ledger:** general ledger implementation ([1d0c98e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/1d0c98e2954c3faf552dac67346971a2ee79327f))
+
 # [1.9.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.8.0...v1.9.0) (2021-12-08)
 
 
