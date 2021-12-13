@@ -32,7 +32,8 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
   }
 };
 
-const transformVariant = async (searchProductSchema: any, data: any, branchId: number) => {
+const transformVariant = async (searchProductSchema: any, data: any, ...restParams: any) => {
+  const { partnerId, branchId } = restParams;
   const variantSearch = [get(searchProductSchema, 'name'), get(searchProductSchema, 'aliasName')];
   let hasDefault = false;
   const variantsInfo: [variantModel] = await Promise.all(data.map(async (_info: any) => {
@@ -63,6 +64,7 @@ const transformVariant = async (searchProductSchema: any, data: any, branchId: n
       cost: get(_info, 'cost', 0),
       price: get(_info, 'price', 0),
       status: get(_info, 'status', PRODUCT_VARIANT_STATUS.ACTIVE),
+      partnerId,
       branchId,
     }, isNil);
   }));
@@ -278,7 +280,14 @@ const createProductAndVariantActionV2 = async (
   next: express.NextFunction,
 ) => {
   try {
-    const branchId = get(req, 'companyId');
+    const branchId = get(req, 'companyId', null);
+    if (isNil(branchId)) {
+      throw new ValidationFailedError('branchId is required');
+    }
+    const partnerId = get(req, 'user.partnerId', null);
+    if (isNil(partnerId)) {
+      throw new ValidationFailedError('partnerId is required');
+    }
     const {
       productType,
       // productCode,
@@ -310,7 +319,7 @@ const createProductAndVariantActionV2 = async (
     const searchProductSchema = { name, aliasName };
     const [productInfo, variantsInfo] = await Promise.all([
       transformProduct(productType, productDetail),
-      transformVariant(searchProductSchema, productVariants, branchId),
+      transformVariant(searchProductSchema, productVariants, partnerId, branchId),
     ]);
 
     const record = await productService.createProductAndVariantV2({
@@ -324,6 +333,7 @@ const createProductAndVariantActionV2 = async (
       groupId,
       positionId,
       routeAdministrationId,
+      partnerId,
       branchId,
       productDetail: productInfo,
       productVariants: variantsInfo,
@@ -384,7 +394,10 @@ const updateProductAndVariantActionV2 = async (
   next: express.NextFunction,
 ) => {
   try {
-    const _id = get(req, 'params.id');
+    const _id = get(req, 'params.id', null);
+    if (isNil(_id)) {
+      throw new ValidationFailedError('_id is required');
+    }
     const {
       productType,
       // productCode,
@@ -392,6 +405,7 @@ const updateProductAndVariantActionV2 = async (
       aliasName,
       barcode,
       typeId,
+      partnerId,
       branchId,
       manufacturerId,
       countryId,
@@ -420,7 +434,7 @@ const updateProductAndVariantActionV2 = async (
     const searchProductSchema = { name, aliasName };
     const [productInfo, variantsInfo] = await Promise.all([
       transformProduct(productType, productDetail),
-      transformVariant(searchProductSchema, productVariants, branchId),
+      transformVariant(searchProductSchema, productVariants, partnerId, branchId),
     ]);
 
     const record = await productService.updateProductAndVariantV2({
@@ -435,6 +449,7 @@ const updateProductAndVariantActionV2 = async (
       groupId,
       positionId,
       routeAdministrationId,
+      partnerId,
       branchId,
       productDetail: productInfo,
       productVariants: variantsInfo,

@@ -10,6 +10,10 @@ const ProductVariantSchema = new mongoose.Schema({
   },
   codeSequence: Number,
   variantSearch: [String],
+  partnerId: {
+    type: Number,
+    ref: 'partner',
+  },
   branchId: {
     type: Number,
     ref: 'branch'
@@ -40,6 +44,12 @@ const ProductVariantSchema = new mongoose.Schema({
   toObject: {virtuals: true}
 });
 
+ProductVariantSchema.virtual('partner', {
+  ref: 'partner',
+  localField: 'partnerId',
+  foreignField: '_id',
+  justOne: true,
+});
 ProductVariantSchema.virtual('branch', {
   ref: 'branch',
   localField: 'branchId',

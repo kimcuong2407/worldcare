@@ -32,6 +32,10 @@ const ProductSchema = new mongoose.Schema({
   },
   aliasName: String,
   barcode: String,
+  partnerId: {
+    type: Number,
+    ref: 'partner',
+  },
   branchId: {
     type: Number,
     ref: 'branch'
@@ -77,6 +81,12 @@ const ProductSchema = new mongoose.Schema({
   },
 });
 
+ProductSchema.virtual('partner', {
+  ref: 'partner',
+  localField: 'partnerId',
+  foreignField: '_id',
+  justOne: true,
+});
 ProductSchema.virtual('branch', {
   ref: 'branch',
   localField: 'branchId',

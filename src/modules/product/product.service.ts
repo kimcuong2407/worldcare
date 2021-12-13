@@ -303,6 +303,7 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
   const productIdList = uniq(await Bluebird.map(variantList, (v) => `${v.productId}`));
   const data = await Bluebird.map(productIdList, async (id) => {
     const product = await ProductCollection.findOne({_id: id})
+    .populate('partner')
     .populate('branch')
     .populate('manufacturer')
     .populate('country')
@@ -343,6 +344,7 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
 
 const fetchProductInfoV2 = async (query: any, language = 'vi', isRaw = false) => {
   const product = await ProductCollection.findOne(query)
+  .populate('partner')
   .populate('branch')
   .populate('manufacturer')
   .populate('country')
@@ -372,6 +374,7 @@ const updateProductAndVariantV2 = async (info: any) => {
   }, {
     new: true
   })
+  .populate('partner')
   .populate('branch')
   .populate('manufacturer')
   .populate('country')
