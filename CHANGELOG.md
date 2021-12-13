@@ -1,3 +1,11 @@
+## [1.10.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.0...v1.10.1) (2021-12-13)
+
+
+### Bug Fixes
+
+* **productconfig:** update middleware auth for product and configs ([4fb14df](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/4fb14df2c637d368fc6891b56e074797be3a05df))
+* **product:** update partnerId in product schema ([0cf7d2b](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0cf7d2b4a42c12895edf44fd7ea276ed89863d31))
+
 # [1.10.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.9.0...v1.10.0) (2021-12-12)
 
 
