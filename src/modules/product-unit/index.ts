@@ -5,11 +5,11 @@ import productUnitController from './productUnit.controller';
 
 const productUnitRoutes = (app: express.Application): void => {
   // Product Unit
-  app.post('/api/v1/product-unit', productUnitController.createProductUnitAction);
-  app.get('/api/v1/product-unit', productUnitController.fetchProductUnitListAction);
-  app.get('/api/v1/product-unit/:id', productUnitController.fetchProductUnitInfoAction);
-  app.put('/api/v1/product-unit/:id', productUnitController.updateProductUnitAction);
-  app.delete('/api/v1/product-unit/:id', productUnitController.deleteProductUnitByIdAction);
+  app.post('/api/v1/product-unit', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.write]]), productUnitController.createProductUnitAction);
+  app.get('/api/v1/product-unit', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productUnitController.fetchProductUnitListAction);
+  app.get('/api/v1/product-unit/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productUnitController.fetchProductUnitInfoAction);
+  app.put('/api/v1/product-unit/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.update]]), productUnitController.updateProductUnitAction);
+  app.delete('/api/v1/product-unit/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.delete]]), productUnitController.deleteProductUnitByIdAction);
 };
 
 export default productUnitRoutes;

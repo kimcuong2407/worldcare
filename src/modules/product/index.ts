@@ -17,12 +17,12 @@ const productRoutes = (app: express.Application): void => {
   app.get('/api/v1/medicine/search', productActions.searchMedicineAction);
 
   // @Tuan.NG:> V2 after meeting
-  app.post('/api/v2/product', productActions.createProductAndVariantActionV2);
-  app.get('/api/v2/product', productActions.fetchProductListActionV2);
-  app.get('/api/v2/product/:id', productActions.fetchProductInfoActionV2);
-  app.put('/api/v2/product/:id', productActions.updateProductAndVariantActionV2);
-  app.delete('/api/v2/product/:id', productActions.deleteProductAndVariantActionV2);
-  app.get('/api/v2/product-variant/quantity', productActions.fetchProductVariantQuantityActionV2);
+  app.post('/api/v2/product', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.write]]), productActions.createProductAndVariantActionV2);
+  app.get('/api/v2/product',  middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductListActionV2);
+  app.get('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductInfoActionV2);
+  app.put('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.update]]), productActions.updateProductAndVariantActionV2);
+  app.delete('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.delete]]), productActions.deleteProductAndVariantActionV2);
+  app.get('/api/v2/product-variant/quantity', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductVariantQuantityActionV2);
 
   app.get('/api/v1/product-variant/search', middleware.authorization([
     [ROOT_RESOURCES.sale, CORE_ACTIONS.read]

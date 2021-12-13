@@ -5,11 +5,11 @@ import manufacturerController from './manufacturer.controller';
 
 const manufacturerRoutes = (app: express.Application): void => {
   // Manufacturer
-  app.post('/api/v1/manufacturer', manufacturerController.createManufacturerAction);
-  app.get('/api/v1/manufacturer', manufacturerController.fetchManufacturerListAction);
-  app.get('/api/v1/manufacturer/:id', manufacturerController.fetchManufacturerInfoAction);
-  app.put('/api/v1/manufacturer/:id', manufacturerController.updateManufacturerAction);
-  app.delete('/api/v1/manufacturer/:id', manufacturerController.deleteManufacturerByIdAction);
+  app.post('/api/v1/manufacturer', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.write]]), manufacturerController.createManufacturerAction);
+  app.get('/api/v1/manufacturer', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), manufacturerController.fetchManufacturerListAction);
+  app.get('/api/v1/manufacturer/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), manufacturerController.fetchManufacturerInfoAction);
+  app.put('/api/v1/manufacturer/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.update]]), manufacturerController.updateManufacturerAction);
+  app.delete('/api/v1/manufacturer/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.delete]]), manufacturerController.deleteManufacturerByIdAction);
 };
 
 export default manufacturerRoutes;
