@@ -1,3 +1,10 @@
+## [1.10.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.1...v1.10.2) (2021-12-14)
+
+
+### Bug Fixes
+
+* **product:** fix search list and unique config ([26be199](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/26be19914318c822a251da625d0ac4c057d3b590))
+
 ## [1.10.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.0...v1.10.1) (2021-12-13)
 
 
