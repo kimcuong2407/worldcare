@@ -1,3 +1,15 @@
+# [1.11.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.3...v1.11.0) (2021-12-14)
+
+
+### Bug Fixes
+
+* **batch:** create batch api ([90a383f](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/90a383f369805104a5c78f83216832f9fec83d5d))
+
+
+### Features
+
+* **product-variant:** fetch product variants by product id feature ([43fcc05](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/43fcc05b73cac6f1cdcca4a6d0bdb9b419c43ccd))
+
 ## [1.10.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.2...v1.10.3) (2021-12-14)
 
 
