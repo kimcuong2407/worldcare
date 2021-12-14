@@ -398,6 +398,14 @@ const updateProductAndVariantActionV2 = async (
     if (isNil(_id)) {
       throw new ValidationFailedError('_id is required');
     }
+    const branchId = get(req, 'companyId', null);
+    if (isNil(branchId)) {
+      throw new ValidationFailedError('branchId is required');
+    }
+    const partnerId = get(req, 'user.partnerId', null);
+    if (isNil(partnerId)) {
+      throw new ValidationFailedError('partnerId is required');
+    }
     const {
       productType,
       // productCode,
@@ -405,8 +413,6 @@ const updateProductAndVariantActionV2 = async (
       aliasName,
       barcode,
       typeId,
-      partnerId,
-      branchId,
       manufacturerId,
       countryId,
       groupId,
