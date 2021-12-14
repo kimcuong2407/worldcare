@@ -535,7 +535,7 @@ const fetchVariantsByProductId = async (
     const list = await productService.fetchVariantsByProductId(productId, branchId);
     res.send(list);
   } catch (error) {
-    logger.error('searchProductVariant', error);
+    logger.error('fetchVariantsByProductId', error);
     next(error);
   }
 }
