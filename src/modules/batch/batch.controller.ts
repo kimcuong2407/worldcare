@@ -4,7 +4,6 @@ import batchService from './batch.service';
 import {isNil, get} from 'lodash'
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import ProductVariantCollection from '@modules/product/productVariant.collection';
-import ProductCollection from '@modules/product/product.collection';
 import BatchCollection from '@modules/batch/batch.collection';
 import {BATCH_STATUS} from '@modules/batch/constant';
 
@@ -29,7 +28,6 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
     const {
       lotNumber,
       aliasName,
-      productId,
       variantId,
       expirationDate
     } = req.body;
@@ -37,13 +35,21 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
     const batchInfo = {
       lotNumber,
       aliasName,
-      productId,
       variantId,
       expirationDate,
       branchId
     }
 
-    await validateBatch(batchInfo);
+    await validateBatchInput(batchInfo);
+    const productVariant = await ProductVariantCollection.findOne({
+      _id: batchInfo.variantId,
+      deletedAt: null,
+      branchId: batchInfo.branchId
+    }).lean();
+    if (isNil(productVariant)) {
+      throw new ValidationFailedError('Product variant can not be found.');
+    }
+
     const existedBatch = await BatchCollection.findOne({
       variantId,
       expirationDate,
@@ -55,6 +61,7 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
 
     const batch = await BatchCollection.create({
       ...batchInfo,
+      productId: productVariant.productId,
       quantity: 0,
       status: BATCH_STATUS.ACTIVE
     })
@@ -66,7 +73,7 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
   }
 };
 
-async function validateBatch(batchInfo: any) {
+async function validateBatchInput(batchInfo: any) {
   if (isNil(batchInfo.lotNumber)) {
     throw new ValidationFailedError('Lot number is required.');
   }
@@ -75,27 +82,6 @@ async function validateBatch(batchInfo: any) {
   }
   if (isNil(batchInfo.variantId)) {
     throw new ValidationFailedError('Variant ID is required.');
-  }
-  if (isNil(batchInfo.productId)) {
-    throw new ValidationFailedError('Product ID is required.');
-  }
-
-  const productVariant = await ProductVariantCollection.findOne({
-    _id: batchInfo.variantId,
-    deletedAt: null,
-    branchId: batchInfo.branchId
-  })
-  if (isNil(productVariant)) {
-    throw new ValidationFailedError('Product variant can not be found.');
-  }
-
-  const product = await ProductCollection.findOne({
-    _id: batchInfo.productId,
-    deletedAt: null,
-    branchId: batchInfo.branchId
-  })
-  if (isNil(product)) {
-    throw new ValidationFailedError('Product can not be found.');
   }
 }
 

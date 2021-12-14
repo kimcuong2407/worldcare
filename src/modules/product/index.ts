@@ -27,6 +27,10 @@ const productRoutes = (app: express.Application): void => {
   app.get('/api/v1/product-variant/search', middleware.authorization([
     [ROOT_RESOURCES.sale, CORE_ACTIONS.read]
   ]), productActions.searchProductVariant);
+  
+  app.get('/api/v1/product-variant/product-id/:productId', middleware.authorization([
+    [ROOT_RESOURCES.sale, CORE_ACTIONS.read]
+  ]), productActions.fetchVariantsByProductId);
 };
 
 export default productRoutes;

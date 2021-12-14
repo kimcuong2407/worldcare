@@ -436,6 +436,27 @@ const searchProductVariants = async (keyword: string, branchId: number) => {
     .populate('unit')
     .populate('product')
     .lean().exec();
+
+  await setProductVariantsQuantityFields(productVariants);
+  return productVariants;
+}
+
+const fetchVariantsByProductId = async (productId: string, branchId: number) => {
+  const query = {
+    productId,
+    branchId,
+    status: PRODUCT_VARIANT_STATUS.ACTIVE
+  };
+  const productVariants = await ProductVariantCollection.find(query)
+    .populate('unit')
+    .populate('product')
+    .lean().exec();
+
+  await setProductVariantsQuantityFields(productVariants);
+  return productVariants;
+}
+
+const setProductVariantsQuantityFields = async (productVariants) => {
   if (!productVariants || productVariants.length === 0) {
     return [];
   }
@@ -445,8 +466,6 @@ const searchProductVariants = async (keyword: string, branchId: number) => {
     }).sort({expirationDate: 1}).lean().exec();
     productVariant.availableQuantity = productVariant.batches.map((batch: any) => batch.quantity).reduce((a: any, b: any) => a + b, 0);
   }
-
-  return productVariants
 }
 
 export default {
@@ -474,5 +493,6 @@ export default {
   deleteProductAndVariantV2,
   fetchProductVariantQuantityV2,
   
-  searchProductVariants
+  searchProductVariants,
+  fetchVariantsByProductId
 }

@@ -10,6 +10,7 @@ import productService from './product.service';
 import Bluebird from 'bluebird';
 import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
+import { Types } from 'mongoose';
 
 const logger = loggerHelper.getLogger('Product.controller');
 
@@ -522,6 +523,29 @@ const searchProductVariant = async (
   }
 }
 
+const fetchVariantsByProductId = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const branchId = req.companyId;
+    const productId = req.params.productId
+    if (!productId || !Types.ObjectId.isValid(productId)) {
+      throw new ValidationFailedError('Product ID is not valid.');
+    }
+    const product = await productService.fetchProductInfo({_id: productId}, 'vi', true);
+    if (!product) {
+      throw new ValidationFailedError('Product is not valid.');
+    }
+    const list = await productService.fetchVariantsByProductId(productId, branchId);
+    res.send(list);
+  } catch (error) {
+    logger.error('fetchVariantsByProductId', error);
+    next(error);
+  }
+}
+
 export default {
   // Product
   createProductAction,
@@ -540,4 +564,5 @@ export default {
   fetchProductVariantQuantityActionV2,
   
   searchProductVariant,
+  fetchVariantsByProductId
 };
