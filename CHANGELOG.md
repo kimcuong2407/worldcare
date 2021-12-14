@@ -1,3 +1,10 @@
+## [1.10.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.2...v1.10.3) (2021-12-14)
+
+
+### Bug Fixes
+
+* **product:** require branchId partnerId when update from token ([69e179f](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/69e179f99786f0ab93892aef7514477015d0f9a2))
+
 ## [1.10.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.1...v1.10.2) (2021-12-14)
 
 
