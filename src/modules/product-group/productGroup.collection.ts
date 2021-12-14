@@ -6,7 +6,6 @@ import { PRODUCT_GROUP_STATUS } from './constant';
 const ProductGroupSchema = new mongoose.Schema({
   name: {
     type: String,
-    unique: true,
     required: true,
   },
   superGroupId: {

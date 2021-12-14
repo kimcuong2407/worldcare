@@ -33,7 +33,7 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
 };
 
 const transformVariant = async (searchProductSchema: any, data: any, ...restParams: any) => {
-  const { partnerId, branchId } = restParams;
+  const [ partnerId, branchId ] = restParams;
   const variantSearch = [get(searchProductSchema, 'name'), get(searchProductSchema, 'aliasName')];
   let hasDefault = false;
   const variantsInfo: [variantModel] = await Promise.all(data.map(async (_info: any) => {
