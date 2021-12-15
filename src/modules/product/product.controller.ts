@@ -487,15 +487,38 @@ const deleteProductAndVariantActionV2 = async (
   }
 }
 
-const fetchProductVariantQuantityActionV2 = async (
+const fetchProductVariantStockActionV2 = async (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction,
 ) => {
   try {
     const _id = get(req, 'params.id');
-    const params = { variantId: _id }; 
-    const record = await productService.fetchProductVariantQuantityV2(params);
+    const branchId = get(req, 'companyId');
+    const params = { variantId: _id };
+    const record = await productService.fetchProductVariantStockV2(params);
+    res.send(record);
+  } catch (error) {
+    logger.error('fetchProductVariantQuantityActionV2', error);
+    next(error);
+  }
+}
+
+const fetchProductVariantLotActionV2 = async (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
+  try {
+    const _id = get(req, 'params.id');
+    const branchId = get(req, 'companyId', null);
+    const partnerId = get(req, 'user.partnerId', null);
+    if (isNil(partnerId)) {
+      throw new ValidationFailedError('partnerId is required');
+    }
+    const keyword = get(req, 'query.keyword', null);
+    const params = { keyword, variantId: _id, branchId, partnerId };
+    const record = await productService.fetchProductVariantLotV2(params);
     res.send(record);
   } catch (error) {
     logger.error('fetchProductVariantQuantityActionV2', error);
@@ -561,7 +584,8 @@ export default {
   fetchProductInfoActionV2,
   updateProductAndVariantActionV2,
   deleteProductAndVariantActionV2,
-  fetchProductVariantQuantityActionV2,
+  fetchProductVariantStockActionV2,
+  fetchProductVariantLotActionV2,
   
   searchProductVariant,
   fetchVariantsByProductId

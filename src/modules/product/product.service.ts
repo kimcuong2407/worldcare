@@ -16,6 +16,7 @@ import SaleOrderCollection from '../sale-orders/sale-order.collection';
 import InventoryTransactionCollection from '../inventory-transaction/inventory-transaction.collection';
 import { ORDER_STATUS } from '../orders/constant';
 import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';
+import { BATCH_STATUS } from '../batch/constant';
 
 // @Tuan.NG:> setup code sequence
 
@@ -408,12 +409,42 @@ const deleteProductAndVariantV2 = async (query: any) => {
   return true;
 }
 
-const fetchProductVariantQuantityV2 = async (params: any) => {
+const fetchProductVariantStockV2 = async (params: any) => {
   const { variantId } = params;
   const query = { variantId, type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT }
   const allOrderTransactions = await InventoryTransactionCollection.find(query).lean().exec();
   const quantityOrder = await SaleOrderCollection.find(query).lean().exec();
 };
+
+const fetchProductVariantLotV2 = async (params: any) => {
+  const {
+    keyword,
+    variantId,
+    branchId,
+    partnerId
+  } = params;
+  const variant = await ProductVariantCollection.findOne({
+    _id: variantId
+  }).lean().exec();
+  const exchangeValue = get(variant, 'exchangeValue');
+  const productId = get(variant, 'productId');
+  let query: any = { deletedAt: null, productId, branchId };
+  if (!isNil(keyword)) {
+    query['$text'] = { $search: keyword }
+  }
+  const batches = await BatchCollection.find(query).lean().exec();
+  // Normalize the result which is exchange * quantity by variant
+  return Bluebird.map(batches, (batch) => {
+    const expirationDate = get(batch, 'expirationDate');
+    const batchQuantity = get(batch, 'quantity', 0);
+    return {
+      lotNumber: get(batch, 'lotNumber'),
+      expirationDate,
+      quantity: exchangeValue * batchQuantity,
+      status: batchQuantity === 0 ? BATCH_STATUS.INACTIVE : BATCH_STATUS.ACTIVE,
+    }
+  });
+}
 
 const searchProductVariants = async (keyword: string, branchId: number) => {
   const productVariants = await ProductVariantCollection.find({
@@ -491,7 +522,8 @@ export default {
   fetchProductInfoV2,
   updateProductAndVariantV2,
   deleteProductAndVariantV2,
-  fetchProductVariantQuantityV2,
+  fetchProductVariantStockV2,
+  fetchProductVariantLotV2,
   
   searchProductVariants,
   fetchVariantsByProductId
