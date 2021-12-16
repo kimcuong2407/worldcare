@@ -1,3 +1,10 @@
+## [1.11.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.0...v1.11.1) (2021-12-16)
+
+
+### Bug Fixes
+
+* **purchase-order:** add more fields to return when create and fetch by ID ([60cb34e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/60cb34e3a1cb997c067cdfce2a8b9cb45be07830))
+
 # [1.11.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.10.3...v1.11.0) (2021-12-14)
 
 
