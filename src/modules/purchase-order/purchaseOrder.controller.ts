@@ -20,7 +20,9 @@ const createPurchaseOrder = async (req: express.Request, res: express.Response, 
       status,
       discountValue,
       discountPercent,
-      discountType
+      discountType,
+      note,
+      purchasedAt
     } = req.body;
 
     // Create purchase receipt
@@ -35,11 +37,18 @@ const createPurchaseOrder = async (req: express.Request, res: express.Response, 
       createdBy: req.user.id,
       discountValue,
       discountPercent,
-      discountType
+      discountType,
+      note,
+      purchasedAt
     }
 
     const purchaseOrder = await purchaseOrderService.createPurchaseOrder(purchaseOrderInfo);
-    res.send(purchaseOrder);
+
+    const data = await purchaseOrderService.findById({
+      _id: purchaseOrder['_id'],
+      branchId
+    });
+    res.send(data);
   } catch (e) {
     logger.error('createPurchaseOrder', e);
     next(e);
@@ -68,8 +77,9 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
       status,
       discountValue,
       discountPercent,
-      discountType
-
+      discountType,
+      note,
+      purchasedAt
     } = req.body;
 
     // Update purchase receipt
@@ -84,7 +94,9 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
       partnerId,
       discountValue,
       discountPercent,
-      discountType
+      discountType,
+      note,
+      purchasedAt
     }
 
     const data = await purchaseOrderService.updatePurchaseOrder(purchaseOrderInfo);

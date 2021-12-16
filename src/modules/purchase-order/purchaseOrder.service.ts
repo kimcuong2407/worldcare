@@ -1,5 +1,5 @@
 import loggerHelper from '@utils/logger.util';
-import {get, isNil, clone, map} from 'lodash';
+import {clone, get, isNil, map} from 'lodash';
 import PurchaseOrderCollection from './purchaseOrder.collection';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
@@ -31,6 +31,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
     supplierId,
     note: purchaseOrderInfo.note,
     involvedById: purchaseOrderInfo.involvedById,
+    purchasedAt: purchaseOrderInfo.purchasedAt,
     paymentNoteIds: undefined as any,
     totalQuantity: undefined as any,
     subTotal: undefined as any
@@ -143,7 +144,8 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
     involvedById: purchaseOrderInfo.involvedById,
     paymentNoteIds: undefined as any,
     totalQuantity: undefined as any,
-    subTotal: undefined as any
+    subTotal: undefined as any,
+    purchasedAt: purchaseOrderInfo.purchasedAt
   }
 
   const purchaseOrderDoc = await PurchaseOrderCollection.findOne({_id: purchaseOrderInfo.purchaseOrderId}).exec();
@@ -207,11 +209,25 @@ const getPurchaseOrder = async (query: any) => {
 };
 
 const findById = async (query: any) => {
-  return await PurchaseOrderCollection.findOne(query)
+  const result = await PurchaseOrderCollection.findOne(query)
     .populate('purchaseOrderItems.product')
     .populate('purchaseOrderItems.productVariant')
     .populate('supplier')
+    .populate('branch')
+    .populate('partner')
+    .lean()
     .exec();
+  if (result && result?.purchaseOrderItems) {
+    for (const item of result.purchaseOrderItems) {
+      if (item?.batches) {
+        for (const batchItem of item.batches) {
+          batchItem.batch = await BatchCollection.findById({_id: get(batchItem, 'batchId')}).lean().exec();
+        }
+      }
+      item.fullBatches = await BatchCollection.find({variantId: item.variantId}).lean().exec();
+    }
+  }
+  return result;
 }
 
 const initCode = (prefix: string, seq: number) => {

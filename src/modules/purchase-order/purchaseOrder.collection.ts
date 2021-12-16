@@ -56,18 +56,19 @@ const PurchaseOrderSchema = new mongoose.Schema({
   discountType: String,
   total: Number,
   paid: Number,
-  partnerId: String,
-  branchId: String,
+  partnerId: Number,
+  branchId: Number,
   status: String,
   supplierId: String,
   note: String,
+  purchasedAt: Date,
   involvedById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
   createdBy: String,
   updatedBy: String,
-  deletedAt: String
+  deletedAt: Date
 }, {
   timestamps: true,
   toJSON: {virtuals: true},
@@ -90,6 +91,20 @@ PurchaseOrderItemSchema.virtual('productVariant', {
 PurchaseOrderSchema.virtual('supplier', {
   ref: 'supplier', // the collection/model name
   localField: 'supplierId',
+  foreignField: '_id',
+  justOne: true, // default is false
+});
+
+PurchaseOrderSchema.virtual('branch', {
+  ref: 'branch', // the collection/model name
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true, // default is false
+});
+
+PurchaseOrderSchema.virtual('partner', {
+  ref: 'partner', // the collection/model name
+  localField: 'partnerId',
   foreignField: '_id',
   justOne: true, // default is false
 });
