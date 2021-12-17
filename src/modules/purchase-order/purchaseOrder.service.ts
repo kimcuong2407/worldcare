@@ -190,16 +190,23 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
       createdAt: -1,
     },
     populate: [
-      { path: 'purchaseOrderItems.product', select: '_id name' },
-      { path: 'purchaseOrderItems.productVariant', select: '_id name' },
-      { path: 'supplier'},
+      { path: 'purchaseOrderItems.product' },
+      { path: 'purchaseOrderItems.productVariant' },
+      { path: 'purchaseOrderItems.batches.batch' },
+      { path: 'supplier' },
+      { path: 'branch' },
+      { path: 'partner' }
     ],
+    lean: true
   });
   const {docs, ...rest} = purchaseOrders
+  const resultDocs = [];
+  for (const doc of docs) {
+    await setPurchaseOrderFullBatches(doc);
+    resultDocs.push(doc);
+  }
   return {
-    docs: map(docs, doc => {
-      return get(doc, '_doc')
-    }),
+    docs: resultDocs,
     ...rest
   };
 }
@@ -212,22 +219,23 @@ const findById = async (query: any) => {
   const result = await PurchaseOrderCollection.findOne(query)
     .populate('purchaseOrderItems.product')
     .populate('purchaseOrderItems.productVariant')
+    .populate('purchaseOrderItems.batches.batch')
     .populate('supplier')
     .populate('branch')
     .populate('partner')
+    .populate('fullBatches')
     .lean()
     .exec();
-  if (result && result?.purchaseOrderItems) {
-    for (const item of result.purchaseOrderItems) {
-      if (item?.batches) {
-        for (const batchItem of item.batches) {
-          batchItem.batch = await BatchCollection.findById({_id: get(batchItem, 'batchId')}).lean().exec();
-        }
-      }
+  await setPurchaseOrderFullBatches(result);
+  return result;
+}
+
+const setPurchaseOrderFullBatches = async (doc: any) => {
+  if (doc && doc?.purchaseOrderItems) {
+    for (const item of doc.purchaseOrderItems) {
       item.fullBatches = await BatchCollection.find({variantId: item.variantId}).lean().exec();
     }
   }
-  return result;
 }
 
 const initCode = (prefix: string, seq: number) => {
