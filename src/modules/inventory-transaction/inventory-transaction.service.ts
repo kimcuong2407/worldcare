@@ -6,6 +6,10 @@ import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constan
 
 const logger = loggerHelper.getLogger('inventory-transaction.service');
 
+/**
+ * Delete and restore quantity
+ * @param id
+ */
 const deleteInventoryTransaction = async (id: string) => {
   const inventoryTransactionDoc = await InventoryTransactionCollection.findOne({_id: id});
   if (_.isNil(inventoryTransactionDoc)) {

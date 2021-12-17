@@ -7,6 +7,8 @@ import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constan
 import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
 import BatchCollection from '@modules/batch/batch.collection';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
+import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
+import paymentNoteService from '@modules/payment-note/payment-note.service';
 
 const logger = loggerHelper.getLogger('purchaseOrder.service');
 
@@ -182,7 +184,9 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
 };
 
 const fetchPurchaseOrders = async (queryInput: any, options: any) => {
-  let query = {} as any;
+  let query = {
+    deletedAt: null
+  } as any;
   if (queryInput.keyword) {
     query['$text'] = {$search: queryInput.keyword}
   }
@@ -231,6 +235,35 @@ const findById = async (query: any) => {
   await setPurchaseOrderFullBatches(result);
   return result;
 }
+/**
+ * 1. Delete PurchaseOrder and set CANCELED status
+ * 2. Delete and restore quantity InventoryTransaction
+ * 3. Remove PaymentNote if necessary
+ * @param purchaseOrderId
+ * @param removePaymentNote
+ */
+const deletePurchaseOrder = async (purchaseOrderId: string, removePaymentNote: boolean) => {
+  const updateInfo = {
+    status: PURCHASE_ORDER_STATUS.CANCELED,
+    deletedAt: new Date()
+  }
+  const deletedPurchaseOrder = await PurchaseOrderCollection.findByIdAndUpdate(purchaseOrderId, {
+    $set: updateInfo
+  }, {
+    new: true
+  }).lean();
+  const inventoryTransactions = deletedPurchaseOrder.inventoryTransactions || [];
+  for (const inventoryTransactionId of inventoryTransactions) {
+    await inventoryTransactionService.deleteInventoryTransaction(inventoryTransactionId)
+  }
+  if (removePaymentNote) {
+    const paymentNoteIds = deletedPurchaseOrder.paymentNoteIds || [];
+    for (const paymentNoteId of paymentNoteIds) {
+      await paymentNoteService.deletePaymentNote({_id: paymentNoteId})
+    }
+  }
+  return true;    
+}
 
 const setPurchaseOrderFullBatches = async (doc: any) => {
   if (doc && doc?.purchaseOrderItems) {
@@ -256,5 +289,6 @@ export default {
   getPurchaseOrder,
   updatePurchaseOrder,
   fetchPurchaseOrders,
-  findById
+  findById,
+  deletePurchaseOrder
 };

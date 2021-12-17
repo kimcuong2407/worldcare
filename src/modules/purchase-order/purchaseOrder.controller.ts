@@ -125,7 +125,7 @@ const fetchPurchaseOrder = async (req: express.Request, res: express.Response, n
     const data = await purchaseOrderService.fetchPurchaseOrders(query, options);
     res.send(data);
   } catch (e) {
-    logger.error('Error while creating new supplier', e);
+    logger.error('Error while fetchPurchaseOrder', e);
     next(e);
   }
 };
@@ -147,7 +147,27 @@ const fetchPurchaseOrderById = async (req: express.Request, res: express.Respons
     });
     res.send(data);
   } catch (e) {
-    logger.error('Error while creating new supplier', e);
+    logger.error('Error while fetchPurchaseOrderById', e);
+    next(e);
+  }
+};
+
+const deletePurchaseOrderById = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const branchId = req.companyId;
+    const purchaseOrderId = req.params.purchaseOrderId;
+    const purchaseOrder = await purchaseOrderService.getPurchaseOrder({
+      _id: purchaseOrderId,
+      branchId
+    })
+    if (isNil(purchaseOrder)) {
+      throw new ValidationFailedError('Can not find Purchase receipt.');
+    }
+    const removePaymentNote: boolean = req.query.removePaymentNote === 'true';
+    const data = await purchaseOrderService.deletePurchaseOrder(purchaseOrderId, removePaymentNote);
+    res.send(data);
+  } catch (e) {
+    logger.error('Error while deletePurchaseOrderById', e);
     next(e);
   }
 };
@@ -156,5 +176,6 @@ export default {
   create: createPurchaseOrder,
   update: updatePurchaseOrder,
   fetch: fetchPurchaseOrder,
-  getById: fetchPurchaseOrderById
+  getById: fetchPurchaseOrderById,
+  deleteAction: deletePurchaseOrderById
 };
