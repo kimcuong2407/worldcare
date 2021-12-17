@@ -78,6 +78,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
+  involvedBy: String,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date
