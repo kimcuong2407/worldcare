@@ -3,7 +3,7 @@ import {CLINIC_RESOURCES, CORE_ACTIONS, ROOT_RESOURCES} from '@app/core/permissi
 import express from 'express';
 import invoiceController from './invoice.controller';
 
-const InvoiceRoutes = (app: express.Application): void => {
+const invoiceRoutes = (app: express.Application): void => {
   app.post('/api/v1/invoice', middleware.authorization([
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
   ]), invoiceController.createInvoiceAction);
@@ -25,3 +25,5 @@ const InvoiceRoutes = (app: express.Application): void => {
   ]), invoiceController.deleteInvoiceAction);
 
 }
+
+export default invoiceRoutes;

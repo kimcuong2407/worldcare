@@ -25,3 +25,5 @@ const saleOrderRoutes = (app: express.Application): void => {
   ]),  saleOrderController.deleteSaleOrderAction);
 
 }
+
+export default saleOrderRoutes;
