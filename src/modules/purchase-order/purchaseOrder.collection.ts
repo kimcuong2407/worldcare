@@ -2,6 +2,24 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 
+const PurchaseOrderItemBatchSchema = new mongoose.Schema({
+  batchId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'batch',
+  },
+  quantity: Number
+}, {
+  toJSON: {virtuals: true},
+  toObject: {virtuals: true}
+});
+
+PurchaseOrderItemBatchSchema.virtual('batch', {
+  ref: 'batch', // the collection/model name
+  localField: 'batchId',
+  foreignField: '_id',
+  justOne: true, // default is false
+});
+
 const PurchaseOrderItemSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Types.ObjectId,
@@ -12,13 +30,7 @@ const PurchaseOrderItemSchema = new mongoose.Schema({
     ref: 'product_variant',
   },
   batches: [
-    {
-      batchId: {
-        type: mongoose.Types.ObjectId,
-        ref: 'batch',
-      },
-      quantity: Number
-    }
+    PurchaseOrderItemBatchSchema
   ],
   price: Number,
   discountValue: Number,
@@ -66,6 +78,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
+  involvedBy: String,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date

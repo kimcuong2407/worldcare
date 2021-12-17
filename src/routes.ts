@@ -38,6 +38,8 @@ import customerV2Routes from './modules/customer-v2';
 import batchRoutes from './modules/batch';
 import generalLedgerRoutes from './modules/general-ledger';
 import paymentNoteRoutes from './modules/payment-note';
+import saleOrdersRoutes from './modules/sale-orders';
+import invoiceRoutes from './modules/invoice';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -79,4 +81,6 @@ export default (app: express.Application): void => {
   batchRoutes(app);
   generalLedgerRoutes(app);
   paymentNoteRoutes(app);
+  saleOrdersRoutes(app);
+  invoiceRoutes(app);
 };
