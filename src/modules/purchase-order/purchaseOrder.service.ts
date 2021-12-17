@@ -188,7 +188,9 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
     deletedAt: null
   } as any;
   if (queryInput.keyword) {
-    query['$text'] = {$search: queryInput.keyword}
+    query.code = {
+      $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
+    }
   }
   const purchaseOrders = await PurchaseOrderCollection.paginate(query, {
     ...options,
@@ -197,7 +199,11 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
     },
     populate: [
       { path: 'purchaseOrderItems.product' },
-      { path: 'purchaseOrderItems.productVariant' },
+      {
+        path: 'purchaseOrderItems.productVariant',
+        strictPopulate: false,
+        populate: 'unit'
+      },
       { path: 'purchaseOrderItems.batches.batch' },
       { path: 'supplier' },
       { path: 'branch' },
@@ -224,7 +230,11 @@ const getPurchaseOrder = async (query: any) => {
 const findById = async (query: any) => {
   const result = await PurchaseOrderCollection.findOne(query)
     .populate('purchaseOrderItems.product')
-    .populate('purchaseOrderItems.productVariant')
+    .populate({
+      path: 'purchaseOrderItems.productVariant',
+      strictPopulate: false,
+      populate: 'unit'
+    })
     .populate('purchaseOrderItems.batches.batch')
     .populate('supplier')
     .populate('branch')
