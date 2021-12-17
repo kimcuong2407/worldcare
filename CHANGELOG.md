@@ -1,3 +1,10 @@
+## [1.11.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.2...v1.11.3) (2021-12-17)
+
+
+### Bug Fixes
+
+* **product-variant:** support fetch lot api ([2cca16c](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2cca16cc48d252bb22c27d176124db228173a7e1))
+
 ## [1.11.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.1...v1.11.2) (2021-12-17)
 
 
