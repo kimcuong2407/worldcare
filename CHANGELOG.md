@@ -1,3 +1,12 @@
+## [1.11.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.1...v1.11.2) (2021-12-17)
+
+
+### Bug Fixes
+
+* **purchase-order:** add involvedby field ([849604a](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/849604af693991bcefaf8dded8cc556d21b3932d))
+* **purchase-order:** return full detail purchase order when fetch list ([414f88c](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/414f88cbe36c3c6bf81c63c8798e5868b8784f75))
+* **sale:** add invoice and sale orders to routes ([3d51fca](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/3d51fca407817a4e32a572f4a77979f098fce9a0))
+
 ## [1.11.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.0...v1.11.1) (2021-12-16)
 
 
