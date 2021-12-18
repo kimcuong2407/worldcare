@@ -18,7 +18,9 @@ const deleteInventoryTransaction = async (id: string) => {
   }
   const inventoryTransaction = _.cloneDeep(_.get(inventoryTransactionDoc, '_doc'))
   await InventoryTransactionCollection.findByIdAndUpdate(id, {
-    deletedAt: new Date()
+    $set: {
+      deletedAt: new Date()
+    }
   });
   // Find. if can not find. return
   // Found. update data

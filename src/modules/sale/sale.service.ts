@@ -166,7 +166,9 @@ async function createInventoryTransaction(type: string, inputInfo: any, referenc
     const batchDoc = await BatchCollection.findOne({_id: detailItem.batchId}).exec();
     if (!isNil(batchDoc)) {
       await BatchCollection.findOneAndUpdate({_id: detailItem.batchId}, {
-        quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
+        $set: {
+          quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
+        }
       }).exec();
     }
   }

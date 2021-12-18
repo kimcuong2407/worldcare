@@ -1,5 +1,5 @@
 import loggerHelper from '@utils/logger.util';
-import {clone, get, isNil, map} from 'lodash';
+import {get, isNil} from 'lodash';
 import PurchaseOrderCollection from './purchaseOrder.collection';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
@@ -19,7 +19,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
+  const paymentNote = await createPurchasePaymentNote(payment, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
 
   const purchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -89,7 +89,9 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
         const batchDoc = await BatchCollection.findOne({_id: batch.batchId}).exec();
         if (!isNil(batchDoc)) {
           await BatchCollection.findOneAndUpdate({_id: batch.batchId}, {
-            quantity: get(batchDoc, '_doc').quantity + batch.quantity
+            $set: {
+              quantity: get(batchDoc, '_doc').quantity + batch.quantity
+            }
           }).exec();
         }
         inventoryTransactionIds.push(get(inventoryTransaction, '_doc._id'));
@@ -102,10 +104,11 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
   }
 }
 
-async function createPaymentNote(payment: any, branchId: any, supplierId: any, purchaseOrderInfo: any) {
+async function createPurchasePaymentNote(payment: any, branchId: any, 
+                                         supplierId: any, purchaseOrderInfo: any, type: string) {
   if (payment.amount && payment.amount > 0) {
     const paymentNoteInfo = {
-      type: PAYMENT_NOTE_TYPE.PAYMENT,
+      type,
       branchId,
       supplierId,
       involvedById: purchaseOrderInfo.involvedById,
@@ -121,7 +124,7 @@ async function createPaymentNote(payment: any, branchId: any, supplierId: any, p
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
     paymentNote.code = initCode(PaymentNoteConstants.PCPN.symbol, paymentNote.paymentNoteCodeSequence);
     await paymentNote.save();
-    logger.info(`Created payment note with code[${paymentNote.code}]`)
+    logger.info(`Created payment note with code[${paymentNote.code}] branchId[${branchId}] amount[${payment.amount}] type[${type}]`)
     return paymentNote;
   }
   return null;
@@ -134,7 +137,7 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPaymentNote(payment, branchId, supplierId, purchaseOrderInfo);
+  const paymentNote = await createPurchasePaymentNote(payment, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
 
   const willBeUpdatePurchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -152,12 +155,11 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
     purchasedAt: purchaseOrderInfo.purchasedAt
   }
 
-  const purchaseOrderDoc = await PurchaseOrderCollection.findOne({_id: purchaseOrderInfo.purchaseOrderId}).exec();
-  const existed = get(purchaseOrderDoc, '_doc');
-  const existedStatus = clone(existed.status);
-  if (!isNil(paymentNote) && existed.paymentNoteIds.length > 0) {
-    existed.paymentNoteIds.push(get(paymentNote, '_doc._id'));
-    willBeUpdatePurchaseOrder.paymentNoteIds = existed.paymentNoteIds
+  // Update list PaymentNote ID 
+  const existedOrder = await PurchaseOrderCollection.findById(purchaseOrderInfo.purchaseOrderId).lean().exec();
+  if (!isNil(paymentNote) && existedOrder.paymentNoteIds.length > 0) {
+    existedOrder.paymentNoteIds.push(get(paymentNote, '_doc._id'));
+    willBeUpdatePurchaseOrder.paymentNoteIds = existedOrder.paymentNoteIds;
   } else if (!isNil(paymentNote)) {
     willBeUpdatePurchaseOrder.paymentNoteIds = [get(paymentNote, '_doc._id')]
   }
@@ -170,18 +172,47 @@ const updatePurchaseOrder = async (purchaseOrderInfo: any) => {
   willBeUpdatePurchaseOrder.subTotal = purchaseOrderInfo.purchaseItems.reduce((a: any, b: { price: any; }) => a + b.price, 0)
 
   const updatedPurchaseOrder = await PurchaseOrderCollection
-    .findOneAndUpdate({_id: purchaseOrderInfo.purchaseOrderId}, willBeUpdatePurchaseOrder).exec();
+    .findOneAndUpdate({_id: purchaseOrderInfo.purchaseOrderId}, {
+      $set: {...willBeUpdatePurchaseOrder}
+    }).exec();
   const purchaseOrderId = get(updatedPurchaseOrder, '_doc._id');
 
-  if (purchaseOrderInfo.status === PURCHASE_ORDER_STATUS.COMPLETED && existedStatus === PURCHASE_ORDER_STATUS.DRAFT) {
+  // Create inventory transaction
+  // ONLY when status is changed from DRAFT => COMPLETED
+  if (existedOrder.status === PURCHASE_ORDER_STATUS.DRAFT && purchaseOrderInfo.status === PURCHASE_ORDER_STATUS.COMPLETED) {
     await createInventoryTransaction(purchaseOrderInfo, supplierId, partnerId, branchId, purchaseOrderId, updatedPurchaseOrder);
+    const receiveFromSupplierAmount = await balancePurchaseOrderPayments(purchaseOrderId);
+    if (receiveFromSupplierAmount > 0) {
+      await createPurchasePaymentNote({
+        ...payment,
+        amount: receiveFromSupplierAmount
+      }, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.RECEIPT);
+    }
   }
 
-  const resultDoc = await PurchaseOrderCollection.findOne({_id: purchaseOrderId})
+  const resultDoc = await PurchaseOrderCollection.findById(purchaseOrderId);
   return {
     ...get(resultDoc, '_doc', {}),
   };
 };
+
+/**
+ * Return cashback amount from supplier 
+ * @param purchaseOrderId
+ */
+const balancePurchaseOrderPayments = async (purchaseOrderId: string) => {
+  const purchaseOrder = await PurchaseOrderCollection.findById(purchaseOrderId)
+    .populate('paymentNotes')
+    .lean();
+  let totalPayment = purchaseOrder.purchaseOrderItems.reduce((a: any, b: { total: any; }) => a + b.total, 0)
+  let totalPaid;
+  if (purchaseOrder.paymentNotes) {
+    totalPaid = purchaseOrder.paymentNotes.reduce((a: any, b: { paymentAmount: any; }) => a + b.paymentAmount, 0)
+  } else {
+    totalPaid = 0;
+  }
+  return totalPaid - totalPayment;
+}
 
 const fetchPurchaseOrders = async (queryInput: any, options: any) => {
   let query = {
@@ -207,7 +238,8 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
       { path: 'purchaseOrderItems.batches.batch' },
       { path: 'supplier' },
       { path: 'branch' },
-      { path: 'partner' }
+      { path: 'partner' },
+      { path: 'paymentNotes' }
     ],
     lean: true
   });
@@ -240,11 +272,13 @@ const findById = async (query: any) => {
     .populate('branch')
     .populate('partner')
     .populate('fullBatches')
+    .populate('paymentNotes')
     .lean()
     .exec();
   await setPurchaseOrderFullBatches(result);
   return result;
 }
+
 /**
  * 1. Delete PurchaseOrder and set CANCELED status
  * 2. Delete and restore quantity InventoryTransaction
