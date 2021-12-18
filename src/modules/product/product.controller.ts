@@ -495,7 +495,14 @@ const fetchProductVariantStockActionV2 = async (
   try {
     const _id = get(req, 'params.id');
     const branchId = get(req, 'companyId');
-    const params = { variantId: _id };
+    if (isNil(branchId)) {
+      throw new ValidationFailedError('branchId is required');
+    }
+    const partnerId = get(req, 'user.partnerId', null);
+    if (isNil(partnerId)) {
+      throw new ValidationFailedError('partnerId is required');
+    }
+    const params = { variantId: _id, partnerId };
     const record = await productService.fetchProductVariantStockV2(params);
     res.send(record);
   } catch (error) {
@@ -512,6 +519,9 @@ const fetchProductVariantLotActionV2 = async (
   try {
     const _id = get(req, 'params.id');
     const branchId = get(req, 'companyId', null);
+    if (isNil(branchId)) {
+      throw new ValidationFailedError('branchId is required');
+    }
     const partnerId = get(req, 'user.partnerId', null);
     if (isNil(partnerId)) {
       throw new ValidationFailedError('partnerId is required');

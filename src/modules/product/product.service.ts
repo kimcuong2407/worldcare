@@ -17,6 +17,8 @@ import InventoryTransactionCollection from '../inventory-transaction/inventory-t
 import { ORDER_STATUS } from '../orders/constant';
 import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';
 import { BATCH_STATUS } from '../batch/constant';
+import { SALE_ORDER_STATUS } from '../sale-orders/constant';
+import moment from 'moment';
 
 // @Tuan.NG:> setup code sequence
 
@@ -410,10 +412,59 @@ const deleteProductAndVariantV2 = async (query: any) => {
 }
 
 const fetchProductVariantStockV2 = async (params: any) => {
-  const { variantId } = params;
-  const query = { variantId, type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT }
-  const allOrderTransactions = await InventoryTransactionCollection.find(query).lean().exec();
-  const quantityOrder = await SaleOrderCollection.find(query).lean().exec();
+  const { variantId, branchId } = params;
+  const variant = await ProductVariantCollection.findOne({
+    _id: variantId
+  }).lean().exec();
+  const exchangeValue = get(variant, 'exchangeValue');
+  const productId = get(variant, 'productId');
+  const orderTransactions = await InventoryTransactionCollection.find({ 
+    deletedAt: null,
+    productId,
+    branchId,
+    type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT
+  }).lean().exec();
+  const totalOrderQuantity = await Bluebird.reduce(orderTransactions, async (total, order) => {
+    const referenceDocId = get(order, 'referenceDocId');
+    const isDraft = await SaleOrderCollection.exists({
+      _id: referenceDocId,
+      status: SALE_ORDER_STATUS.DRAFT,
+    });
+    if (!isDraft) {
+      const vId = get(order, 'variantId');
+      const quantity = +get(order, 'quantity', 0);
+      if (vId === variantId) {
+        return total += quantity;
+      }
+      return total += exchangeValue * quantity;
+    }
+  }, 0);
+  const batches = await BatchCollection.find({
+    deletedAt: null,
+    productId,
+    branchId,
+    status: BATCH_STATUS.ACTIVE,
+  }).lean().exec();
+  let outOfStockDate = new Date().valueOf();
+  const totalStock = await Bluebird.reduce(batches, (total, batch) => {
+    const expirationDate = get(batch, 'expirationDate', new Date().valueOf());
+    if (outOfStockDate < moment(expirationDate).valueOf()) {
+      outOfStockDate = expirationDate;
+    }
+    const quantity = +get(batch, 'quantity', 0);
+    const vId = get(batch, 'vatiantId');
+    if (vId === variantId) {
+      return total += quantity;
+    }
+    return total += exchangeValue * quantity;
+  }, 0);
+  return {
+    branchId,
+    totalStock,
+    totalOrderQuantity,
+    outOfStockDate,
+    status: BATCH_STATUS.ACTIVE,
+  }
 };
 
 const fetchProductVariantLotV2 = async (params: any) => {

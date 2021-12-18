@@ -22,7 +22,8 @@ const productRoutes = (app: express.Application): void => {
   app.get('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductInfoActionV2);
   app.put('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.update]]), productActions.updateProductAndVariantActionV2);
   app.delete('/api/v2/product/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.delete]]), productActions.deleteProductAndVariantActionV2);
-  app.get('/api/v2/product-variant/quantity', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductVariantQuantityActionV2);
+  app.get('/api/v2/product-variant/stock/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductVariantStockActionV2);
+  app.get('/api/v2/product-variant/lot/:id', middleware.authorization([[ROOT_RESOURCES.cms, CORE_ACTIONS.read]]), productActions.fetchProductVariantLotActionV2);
 
   app.get('/api/v1/product-variant/search', middleware.authorization([
     [ROOT_RESOURCES.sale, CORE_ACTIONS.read]
