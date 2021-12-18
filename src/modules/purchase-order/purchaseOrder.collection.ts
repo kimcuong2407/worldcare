@@ -121,6 +121,11 @@ PurchaseOrderSchema.virtual('partner', {
   foreignField: '_id',
   justOne: true, // default is false
 });
+PurchaseOrderSchema.virtual('paymentNotes', {
+  ref: 'payment_note', // the collection/model name
+  localField: 'paymentNoteIds',
+  foreignField: '_id'
+});
 
 PurchaseOrderSchema.plugin(mongoosePaginate);
 PurchaseOrderSchema.plugin(AutoIncrement(mongoose), {

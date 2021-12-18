@@ -2,6 +2,9 @@ import loggerHelper from '@app/utils/logger.util';
 import express from 'express';
 import get from 'lodash/get';
 import invoiceService from './invoice.service';
+import appUtil from '@utils/app.util';
+import {Types} from 'mongoose';
+import {ValidationFailedError} from '@core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('invoice.controller');
 
@@ -44,9 +47,18 @@ const fetchInvoiceListByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const query = { branchId };
-    const list = await invoiceService.fetchInvoiceListByQuery(query);
-    return list;
+    const {keyword} = req.query;
+    const {page, limit} = appUtil.getPaging(req);
+    const options = {
+      page,
+      limit,
+    }
+    const query = {
+      branchId,
+      keyword
+    };
+    const list = await invoiceService.fetchInvoiceListByQuery(query, options);
+    return res.send(list);
   } catch (error) {
     logger.error('fetchInvoiceListByQueryAction', error);
     next(error);
@@ -60,10 +72,13 @@ const fetchInvoiceInfoByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const id = get(req, 'id');
+    const id = req.params.id;
+    if (!id || !Types.ObjectId.isValid(id)) {
+      throw new ValidationFailedError('ID is not valid.');
+    }
     const query = { _id: id, branchId };
     const record = await invoiceService.fetchInvoiceInfoByQuery(query);
-    return record;
+    return res.send(record);
   } catch (error) {
     logger.error('fetchInvoiceInfoByQueryAction', error);
     next(error);

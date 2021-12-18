@@ -38,7 +38,7 @@ const InvoiceSchema = new mongoose.Schema({
   codeSequence: Number,
   customerId: {
     type: mongoose.Types.ObjectId,
-    ref: 'customer',
+    ref: 'customer_v2',
   },
   branchId: {
     type: Number,
@@ -72,9 +72,31 @@ const InvoiceSchema = new mongoose.Schema({
   discountValue: Number,
   discountPercent: Number,
   discountType: String,
+  purchasedAt: Date,
+  involvedBy: String,
   deletedAt: Date
 }, {
   timestamps: true,
+});
+
+InvoiceSchema.virtual('branch', {
+  ref: 'branch',
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true
+});
+
+InvoiceSchema.virtual('customer', {
+  ref: 'customer_v2',
+  localField: 'customerId',
+  foreignField: '_id',
+  justOne: true
+});
+InvoiceSchema.virtual('paymentNote', {
+  ref: 'payment_note',
+  localField: 'paymentNoteId',
+  foreignField: '_id',
+  justOne: true
 });
 
 InvoiceSchema.plugin(mongoosePaginate);

@@ -1,10 +1,7 @@
-import { InternalServerError } from '@app/core/types/ErrorTypes';
-import { AnyLengthString } from 'aws-sdk/clients/comprehend';
+import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
-import { SALE_ORDER_STATUS } from './constant';
 import SaleOrderCollection from './sale-order.collection';
-
 
 const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -49,16 +46,53 @@ const createSaleOrder = async (info: any) => {
   return await persistsSaleOrder(info);
 };
 
-const fetchSaleOrderListByQuery = async (query: any) => {
-  const list = await SaleOrderCollection.find(query)
-    .lean()
-    .sort({ index: 1, createdAt: 1 }).exec();
-  return list;
+const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
+  const query: any = {
+    deletedAt: null,
+    branchId: queryInput.branchId
+  }
+  if (queryInput.keyword) {
+    query.code = {
+      $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
+    }
+  }
+  const saleOrders = await SaleOrderCollection.paginate(query, {
+    ...options,
+    sort: {
+      createdAt: -1,
+    },
+    lean: true,
+    populate: [
+      {path: 'branch'},
+      {path: 'invoice'},
+      {path: 'paymentNote'},
+      {path: 'saleOrderDetail.product'},
+      {
+        path: 'saleOrderDetail.productVariant',
+        strictPopulate: false,
+        populate: 'unit'
+      }
+    ],
+  });
+  const {docs, ...rest} = saleOrders;
+  return {
+    docs,
+    ...rest
+  };
 };
 
 const fetchSaleOrderInfoByQuery = async (query: any) => {
-  const record = await SaleOrderCollection.findOne(query).lean().exec();
-  return record;
+  return await SaleOrderCollection.findOne(query)
+    .populate('branch')
+    .populate('invoice')
+    .populate('paymentNote')
+    .populate('saleOrderDetail.product')
+    .populate({
+        path: 'saleOrderDetail.productVariant',
+        strictPopulate: false,
+        populate: 'unit'
+      })
+    .lean().exec();
 };
 
 const updateSaleOrder = async (query: any, info: any) => {

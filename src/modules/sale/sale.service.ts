@@ -66,7 +66,9 @@ const createInvoice = async (invoiceInfo: any) => {
     discountValue: invoiceInfo.discountValue,
     discountPercent: invoiceInfo.discountPercent,
     discountType: invoiceInfo.discountType,
-    prescriptionId: undefined as any
+    prescriptionId: undefined as any,
+    involvedBy: invoiceInfo.involvedBy,
+    purchasedAt: invoiceInfo.purchasedAt
   }
 
   if (invoiceInfo.isPrescriptionFilled && !isNil(invoiceInfo.prescription)) {
@@ -81,7 +83,8 @@ const createInvoice = async (invoiceInfo: any) => {
 
   for (const item of invoice.invoiceDetail) {
     item.branch = await BranchCollection.findOne({_id: item.branchId}).lean().exec();
-    item.variant = await ProductVariantCollection.findOne({_id: item.variantId}).lean().exec();
+    item.variant = await ProductVariantCollection.findOne({_id: item.variantId})
+      .populate('unit').lean().exec();
     item.batch = await BatchCollection.findOne({_id: item.batchId}).lean().exec();
     item.product = await ProductCollection.findOne({_id: item.productId}).lean().exec();
   }
@@ -129,7 +132,9 @@ const createSaleOrder = async (saleOrderInfo: any) => {
     discountPercent: saleOrderInfo.discountPercent,
     discountType: saleOrderInfo.discountType,
     saleChannel: saleOrderInfo.saleChannel,
-    note: saleOrderInfo.note
+    note: saleOrderInfo.note,
+    involvedBy: saleOrderInfo.involvedBy,
+    purchasedAt: saleOrderInfo.purchasedAt
   }
 
   if (paymentNote) {
@@ -166,7 +171,9 @@ async function createInventoryTransaction(type: string, inputInfo: any, referenc
     const batchDoc = await BatchCollection.findOne({_id: detailItem.batchId}).exec();
     if (!isNil(batchDoc)) {
       await BatchCollection.findOneAndUpdate({_id: detailItem.batchId}, {
-        quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
+        $set: {
+          quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
+        }
       }).exec();
     }
   }
@@ -205,11 +212,11 @@ async function createPaymentNote(payment: any, info: any, transactionType: Payme
  * @param saleOrderInfo
  */
 const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
-  const saleOrderDoc = await SaleOrderCollection.findById(id);
-  const saleOrder = get(saleOrderDoc, '_doc');
+  const savedSaleOrder = await SaleOrderCollection.findById(id).lean();
 
-  // status COMPLETED
-  if (saleOrder.status === SALE_ORDER_STATUS.COMPLETED) {
+  // If status is Completed.
+  // ONLY update note
+  if (savedSaleOrder.status === SALE_ORDER_STATUS.COMPLETED) {
     const resultDoc = await SaleOrderCollection.findByIdAndUpdate(id, {
       $set: {
         note: saleOrderInfo.note
@@ -228,7 +235,9 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
       discountPercent: saleOrderInfo.discountPercent,
       discountType: saleOrderInfo.discountType,
       note: saleOrderInfo.note,
-      status: saleOrderInfo.status
+      status: saleOrderInfo.status,
+      purchasedAt: saleOrderInfo.purchasedAt,
+      involvedBy: saleOrderInfo.involvedBy
     }
   });
 

@@ -4,9 +4,9 @@ import express from 'express';
 import saleOrderController from './sale-order.controller';
 
 const saleOrderRoutes = (app: express.Application): void => {
-  app.post('/api/v1/sale-order', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
-  ]), saleOrderController.createSaleOrderAction);
+  // app.post('/api/v1/sale-order', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
+  // ]), saleOrderController.createSaleOrderAction);
 
   app.get('/api/v1/sale-order', middleware.authorization([
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
@@ -16,13 +16,13 @@ const saleOrderRoutes = (app: express.Application): void => {
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
   ]), saleOrderController.fetchSaleOrderInfoByQueryAction);
 
-  app.put('/api/v1/sale-order/:id', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
-  ]), saleOrderController.updateSaleOrderAction);
+  // app.put('/api/v1/sale-order/:id', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
+  // ]), saleOrderController.updateSaleOrderAction);
 
-  app.delete('/api/v1/sale-order/:id', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
-  ]),  saleOrderController.deleteSaleOrderAction);
+  // app.delete('/api/v1/sale-order/:id', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
+  // ]),  saleOrderController.deleteSaleOrderAction);
 
 }
 

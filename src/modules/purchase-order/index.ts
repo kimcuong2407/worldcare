@@ -19,6 +19,11 @@ const purchaseOrderRoutes = (app: express.Application): void => {
   app.get('/api/v1/purchase-order/:purchaseOrderId', middleware.authorization([
     [CLINIC_RESOURCES.purchaseOrder, CORE_ACTIONS.read]
   ]), purchaseOrderActions.getById);
+
+  app.delete('/api/v1/purchase-order/:purchaseOrderId', middleware.authorization([
+    [CLINIC_RESOURCES.purchaseOrder, CORE_ACTIONS.delete]
+  ]), purchaseOrderActions.deleteAction);
+
 };
 
 export default purchaseOrderRoutes;

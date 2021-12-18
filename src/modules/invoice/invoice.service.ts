@@ -1,4 +1,4 @@
-import { InternalServerError } from '@app/core/types/ErrorTypes';
+import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import InvoiceCollection from './invoice.collection';
@@ -46,16 +46,39 @@ const createInvoice = async (info: any) => {
   return await persistsInvoice(info);
 };
 
-const fetchInvoiceListByQuery = async (query: any) => {
-  const list = await InvoiceCollection.find(query)
-    .lean()
-    .sort({ index: 1, createdAt: 1 }).exec();
-  return list;
+const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
+  const query = {
+    deletedAt: null,
+    branchId: queryInput.branchId
+  } as any
+  if (queryInput.keyword) {
+    query.code = {
+      $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
+    }
+  }
+  const invoices = await InvoiceCollection.paginate(query, {
+    ...options,
+    sort: { createdAt: -1 },
+    lean: true,
+    populate: [
+      { path: 'customer'},
+      { path: 'branch'},
+      { path: 'paymentNote'}
+    ]
+  })
+  const {docs, ...rest} = invoices
+  return {
+    docs,
+    ...rest
+  }
 };
 
 const fetchInvoiceInfoByQuery = async (query: any) => {
-  const record = await InvoiceCollection.findOne(query).lean().exec();
-  return record;
+  return await InvoiceCollection.findOne(query)
+    .populate('customer')
+    .populate('branch')
+    .populate('paymentNote')
+    .lean().exec();
 };
 
 const updateInvoice = async (query: any, info: any) => {

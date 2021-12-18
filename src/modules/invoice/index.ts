@@ -4,9 +4,9 @@ import express from 'express';
 import invoiceController from './invoice.controller';
 
 const invoiceRoutes = (app: express.Application): void => {
-  app.post('/api/v1/invoice', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
-  ]), invoiceController.createInvoiceAction);
+  // app.post('/api/v1/invoice', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
+  // ]), invoiceController.createInvoiceAction);
 
   app.get('/api/v1/invoice', middleware.authorization([
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
@@ -16,13 +16,13 @@ const invoiceRoutes = (app: express.Application): void => {
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
   ]), invoiceController.fetchInvoiceInfoByQueryAction);
 
-  app.put('/api/v1/invoice/:id', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
-  ]), invoiceController.updateInvoiceAction);
+  // app.put('/api/v1/invoice/:id', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
+  // ]), invoiceController.updateInvoiceAction);
 
-  app.delete('/api/v1/invoice/:id', middleware.authorization([
-    [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
-  ]), invoiceController.deleteInvoiceAction);
+  // app.delete('/api/v1/invoice/:id', middleware.authorization([
+  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
+  // ]), invoiceController.deleteInvoiceAction);
 
 }
 

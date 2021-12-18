@@ -1,8 +1,7 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
-import {isNil, get} from 'lodash';
+import {isNil} from 'lodash';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
-import appUtil from '@utils/app.util';
 import saleService from './sale.service';
 import saleOrderService from '../sale-orders/sale-order.service';
 import {SALE_CHANNELS, SALE_TYPE} from './constant';
@@ -23,7 +22,9 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
       discountType,
       payment,
       note,
-      status
+      status,
+      purchasedAt,
+      involvedBy
     } = req.body;
     if (type !== SALE_TYPE.DIRECT && type !== SALE_TYPE.ORDER) {
       throw new ValidationFailedError('Sale type is not correct.');
@@ -42,9 +43,10 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
       discountType,
       payment,
       status,
-      note
+      note,
+      purchasedAt,
+      involvedBy
     }
-
     
     const saleId = req.params.saleId;
     switch (type) {
@@ -84,7 +86,9 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
       payment,
       note,
       prescription,
-      isPrescriptionFilled
+      isPrescriptionFilled,
+      purchasedAt,
+      involvedBy
     } = req.body;
 
     if (type !== SALE_TYPE.DIRECT && type !== SALE_TYPE.ORDER) {
@@ -97,13 +101,14 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
       customerId,
       soldById,
       createdBy: req.user.id,
-      involvedById: req.user.id,
+      involvedBy,
       items,
       partnerId,
       discountValue,
       discountPercent,
       discountType,
-      payment
+      payment,
+      purchasedAt
     }
 
     switch (type) {
