@@ -4,6 +4,8 @@ import express from 'express';
 import { isNil } from 'lodash';
 import get from 'lodash/get';
 import saleOrderService from './sale-order.service';
+import appUtil from '@utils/app.util';
+import {Types} from 'mongoose';
 
 const logger = loggerHelper.getLogger('purchase-order.controller');
 
@@ -43,9 +45,18 @@ const fetchSaleOrderListByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const query = { branchId };
-    const list = await saleOrderService.fetchSaleOrderListByQuery(query);
-    return list;
+    const {keyword} = req.query;
+    const {page, limit} = appUtil.getPaging(req);
+    const options = {
+      page,
+      limit,
+    }
+    const query = {
+      branchId,
+      keyword
+    };
+    const list = await saleOrderService.fetchSaleOrderListByQuery(query, options);
+    return res.status(200).send(list);
   } catch (error) {
     logger.error('', error);
     next(error);
@@ -59,8 +70,10 @@ const fetchSaleOrderInfoByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId')  ;
-    const id  = get(req, 'id');
-    if (isNil(id)) throw new ValidationFailedError('id is required.');
+    const id  = req.params.id;
+    if (isNil(id) || !Types.ObjectId.isValid(id)) {
+      throw new ValidationFailedError('ID is not valid.');
+    }
     const record = await saleOrderService.fetchSaleOrderInfoByQuery({ _id: id, branchId });
     res.send(record);
   } catch (error) {

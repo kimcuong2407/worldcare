@@ -25,6 +25,8 @@ const SaleOrderDetail = new mongoose.Schema({
   cost: Number,
   price: Number,
   quantity: Number,
+  purchasedAt: Date,
+  involvedBy: String
 }, {
   timestamps: true
 });
@@ -63,6 +65,36 @@ const SaleOrderSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 })
+SaleOrderDetail.virtual('product', {
+  ref: 'product',
+  localField: 'productId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderDetail.virtual('productVariant', {
+  ref: 'product_variant',
+  localField: 'variantId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderSchema.virtual('branch', {
+  ref: 'branch',
+  localField: 'branchId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderSchema.virtual('invoice', {
+  ref: 'invoice',
+  localField: 'invoiceId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderSchema.virtual('paymentNote', {
+  ref: 'payment_note',
+  localField: 'paymentNoteId',
+  foreignField: '_id',
+  justOne: true
+});
 
 
 SaleOrderSchema.plugin(mongoosePaginate);
