@@ -1,3 +1,19 @@
+# [1.12.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.3...v1.12.0) (2021-12-18)
+
+
+### Bug Fixes
+
+* **batch:** remove debug ([096af3e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/096af3ee8bfd0fae84d5c87deac0c66ee5ee1b7e))
+* **product:** add api stock and lot ([6145464](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/6145464433c82c2218362c08b00246be1e4cea19))
+* **purchase-order:** add unit to product variant when fetch list ([0fe5820](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0fe5820de9e5d3467509fcb5834843da5ae9ed1a))
+* **purchase-order:** fix null batch after ([c973af2](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/c973af2ca5b4ed52037667419af47bc8985658a2))
+* **sale:** add more fields to return for invoice and sale order ([304a7c0](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/304a7c0876a65a6895d6818643aa08d2a75d7bef))
+
+
+### Features
+
+* **purchase-order:** delete endpoint ([da99cfd](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/da99cfd6b7d1a9bc728a52500a18561a774e97c5))
+
 ## [1.11.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.2...v1.11.3) (2021-12-17)
 
 
