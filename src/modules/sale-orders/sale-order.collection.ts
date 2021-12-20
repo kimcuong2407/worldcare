@@ -25,8 +25,6 @@ const SaleOrderDetail = new mongoose.Schema({
   cost: Number,
   price: Number,
   quantity: Number,
-  purchasedAt: Date,
-  involvedBy: String
 }, {
   timestamps: true
 });
@@ -43,7 +41,7 @@ const SaleOrderSchema = new mongoose.Schema({
   supplierId: String,
   createdById: {
     type: mongoose.Types.ObjectId,
-    ref: 'employee',
+    ref: 'user',
   },
   receiverById: {
     type: mongoose.Types.ObjectId,
@@ -58,6 +56,12 @@ const SaleOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'invoice'
   },
+  customerId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'customer_v2'
+  },
+  purchasedAt: Date,
+  involvedBy: String,
   saleChannel: String,
   status: String,
   note: String,
@@ -92,6 +96,18 @@ SaleOrderSchema.virtual('invoice', {
 SaleOrderSchema.virtual('paymentNote', {
   ref: 'payment_note',
   localField: 'paymentNoteId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderSchema.virtual('customer', {
+  ref: 'customer_v2',
+  localField: 'customerId',
+  foreignField: '_id',
+  justOne: true
+});
+SaleOrderSchema.virtual('createdBy', {
+  ref: 'user',
+  localField: 'createdById',
   foreignField: '_id',
   justOne: true
 });
