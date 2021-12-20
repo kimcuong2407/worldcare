@@ -39,11 +39,12 @@ const deleteInventoryTransaction = async (id: string) => {
         })
         break;
       case INVENTORY_TRANSACTION_TYPE.PURCHASE_RECEIPT:
+        const newQuantityValue = _.get(batchDoc, '_doc.quantity') - inventoryTransaction.quantity;
         await BatchCollection.findOneAndUpdate({
           _id: _.get(batchDoc, '_doc._id')
         }, {
           $set: {
-            quantity: _.get(batchDoc, '_doc.quantity') - inventoryTransaction.quantity
+            quantity: newQuantityValue < 0 ? 0 : newQuantityValue
           }
         })
         break;

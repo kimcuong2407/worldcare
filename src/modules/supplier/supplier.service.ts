@@ -7,6 +7,8 @@ import {SupplierModel} from './supplier.model';
 import makeQuery from '@core/database/query';
 import {SUPPLIER_GROUP_STATUS} from '@modules/supplier/constant';
 import { InternalServerError } from '@app/core/types/ErrorTypes';
+import PurchaseOrderCollection from '@modules/purchase-order/purchaseOrder.collection';
+import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 
 const logger = loggerHelper.getLogger('supplier.service');
 
@@ -48,12 +50,58 @@ const persistSupplier = async (supplierInfo: SupplierModel) => {
   };
 };
 
-const formatSupplier = (supplier: any) => {
+const formatSupplier = async (supplier: any) => {
   if (!supplier) {
     return {};
   }
-  supplier.address = addressUtil.formatAddressV2(get(supplier, 'address'));
+  supplier.address = addressUtil.formatAddressV2(supplier.address);
+  const supplierPaymentSummary = await calculateSupplierPaymentSummary(get(supplier, '_id'));
+  supplier.totalPurchase = supplierPaymentSummary.totalPurchase;
+  supplier.currentDebt = supplierPaymentSummary.currentDebt;
+
   return supplier;
+}
+
+const calculateSupplierPaymentSummary = async (supplierId: string, ) => {
+  const query = {
+    supplierId: supplierId.toString(),
+    status: PURCHASE_ORDER_STATUS.COMPLETED
+  }
+  const supplierPaymentSummary = await PurchaseOrderCollection.aggregate([
+    {
+      $match: query
+    },
+    {
+      $project: {
+        _id: 0,
+        totalPayment: 1,
+        currentDebt: 1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalPurchase: {
+          $sum: '$totalPayment'
+        },
+        currentDebt: {
+          $sum: '$currentDebt'
+        }
+      }
+    }
+  ]).exec();
+
+  if (supplierPaymentSummary.length > 0) {
+    const summary = supplierPaymentSummary[0];
+    return {
+      totalPurchase: summary.totalPurchase ? summary.totalPurchase : 0,
+      currentDebt: summary.currentDebt ? summary.currentDebt : 0,
+    }
+  }
+  return {
+    totalPurchase: 0,
+    currentDebt: 0
+  };
 }
 
 const createSupplier = async (supplierInfo: SupplierModel) => {
@@ -98,10 +146,15 @@ const fetchSuppliers = async (queryInput: any, options: any) => {
     populate: [
       { path: 'supplierGroup'},
     ],
+    lean: true
   });
   const {docs, ...rest} = suppliers
+  const resultDocs = [];
+  for (const doc of docs) {
+    resultDocs.push(await formatSupplier(doc));
+  }
   return {
-    docs: map(docs, formatSupplier),
+    docs: resultDocs,
     ...rest
   };
 }
@@ -110,7 +163,7 @@ const getSupplierInfo = async (query: any) => {
   const supplier = await SupplierCollection.findOne(query)
     .populate('supplierGroup')
     .exec();
-  return formatSupplier(get(supplier, '_doc'));
+  return await formatSupplier(get(supplier, '_doc'));
 };
 
 const updateSupplierInfo = async (query: any, supplierInfo: any) => {

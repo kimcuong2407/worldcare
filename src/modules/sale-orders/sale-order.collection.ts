@@ -60,6 +60,9 @@ const SaleOrderSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'customer_v2'
   },
+  discountValue: Number,
+  discountPercent: Number,
+  discountType: String,
   purchasedAt: Date,
   involvedBy: String,
   saleChannel: String,
