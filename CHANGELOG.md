@@ -1,3 +1,15 @@
+# [1.13.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.12.0...v1.13.0) (2021-12-21)
+
+
+### Bug Fixes
+
+* **sale:** populate fields to return to FE ([73b8ff9](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/73b8ff9f55decafbdca4062a525ae34c8bb8d134))
+
+
+### Features
+
+* **supplier:** calculate total purchase and total debt ([a2fc077](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/a2fc07716fae231002d3f06f335fdfa86bb50a61))
+
 # [1.12.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.11.3...v1.12.0) (2021-12-18)
 
 
