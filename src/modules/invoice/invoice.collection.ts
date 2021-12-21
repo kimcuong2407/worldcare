@@ -98,6 +98,12 @@ InvoiceSchema.virtual('paymentNote', {
   foreignField: '_id',
   justOne: true
 });
+InvoiceSchema.virtual('createdBy', {
+  ref: 'user',
+  localField: 'createdById',
+  foreignField: '_id',
+  justOne: true
+});
 
 InvoiceSchema.plugin(mongoosePaginate);
 InvoiceSchema.plugin(AutoIncrement(mongoose), {

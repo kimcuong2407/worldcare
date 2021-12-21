@@ -103,7 +103,7 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
       purchasedAt
     }
 
-    const data = await purchaseOrderService.updatePurchaseOrder(purchaseOrderInfo);
+    const data = await purchaseOrderService.updatePurchaseOrder(purchaseOrderId, purchaseOrderInfo);
     res.send(data);
   } catch (e) {
     logger.error('updatePurchaseOrder', e);

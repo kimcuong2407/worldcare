@@ -66,7 +66,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
   discountValue: Number,
   discountPercent: Number,
   discountType: String,
-  total: Number,
+  totalPayment: Number,
   paid: Number,
   partnerId: Number,
   branchId: Number,
@@ -79,6 +79,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     ref: 'employee',
   },
   involvedBy: String,
+  currentDebt: String,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date
