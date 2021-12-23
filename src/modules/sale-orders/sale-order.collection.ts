@@ -84,6 +84,12 @@ SaleOrderDetail.virtual('productVariant', {
   foreignField: '_id',
   justOne: true
 });
+SaleOrderDetail.virtual('batch', {
+  ref: 'batch',
+  localField: 'batchId',
+  foreignField: '_id',
+  justOne: true
+});
 SaleOrderSchema.virtual('branch', {
   ref: 'branch',
   localField: 'branchId',
