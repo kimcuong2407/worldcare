@@ -420,7 +420,7 @@ const fetchProductVariantStockV2 = async (params: any) => {
   const productId = get(variant, 'productId');
   const orderTransactions = await InventoryTransactionCollection.find({ 
     deletedAt: null,
-    productId,
+    variantId,
     branchId,
     type: INVENTORY_TRANSACTION_TYPE.ORDER_PRODUCT
   }).lean().exec();
@@ -428,11 +428,12 @@ const fetchProductVariantStockV2 = async (params: any) => {
     const referenceDocId = get(order, 'referenceDocId');
     const isDraft = await SaleOrderCollection.exists({
       _id: referenceDocId,
+      deletedAt: null,
       status: SALE_ORDER_STATUS.DRAFT,
     });
     if (!isDraft) {
       // const vId = get(order, 'variantId');
-      const quantity = +get(order, 'quantity', 0);
+      const quantity = +get(order, 'saleOrderDetail.quantity', 0);
       // if (vId === variantId) {
       //   return total += quantity;
       // }
