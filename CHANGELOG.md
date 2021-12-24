@@ -1,3 +1,10 @@
+## [1.13.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.1...v1.13.2) (2021-12-24)
+
+
+### Bug Fixes
+
+* **product:** fix miss params ([2728643](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/27286439cfc667bd21f9360b3e96b5c958d3744d))
+
 ## [1.13.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.0...v1.13.1) (2021-12-24)
 
 
