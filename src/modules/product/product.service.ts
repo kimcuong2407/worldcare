@@ -431,11 +431,11 @@ const fetchProductVariantStockV2 = async (params: any) => {
       status: SALE_ORDER_STATUS.DRAFT,
     });
     if (!isDraft) {
-      const vId = get(order, 'variantId');
+      // const vId = get(order, 'variantId');
       const quantity = +get(order, 'quantity', 0);
-      if (vId === variantId) {
-        return total += quantity;
-      }
+      // if (vId === variantId) {
+      //   return total += quantity;
+      // }
       return total += exchangeValue * quantity;
     }
   }, 0);
@@ -452,10 +452,10 @@ const fetchProductVariantStockV2 = async (params: any) => {
       outOfStockDate = expirationDate;
     }
     const quantity = +get(batch, 'quantity', 0);
-    const vId = get(batch, 'vatiantId');
-    if (vId === variantId) {
-      return total += quantity;
-    }
+    // const vId = get(batch, 'vatiantId');
+    // if (vId === variantId) {
+    //   return total += quantity;
+    // }
     return total += exchangeValue * quantity;
   }, 0);
   return {
