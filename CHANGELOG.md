@@ -1,3 +1,10 @@
+## [1.13.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.4...v1.13.5) (2021-12-24)
+
+
+### Bug Fixes
+
+* **product:** toggle on quantity base variant ([3992897](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/3992897607bc55877f808eca207d0c2c76d25575))
+
 ## [1.13.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.3...v1.13.4) (2021-12-24)
 
 
