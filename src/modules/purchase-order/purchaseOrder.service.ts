@@ -94,11 +94,11 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
           referenceDocId: purchaseOrderId
         }
         const inventoryTransaction = await InventoryTransactionCollection.create(inventoryTransactionInfo);
-        const batchDoc = await BatchCollection.findOne({_id: batch.batchId}).exec();
+        const batchDoc = await BatchCollection.findOne({_id: batch.batchId}).lean().exec();
         if (!isNil(batchDoc)) {
           await BatchCollection.findOneAndUpdate({_id: batch.batchId}, {
             $set: {
-              quantity: get(batchDoc, '_doc').quantity + batch.quantity
+              quantity: batchDoc.quantity + batch.quantity
             }
           }).exec();
         }
@@ -188,7 +188,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
   const updatedPurchaseOrder = await PurchaseOrderCollection
     .findOneAndUpdate({_id: purchaseOrderInfo.purchaseOrderId}, {
       $set: {...willBeUpdatePurchaseOrder}
-    }).exec();
+    }, {new: true}).exec();
 
   // Create inventory transaction
   // ONLY when status is changed from DRAFT => COMPLETED
@@ -197,10 +197,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
     await createSupplierCashbackPaymentNote(paymentSummary, purchaseOrderInfo, updatedPurchaseOrder);
   }
 
-  const resultDoc = await PurchaseOrderCollection.findById(id);
-  return {
-    ...get(resultDoc, '_doc', {}),
-  };
+  return await PurchaseOrderCollection.findById(id).lean().exec();
 };
 
 /**
@@ -214,7 +211,7 @@ const calculateOrderPurchasePaymentSummary = async (purchaseOrderInfo: any, id: 
   const totalPayment = subtotal - discountValue;
   let totalPaid = 0;
   if (id) {
-    const purchaseOrder = await findById(id);
+    const purchaseOrder = await findById({_id: id});
     if (purchaseOrder) {
       totalPaid += purchaseOrder.paymentNotes.reduce((a: any, b: { paymentAmount: any; }) => a + b.paymentAmount, 0);
     }
@@ -263,7 +260,7 @@ async function createSupplierCashbackPaymentNote(paymentSummary: any, purchaseOr
   await PurchaseOrderCollection
     .findOneAndUpdate({_id: purchaseOrderId}, {
       $set: {paymentNoteIds}
-    }).exec();
+    }, {new: true}).exec();
 }
 
 const fetchPurchaseOrders = async (queryInput: any, options: any) => {

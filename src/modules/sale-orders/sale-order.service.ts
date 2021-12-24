@@ -67,6 +67,7 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
       {path: 'invoice'},
       {path: 'paymentNote'},
       {path: 'saleOrderDetail.product'},
+      {path: 'saleOrderDetail.batch'},
       {path: 'customer'},
       {path: 'createdBy'},
       {
@@ -89,6 +90,7 @@ const fetchSaleOrderInfoByQuery = async (query: any) => {
     .populate('invoice')
     .populate('paymentNote')
     .populate('saleOrderDetail.product')
+    .populate('saleOrderDetail.batch')
     .populate('customer')
     .populate('createdBy')
     .populate({
