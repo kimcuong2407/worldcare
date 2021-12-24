@@ -433,6 +433,11 @@ const fetchProductVariantStockV2 = async (params: any) => {
     });
     if (isDraft) {
       const quantity = +get(order, 'quantity', 0);
+      // @Tuan.NG: quantity base variantId
+      const vId = get(order, 'variantId');
+      if (vId === variantId) {
+        return total += quantity;
+      }
       return total += exchangeValue * quantity;
     }
     return total;
@@ -450,10 +455,11 @@ const fetchProductVariantStockV2 = async (params: any) => {
       outOfStockDate = expirationDate;
     }
     const quantity = +get(batch, 'quantity', 0);
-    // const vId = get(batch, 'vatiantId');
-    // if (vId === variantId) {
-    //   return total += quantity;
-    // }
+    // @Tuan.NG: quantity base variantId
+    const vId = get(batch, 'vatiantId');
+    if (vId === variantId) {
+      return total += quantity;
+    }
     return total += exchangeValue * quantity;
   }, 0);
   return {
