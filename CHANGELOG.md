@@ -1,3 +1,11 @@
+## [1.13.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.3...v1.13.4) (2021-12-24)
+
+
+### Bug Fixes
+
+* **product-variant:** get correct totalOrderQuantity in product variant stock api ([6682aa0](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/6682aa0710de39f5f447f849180ea855b6536555))
+* **sale-order:** populate batch in response ([2e823c4](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2e823c45854e668183ef5c5e3df4d84caa9e0d92))
+
 ## [1.13.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.2...v1.13.3) (2021-12-24)
 
 
