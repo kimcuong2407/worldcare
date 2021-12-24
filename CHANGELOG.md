@@ -1,3 +1,10 @@
+## [1.13.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.0...v1.13.1) (2021-12-24)
+
+
+### Bug Fixes
+
+* **product:** total quantity by variant need exchange all ([d46d21b](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/d46d21b5004f00887a0417aae969d22bef97c63b))
+
 # [1.13.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.12.0...v1.13.0) (2021-12-21)
 
 
