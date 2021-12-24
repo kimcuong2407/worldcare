@@ -431,14 +431,11 @@ const fetchProductVariantStockV2 = async (params: any) => {
       deletedAt: null,
       status: SALE_ORDER_STATUS.DRAFT,
     });
-    if (!isDraft) {
-      // const vId = get(order, 'variantId');
-      const quantity = +get(order, 'saleOrderDetail.quantity', 0);
-      // if (vId === variantId) {
-      //   return total += quantity;
-      // }
+    if (isDraft) {
+      const quantity = +get(order, 'quantity', 0);
       return total += exchangeValue * quantity;
     }
+    return total;
   }, 0);
   const batches = await BatchCollection.find({
     deletedAt: null,
