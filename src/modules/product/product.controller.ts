@@ -502,7 +502,7 @@ const fetchProductVariantStockActionV2 = async (
     if (isNil(partnerId)) {
       throw new ValidationFailedError('partnerId is required');
     }
-    const params = { variantId: _id, partnerId };
+    const params = { variantId: _id, branchId, partnerId };
     const record = await productService.fetchProductVariantStockV2(params);
     res.send(record);
   } catch (error) {
