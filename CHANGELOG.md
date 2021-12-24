@@ -1,3 +1,10 @@
+## [1.13.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.2...v1.13.3) (2021-12-24)
+
+
+### Bug Fixes
+
+* **product:** fix total order by variant ([3d32965](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/3d329654db3cf2a6364e6e153b85f55a967ef854))
+
 ## [1.13.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.1...v1.13.2) (2021-12-24)
 
 
