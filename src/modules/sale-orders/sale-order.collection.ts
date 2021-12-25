@@ -26,6 +26,7 @@ const SaleOrderDetail = new mongoose.Schema({
   price: Number,
   quantity: Number,
 }, {
+  _id: false,
   timestamps: true
 });
 
