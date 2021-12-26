@@ -1,3 +1,10 @@
+# [1.14.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.6...v1.14.0) (2021-12-26)
+
+
+### Features
+
+* upload file ([2eab196](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2eab196062e9fb1c08aa97287c7378d48211bc96))
+
 ## [1.13.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.5...v1.13.6) (2021-12-26)
 
 
