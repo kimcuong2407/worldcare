@@ -10,7 +10,8 @@ const logger = loggerHelper.getLogger('user.controller');
 const uploadFileAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const resource = get(req.params, 'resource');
-    const uploadedFile = await uploadImage(req.file, resource);
+    const branchId = get(req, 'companyId');
+    const uploadedFile = await uploadImage(req.file, `${branchId}/${resource}`);
     res.send({url: uploadedFile.Location});
   } catch (e) {
     logger.error('uploadFileAction', e);

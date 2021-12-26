@@ -21,6 +21,7 @@ export const CLINIC_RESOURCES = {
   inventory: 'inventory',
   purchaseOrder: 'purchaseOrder',
   sale: 'sale',
+  supplier: 'supplier'
 };
 
 export const ROOT_RESOURCES = {
@@ -28,7 +29,6 @@ export const ROOT_RESOURCES = {
   ...CLINIC_RESOURCES,
   partner: 'partner',
   cms: 'cms',
-  supplier: 'supplier'
 }
 
 export const CORE_ACTIONS = {
@@ -99,10 +99,10 @@ export const RESOURCES = [
     key: CORE_RESOURCES.customer,
     name: 'Quản lý khách hàng',
   },
-  {
-    key: CORE_RESOURCES.patient,
-    name: 'Quản lý bệnh nhân',
-  },
+  // {
+  //   key: CORE_RESOURCES.patient,
+  //   name: 'Quản lý bệnh nhân',
+  // },
   {
     key: ROOT_RESOURCES.cms,
     name: 'Quản lý CMS',
@@ -113,14 +113,14 @@ export const RESOURCES = [
   },
   {
     key: CLINIC_RESOURCES.sale,
-    name: 'Quản lý bán hảng',
+    name: 'Quản lý bán hàng',
   },
   {
     key: CLINIC_RESOURCES.purchaseOrder,
     name: 'Quản lý nhập kho'
   },
   {
-    key: ROOT_RESOURCES.supplier,
+    key: CLINIC_RESOURCES.supplier,
     name: 'Quản lý nhà cung cấp'
   },
 ]
