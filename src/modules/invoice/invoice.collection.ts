@@ -29,6 +29,8 @@ const InvoiceDetail = new mongoose.Schema({
   cost: Number,
   price: Number,
   quantity: Number
+}, {
+  _id: false
 });
 
 const InvoiceSchema = new mongoose.Schema({

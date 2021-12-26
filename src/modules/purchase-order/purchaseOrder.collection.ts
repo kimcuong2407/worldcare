@@ -9,6 +9,7 @@ const PurchaseOrderItemBatchSchema = new mongoose.Schema({
   },
   quantity: Number
 }, {
+  _id: false,
   toJSON: {virtuals: true},
   toObject: {virtuals: true}
 });
@@ -39,6 +40,7 @@ const PurchaseOrderItemSchema = new mongoose.Schema({
   supplyPrice: Number,
   total: Number
 }, {
+  _id: false,
   toJSON: {virtuals: true},
   toObject: {virtuals: true}
 });
