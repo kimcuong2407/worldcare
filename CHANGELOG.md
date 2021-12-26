@@ -1,3 +1,10 @@
+## [1.13.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.5...v1.13.6) (2021-12-26)
+
+
+### Bug Fixes
+
+* **purchase-order:** disable id of nested object ([fe4bb3f](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/fe4bb3faa5bfcef6433fd9b058a56a90751a5360))
+
 ## [1.13.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.4...v1.13.5) (2021-12-24)
 
 
