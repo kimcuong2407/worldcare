@@ -206,7 +206,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
  * @param id
  */
 const calculateOrderPurchasePaymentSummary = async (purchaseOrderInfo: any, id: string = undefined) => {
-  const subtotal = purchaseOrderInfo.purchaseItems.reduce((a: any, b: { price: any; }) => a + b.price, 0);
+  const subtotal = purchaseOrderInfo.purchaseItems.reduce((a: any, b: { total: any; }) => a + b.total, 0);
   const discountValue = purchaseOrderInfo.discountValue || 0;
   const totalPayment = subtotal - discountValue;
   let totalPaid = 0;
