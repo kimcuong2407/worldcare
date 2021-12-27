@@ -167,7 +167,11 @@ const updateBranchInfo = async (branchId: number, branchInfo: any) => {
 
   const { parentId } = branchInfo;
 
-  const branch = await BranchCollection.findByIdAndUpdate(branchId, branchInfo, { new: true });
+  const branch = await BranchCollection.findByIdAndUpdate(branchId, {
+    $set: {
+      ...branchInfo
+    }
+  }, { new: true });
 
   if (parentId !== get(currentBranch, 'parentId')) {
     await authService.updateParentBranch(branchId, get(currentBranch, 'parentId'), parentId);

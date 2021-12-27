@@ -40,6 +40,20 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
       services,
       partnerId,
       parentId,
+      pharmacyRegistrationNumber,
+      businessRegistrationCertificate,
+      pharmacyType,
+      representativeName,
+      representativeCertificateNumber,
+      representativePhoneNumber,
+      responsiblePersonName,
+      practicingCertificateNumber,
+      professionalQualification,
+      responsiblePersonPhone,
+      responsiblePersonEmail,
+      pharmacyConnectCode,
+      pharmacyConnectUsername,
+      pharmacyConnectPassword
     } = req.body;
     if (!name || !description) {
       throw new Error('Please verify your input!');
@@ -75,6 +89,20 @@ const createBranchAction = async (req: express.Request, res: express.Response, n
       parentId,
       partnerId: partnerIdentity,
       slug: slugify(trim(lowerCase(normalizeText(isString(name) ? name : generatedNamedSlug)))),
+      pharmacyRegistrationNumber,
+      businessRegistrationCertificate,
+      pharmacyType,
+      representativeName,
+      representativeCertificateNumber,
+      representativePhoneNumber,
+      responsiblePersonName,
+      practicingCertificateNumber,
+      professionalQualification,
+      responsiblePersonPhone,
+      responsiblePersonEmail,
+      pharmacyConnectCode,
+      pharmacyConnectUsername,
+      pharmacyConnectPassword
     };
     const partner = await partnerService.findPartnerById(partnerIdentity);
     const data = await branchService.createBranch({
@@ -167,6 +195,20 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
       services,
       parentId,
       isPublic,
+      pharmacyRegistrationNumber,
+      businessRegistrationCertificate,
+      pharmacyType,
+      representativeName,
+      representativeCertificateNumber,
+      representativePhoneNumber,
+      responsiblePersonName,
+      practicingCertificateNumber,
+      professionalQualification,
+      responsiblePersonPhone,
+      responsiblePersonEmail,
+      pharmacyConnectCode,
+      pharmacyConnectUsername,
+      pharmacyConnectPassword
     } = req.body;
     const branchInfo: any = omitBy({
       name,
@@ -185,6 +227,20 @@ const updateBranchInfoAction = async (req: express.Request, res: express.Respons
       parentId,
       isPublic,
       slug: slug ? slugify(trim(lowerCase(normalizeText(slug)))) : null,
+      pharmacyRegistrationNumber,
+      businessRegistrationCertificate,
+      pharmacyType,
+      representativeName,
+      representativeCertificateNumber,
+      representativePhoneNumber,
+      responsiblePersonName,
+      practicingCertificateNumber,
+      professionalQualification,
+      responsiblePersonPhone,
+      responsiblePersonEmail,
+      pharmacyConnectCode,
+      pharmacyConnectUsername,
+      pharmacyConnectPassword
     }, isNil);
 
     if (slug) {
