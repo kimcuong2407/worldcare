@@ -1,3 +1,10 @@
+## [1.15.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.15.0...v1.15.1) (2021-12-27)
+
+
+### Bug Fixes
+
+* **branch:** return status 404 if branch could not be found ([30b20e1](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/30b20e1a97d97c26e107f677e93b2bb28ff8f89e))
+
 # [1.15.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.14.1...v1.15.0) (2021-12-27)
 
 
