@@ -1,3 +1,15 @@
+# [1.15.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.14.1...v1.15.0) (2021-12-27)
+
+
+### Bug Fixes
+
+* **payment-note:** add referenceId of purchase order's supplier cashback payment note ([5de2ea8](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/5de2ea87eaa4b7aeb79b4774fd8b950c0422b713))
+
+
+### Features
+
+* **branch:** adding addtional branch information ([118da57](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/118da57954a7a99c452f6470fc7ce7d14a01a3a0))
+
 ## [1.14.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.14.0...v1.14.1) (2021-12-27)
 
 
