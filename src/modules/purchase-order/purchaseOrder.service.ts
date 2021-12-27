@@ -19,7 +19,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPurchasePaymentNote(payment, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
+  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
 
   const purchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -112,8 +112,8 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
   }
 }
 
-async function createPurchasePaymentNote(payment: any, branchId: any,
-                                         supplierId: any, purchaseOrderInfo: any, type: string) {
+async function createPurchasePaymentNote(payment: any, purchaseOrderInfo: any, type: string, purchaseOrderId: string = undefined) {
+  const { branchId, supplierId } = purchaseOrderInfo;
   if (payment.amount && payment.amount > 0) {
     const paymentNoteInfo = {
       type,
@@ -126,7 +126,8 @@ async function createPurchasePaymentNote(payment: any, branchId: any,
       paymentAmount: payment.amount,
       totalPayment: payment.totalPayment,
       transactionType: PaymentNoteConstants.PCPN.symbol,
-      referenceDocName: PaymentNoteConstants.PCPN.referenceDocName
+      referenceDocName: PaymentNoteConstants.PCPN.referenceDocName,
+      referenceDocId: purchaseOrderId
     };
 
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
@@ -145,7 +146,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPurchasePaymentNote(payment, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
+  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
 
   const willBeUpdatePurchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -238,12 +239,10 @@ async function createSupplierCashbackPaymentNote(paymentSummary: any, purchaseOr
     return;
   }
   const purchaseOrderId = purchaseOrderInfo.purchaseOrderId;
-  const branchId = purchaseOrderInfo.branchId;
-  const supplierId = purchaseOrderInfo.supplierId;
 
   const receiptPaymentNote = await createPurchasePaymentNote({
     amount: Math.abs(paymentSummary.currentDebt)
-  }, branchId, supplierId, purchaseOrderInfo, PAYMENT_NOTE_TYPE.RECEIPT);
+  }, purchaseOrderInfo, PAYMENT_NOTE_TYPE.RECEIPT, get(savedPurchaseOrder, '_doc._id'));
   if (!receiptPaymentNote) {
     return;
   }
