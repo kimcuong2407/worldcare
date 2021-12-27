@@ -1,12 +1,10 @@
-import casbin from '@app/core/casbin';
 import makeQuery from '@app/core/database/query';
 import addressUtil from '@app/utils/address.util';
 import appUtil from '@app/utils/app.util';
 import loggerHelper from '@utils/logger.util';
-import { concat, countBy, each, filter, find, forEach, map, toUpper } from 'lodash';
+import { countBy, each, filter, find, map, toUpper, isNil } from 'lodash';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
-import isNull from 'lodash/isNull';
 import moment from 'moment';
 import { Types } from 'mongoose';
 import AppointmentCollection from '../appointment/appointment.collection';
@@ -16,7 +14,7 @@ import employeeService from '../employee/employee.service';
 import StaffCollection from '../staff/staff.collection';
 import userService from '../user/user.service';
 import BranchCollection from './branch.collection';
-import { BranchModel } from './branch.model';
+import { NotFoundError } from '@core/types/ErrorTypes';
 
 const logger = loggerHelper.getLogger('branch.service');
 
@@ -136,6 +134,9 @@ const fetchBranchInfo = async (branchIdOrSlug: number, language = 'vi', isRaw = 
   }
 
   branch = await BranchCollection.findOne(query).populate('speciality', 'name').lean();
+  if (isNil(branch)) {
+    throw new NotFoundError('Branch could not be found.');
+  }
   const doctor = await StaffCollection.findOne({ branch: get(branch, '_id') });
 
   const formatted = formatBranch(branch, language);
