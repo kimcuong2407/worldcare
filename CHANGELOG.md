@@ -1,3 +1,10 @@
+## [1.14.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.14.0...v1.14.1) (2021-12-27)
+
+
+### Bug Fixes
+
+* **purchase-order:** re-calculate cashback amount to supplier ([34b01af](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/34b01af97866c95b398374731a888c002d63b529))
+
 # [1.14.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.13.6...v1.14.0) (2021-12-26)
 
 
