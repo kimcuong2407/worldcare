@@ -63,7 +63,7 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
     populate: [
       { path: 'customer'},
       { path: 'branch'},
-      { path: 'paymentNote'},
+      { path: 'paymentNotes'},
       { path: 'createdBy'}
     ]
   })
@@ -78,8 +78,9 @@ const fetchInvoiceInfoByQuery = async (query: any) => {
   return await InvoiceCollection.findOne(query)
     .populate('customer')
     .populate('branch')
-    .populate('paymentNote')
+    .populate('paymentNotes')
     .populate('createdBy')
+    .populate('saleOrder')
     .lean().exec();
 };
 

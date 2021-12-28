@@ -22,7 +22,6 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
       discountType,
       payment,
       note,
-      status,
       purchasedAt,
       involvedBy
     } = req.body;
@@ -42,7 +41,6 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
       discountPercent,
       discountType,
       payment,
-      status,
       note,
       purchasedAt,
       involvedBy
@@ -58,7 +56,11 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
         if (isNil(saleOrder) || Object.keys(saleOrder).length === 0) {
           throw new ValidationFailedError('Purchase order can not be found.');
         }
-        const result = await saleService.updateSaleOrder(saleId, baseInfo);
+        await saleService.updateSaleOrder(saleId, baseInfo);
+        const result = await saleOrderService.fetchSaleOrderInfoByQuery({
+          _id: saleId,
+          branchId
+        });
         res.send(result);
         break;
       case SALE_TYPE.DIRECT:
@@ -88,7 +90,8 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
       prescription,
       isPrescriptionFilled,
       purchasedAt,
-      involvedBy
+      involvedBy,
+      saleOrderId
     } = req.body;
 
     if (type !== SALE_TYPE.DIRECT && type !== SALE_TYPE.ORDER) {
@@ -118,6 +121,7 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
           ...baseInfo,
           prescription,
           isPrescriptionFilled,
+          saleOrderId,
           // TODO: hardcode sale channel. update when sale channel feature implementation is finished
           saleChannel: SALE_CHANNELS.DIRECT
         };

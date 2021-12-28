@@ -53,6 +53,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     {
       type: mongoose.Types.ObjectId,
       ref: 'payment_note',
+      default: []
     }
   ],
   inventoryTransactions: [

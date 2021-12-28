@@ -50,7 +50,7 @@ const InvoiceSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
-  createById: {
+  createdById: {
     type: mongoose.Types.ObjectId,
     ref: 'employee',
   },
@@ -58,14 +58,16 @@ const InvoiceSchema = new mongoose.Schema({
     type: String,
   },
   invoiceDetail: [InvoiceDetail],
-  paymentNoteId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'payment_note'
-  },
+  paymentNoteIds: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'payment_note'
+    }
+  ],
   status: String,
   saleOrderId: {
     type: mongoose.Types.ObjectId,
-    ref: 'purchase_order'
+    ref: 'sale_order'
   },
   prescriptionId: {
     type: mongoose.Types.ObjectId,
@@ -94,15 +96,20 @@ InvoiceSchema.virtual('customer', {
   foreignField: '_id',
   justOne: true
 });
-InvoiceSchema.virtual('paymentNote', {
+InvoiceSchema.virtual('paymentNotes', {
   ref: 'payment_note',
-  localField: 'paymentNoteId',
-  foreignField: '_id',
-  justOne: true
+  localField: 'paymentNoteIds',
+  foreignField: '_id'
 });
 InvoiceSchema.virtual('createdBy', {
   ref: 'user',
   localField: 'createdById',
+  foreignField: '_id',
+  justOne: true
+});
+InvoiceSchema.virtual('saleOrder', {
+  ref: 'sale_order',
+  localField: 'saleOrderId',
   foreignField: '_id',
   justOne: true
 });

@@ -83,16 +83,28 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
     ...rest
   };
 };
+    // .populate('customer')
+    // .populate('branch')
+    // .populate('paymentNotes')
+    // .populate('createdBy')
 
 const fetchSaleOrderInfoByQuery = async (query: any) => {
   return await SaleOrderCollection.findOne(query)
     .populate('branch')
-    .populate('invoice')
-    .populate('paymentNote')
+    .populate({
+      path: 'invoice',
+      strictPopulate: false,
+      populate: [
+        {path: 'customer'},
+        {path: 'branch'},
+        {path: 'createdBy', select: '-password'},
+      ]
+    })
+    .populate('paymentNotes')
     .populate('saleOrderDetail.product')
     .populate('saleOrderDetail.batch')
     .populate('customer')
-    .populate('createdBy')
+    .populate({path: 'createdBy',select: '-password'})
     .populate({
         path: 'saleOrderDetail.productVariant',
         strictPopulate: false,
