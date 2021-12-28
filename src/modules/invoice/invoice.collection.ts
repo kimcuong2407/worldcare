@@ -52,7 +52,7 @@ const InvoiceSchema = new mongoose.Schema({
   },
   createdById: {
     type: mongoose.Types.ObjectId,
-    ref: 'employee',
+    ref: 'user',
   },
   saleChannel: {
     type: String,
@@ -76,6 +76,8 @@ const InvoiceSchema = new mongoose.Schema({
   discountValue: Number,
   discountPercent: Number,
   discountType: String,
+  total: Number,
+  totalPayment: Number,
   purchasedAt: Date,
   involvedBy: String,
   deletedAt: Date

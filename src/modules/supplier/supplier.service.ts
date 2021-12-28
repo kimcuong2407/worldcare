@@ -85,7 +85,9 @@ const calculateSupplierPaymentSummary = async (supplierId: string, ) => {
           $sum: '$totalPayment'
         },
         currentDebt: {
-          $sum: '$currentDebt'
+          $sum: {
+            $toDouble: '$currentDebt'
+          }
         }
       }
     }

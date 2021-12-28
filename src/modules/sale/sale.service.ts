@@ -1,5 +1,5 @@
 import loggerHelper from '@utils/logger.util';
-import {cloneDeep, get, isNil} from 'lodash';
+import {get, isNil} from 'lodash';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import InvoiceCollection from '@modules/invoice/invoice.collection';
@@ -7,7 +7,6 @@ import SaleOrderCollection from '@modules/sale-orders/sale-order.collection';
 import BatchCollection from '@modules/batch/batch.collection';
 import invoiceService from '@modules/invoice/invoice.service'
 import saleOrderService from '@modules/sale-orders/sale-order.service'
-import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service'
 import prescriptionService from '@modules/prescription-v2/prescription.service'
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
 import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
@@ -15,11 +14,10 @@ import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import {INVOICE_STATUS} from '@modules/invoice/constant';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
-import BranchCollection from '@modules/branch/branch.collection';
 import ProductVariantCollection from '@modules/product/productVariant.collection';
 import ProductCollection from '@modules/product/product.collection';
 
-const logger = loggerHelper.getLogger('purchaseOrder.service');
+const logger = loggerHelper.getLogger('sale.service');
 
 const checkBatchQuantity = async (items: any) => {
   if (!items || items.length === 0) {
@@ -54,13 +52,14 @@ const createInvoice = async (invoiceInfo: any) => {
   logger.info('Start create invoice. ' + JSON.stringify(invoiceInfo));
 
   const paymentNoteIds: any[] = [];
+  let totalPayment = 0;
 
   // 0. Check if invoice is creating bases on a sale order.
   if (!isNil(invoiceInfo.saleOrderId)) {
     const saleOrder = await SaleOrderCollection.findOne({
       _id: invoiceInfo.saleOrderId,
       branchId: invoiceInfo.branchId
-    }).lean().exec();
+    }).populate('paymentNotes').lean().exec();
     if (isNil(saleOrder)) {
       throw new ValidationFailedError('Sale order does not exist.');
     }
@@ -69,6 +68,10 @@ const createInvoice = async (invoiceInfo: any) => {
     }
     const saleOrderPaymentNoteIds = saleOrder.paymentNoteIds || [];
     paymentNoteIds.push(...saleOrderPaymentNoteIds);
+    const saleOrderPaymentNotes = saleOrder.paymentNotes || [];
+    totalPayment += saleOrderPaymentNotes
+      .filter((note: any) => note.type === PAYMENT_NOTE_TYPE.RECEIPT)
+      .reduce((a: any, b: { paymentAmount: number }) => a + b.paymentAmount, 0);
   }
 
   // 1. Create invoice record.
@@ -88,7 +91,9 @@ const createInvoice = async (invoiceInfo: any) => {
     prescriptionId: undefined as any,
     involvedBy: invoiceInfo.involvedBy,
     purchasedAt: invoiceInfo.purchasedAt,
-    saleOrderId: invoiceInfo.saleOrderId
+    saleOrderId: invoiceInfo.saleOrderId,
+    totalPayment,
+    total: 0 as number
   }
 
   if (invoiceInfo.isPrescriptionFilled && !isNil(invoiceInfo.prescription)) {
@@ -103,6 +108,7 @@ const createInvoice = async (invoiceInfo: any) => {
       .populate('unit').lean().exec();
     item.batch = await BatchCollection.findOne({_id: item.batchId}).lean().exec();
     item.product = await ProductCollection.findOne({_id: item.productId}).lean().exec();
+    invoice.total += +item.price;
   }
 
   const createdInvoiceDoc = await InvoiceCollection.create(invoice);
@@ -128,9 +134,11 @@ const createInvoice = async (invoiceInfo: any) => {
   if (paymentNote) {
     const invoicePaymentNoteIds = createdInvoice.paymentNoteIds || [];
     invoicePaymentNoteIds.push(get(paymentNote, '_doc._id'));
+    totalPayment += +get(paymentNote, '_doc.paymentAmount')
     await InvoiceCollection.findByIdAndUpdate(createdInvoice._id, {
       $set: {
-        paymentNoteIds: invoicePaymentNoteIds
+        paymentNoteIds: invoicePaymentNoteIds,
+        totalPayment
       }
     })
   }
@@ -167,18 +175,25 @@ const createSaleOrder = async (saleOrderInfo: any) => {
     createdById: saleOrderInfo.createdBy,
     saleOrderDetail: saleOrderInfo.items,
     paymentNoteIds: [] as any[],
-    discountValue: saleOrderInfo.discountValue,
-    discountPercent: saleOrderInfo.discountPercent,
+    discountValue: saleOrderInfo.discountValue || 0,
+    discountPercent: saleOrderInfo.discountPercent || 0,
     discountType: saleOrderInfo.discountType,
     saleChannel: saleOrderInfo.saleChannel,
     note: saleOrderInfo.note,
     involvedBy: saleOrderInfo.involvedBy,
-    purchasedAt: saleOrderInfo.purchasedAt
+    purchasedAt: saleOrderInfo.purchasedAt,
+    customerNeedToPay: 0,
+    customerPaid: 0
   }
 
   if (paymentNote) {
     saleOrder.paymentNoteIds.push(paymentNote['_doc']['_id']);
+    saleOrder.customerPaid = paymentNote['_doc']['paymentAmount'];
   }
+  const total: number = saleOrder.saleOrderDetail
+    .reduce((a: any, b: { price: any }) => a + parseFloat(b.price), 0);
+  const customerNeedToPay = total - saleOrder.discountValue - saleOrder.customerPaid;
+  saleOrder.customerNeedToPay = customerNeedToPay < 0 ? 0 : customerNeedToPay;
 
   const createdSaleOrderDoc = await SaleOrderCollection.create(saleOrder);
   await saleOrderService.saleOrderAutoIncrease(createdSaleOrderDoc);
@@ -268,9 +283,14 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
   const payment = saleOrderInfo.payment;
   const paymentNote = await createPaymentNote(payment, saleOrderInfo, PaymentNoteConstants.TTDH, id);
   const paymentNoteIds = savedSaleOrder.paymentNoteIds || [];
+  let customerPaid = savedSaleOrder.customerPaid || 0;
   if (paymentNote) {
+    customerPaid += +get(paymentNote, '_doc.paymentAmount')
     paymentNoteIds.push(get(paymentNote, '_doc._id'));
   }
+  const total: number = saleOrderInfo.items
+    .reduce((a: any, b: { price: any }) => a + parseFloat(b.price), 0);
+  const customerNeedToPay = total - saleOrderInfo.discountValue - customerPaid;
 
   // status DRAFT
   const updatedSaleOrderDoc = await SaleOrderCollection.findByIdAndUpdate(id, {
@@ -284,7 +304,9 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
       note: saleOrderInfo.note,
       purchasedAt: saleOrderInfo.purchasedAt,
       involvedBy: saleOrderInfo.involvedBy,
-      paymentNoteIds
+      paymentNoteIds,
+      customerPaid,
+      customerNeedToPay: customerNeedToPay < 0 ? 0 : customerNeedToPay
     }
   }, { new: true }).exec();
 

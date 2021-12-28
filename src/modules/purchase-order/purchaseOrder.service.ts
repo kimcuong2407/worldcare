@@ -298,10 +298,45 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
     await setPurchaseOrderFullBatches(doc);
     resultDocs.push(doc);
   }
+  const summary = await summaryPurchaseOrders(query);
   return {
     docs: resultDocs,
-    ...rest
+    ...rest,
+    summary
   };
+}
+
+const summaryPurchaseOrders = async (query: any) => {
+  const summaryPurchaseOrders = await PurchaseOrderCollection.aggregate([
+    {
+      $match: query
+    },
+    {
+      $project: {
+        _id: 0,
+        currentDebt: 1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalDebt: {
+          $sum: {
+            $toDouble: '$currentDebt'
+          }
+        }
+      }
+    }
+  ]).exec();
+  if (summaryPurchaseOrders.length > 0) {
+    const summary = summaryPurchaseOrders[0];
+    return {
+      totalDebt: summary.totalDebt
+    }
+  }
+  return {
+    totalDebt: 0
+  }
 }
 
 const getPurchaseOrder = async (query: any) => {

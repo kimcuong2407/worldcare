@@ -82,7 +82,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     ref: 'employee',
   },
   involvedBy: String,
-  currentDebt: String,
+  currentDebt: Number,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date

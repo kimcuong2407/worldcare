@@ -71,6 +71,8 @@ const SaleOrderSchema = new mongoose.Schema({
   saleChannel: String,
   status: String,
   note: String,
+  customerNeedToPay: Number,
+  customerPaid: Number,
   deletedAt: Date,
 }, {
   timestamps: true,
