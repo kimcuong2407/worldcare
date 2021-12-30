@@ -1,3 +1,15 @@
+# [1.16.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.15.1...v1.16.0) (2021-12-30)
+
+
+### Bug Fixes
+
+* **sale:** handle payment amount 0. add saleOrderId to invoice body. update paymentnoteids to array ([df9f9f6](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/df9f9f6c52ac27ef0ebf05846c65dd607c41e1c0))
+
+
+### Features
+
+* **summary-data:** summary data for purchase order, invoice, sale order ([9f1d204](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/9f1d204ce2ecf9ae537b54593b8a482d2149cc9a))
+
 ## [1.15.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.15.0...v1.15.1) (2021-12-27)
 
 
