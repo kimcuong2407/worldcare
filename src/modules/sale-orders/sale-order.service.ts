@@ -78,21 +78,70 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
     ],
   });
   const {docs, ...rest} = saleOrders;
+  const summary = await summarySaleOrders(query);
   return {
     docs,
-    ...rest
+    ...rest,
+    summary
   };
 };
+
+const summarySaleOrders = async (query: any) => {
+  const summary = await SaleOrderCollection.aggregate([
+    {
+      $match: {
+        ...query,
+        branchId: parseInt(query.branchId)
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        customerNeedToPay: 1,
+        customerPaid: 1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        customerNeedToPay: {
+          $sum: '$customerNeedToPay'
+        },
+        customerPaid: {
+          $sum: '$customerPaid'
+        }
+      }
+    }
+  ])
+  if (summary.length > 0) {
+    return {
+      customerNeedToPay: summary[0].customerNeedToPay,
+      customerPaid: summary[0].customerPaid
+    }
+  }
+  return {
+    customerNeedToPay: 0,
+    customerPaid: 0
+  }
+}
 
 const fetchSaleOrderInfoByQuery = async (query: any) => {
   return await SaleOrderCollection.findOne(query)
     .populate('branch')
-    .populate('invoice')
-    .populate('paymentNote')
+    .populate({
+      path: 'invoice',
+      strictPopulate: false,
+      populate: [
+        {path: 'customer'},
+        {path: 'branch'},
+        {path: 'createdBy', select: '-password'},
+      ]
+    })
+    .populate('paymentNotes')
     .populate('saleOrderDetail.product')
     .populate('saleOrderDetail.batch')
     .populate('customer')
-    .populate('createdBy')
+    .populate({path: 'createdBy',select: '-password'})
     .populate({
         path: 'saleOrderDetail.productVariant',
         strictPopulate: false,

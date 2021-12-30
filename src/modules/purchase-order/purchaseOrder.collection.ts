@@ -53,6 +53,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     {
       type: mongoose.Types.ObjectId,
       ref: 'payment_note',
+      default: []
     }
   ],
   inventoryTransactions: [
@@ -81,7 +82,7 @@ const PurchaseOrderSchema = new mongoose.Schema({
     ref: 'employee',
   },
   involvedBy: String,
-  currentDebt: String,
+  currentDebt: Number,
   createdBy: String,
   updatedBy: String,
   deletedAt: Date

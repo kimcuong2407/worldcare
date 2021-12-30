@@ -63,8 +63,11 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   logger.info(`Created Purchase receipt with code[${createdPurchaseOrder.code}]`)
 
   const purchaseOrderId = get(createdPurchaseOrder, '_doc._id');
-  paymentNote.referenceDocId = purchaseOrderId;
-  paymentNote.save();
+
+  if (paymentNote) {
+    paymentNote.referenceDocId = purchaseOrderId;
+    paymentNote.save();
+  }
 
   await createInventoryTransaction(purchaseOrderInfo, supplierId, partnerId, branchId, purchaseOrderId, createdPurchaseOrder);
 
@@ -114,7 +117,7 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
 
 async function createPurchasePaymentNote(payment: any, purchaseOrderInfo: any, type: string, purchaseOrderId: string = undefined) {
   const { branchId, supplierId } = purchaseOrderInfo;
-  if (payment.amount && payment.amount > 0) {
+  if (payment && !isNil(payment.amount) && payment.amount > 0) {
     const paymentNoteInfo = {
       type,
       branchId,
@@ -146,7 +149,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
+  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT, id);
 
   const willBeUpdatePurchaseOrder = {
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
@@ -168,11 +171,9 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
 
   // Update list PaymentNote ID 
   const existedOrder = await PurchaseOrderCollection.findById(id).lean().exec();
-  if (!isNil(paymentNote) && existedOrder.paymentNoteIds.length > 0) {
-    existedOrder.paymentNoteIds.push(get(paymentNote, '_doc._id'));
-    willBeUpdatePurchaseOrder.paymentNoteIds = existedOrder.paymentNoteIds;
-  } else if (!isNil(paymentNote)) {
-    willBeUpdatePurchaseOrder.paymentNoteIds = [get(paymentNote, '_doc._id')]
+  willBeUpdatePurchaseOrder.paymentNoteIds = existedOrder.paymentNoteIds || [];
+  if (!isNil(paymentNote)) {
+    willBeUpdatePurchaseOrder.paymentNoteIds.push(get(paymentNote, '_doc._id'));
   }
 
   let totalQuantity = 0;
@@ -297,10 +298,45 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
     await setPurchaseOrderFullBatches(doc);
     resultDocs.push(doc);
   }
+  const summary = await summaryPurchaseOrders(query);
   return {
     docs: resultDocs,
-    ...rest
+    ...rest,
+    summary
   };
+}
+
+const summaryPurchaseOrders = async (query: any) => {
+  const summaryPurchaseOrders = await PurchaseOrderCollection.aggregate([
+    {
+      $match: query
+    },
+    {
+      $project: {
+        _id: 0,
+        currentDebt: 1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalDebt: {
+          $sum: {
+            $toDouble: '$currentDebt'
+          }
+        }
+      }
+    }
+  ]).exec();
+  if (summaryPurchaseOrders.length > 0) {
+    const summary = summaryPurchaseOrders[0];
+    return {
+      totalDebt: summary.totalDebt
+    }
+  }
+  return {
+    totalDebt: 0
+  }
 }
 
 const getPurchaseOrder = async (query: any) => {

@@ -63,23 +63,71 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
     populate: [
       { path: 'customer'},
       { path: 'branch'},
-      { path: 'paymentNote'},
+      { path: 'paymentNotes'},
       { path: 'createdBy'}
     ]
   })
+  const summary = await summaryInvoice(query);
   const {docs, ...rest} = invoices
   return {
     docs,
-    ...rest
+    ...rest,
+    summary
   }
 };
+
+const summaryInvoice = async (query: any) => {
+  const summary = await InvoiceCollection.aggregate([
+    {
+      $match: {
+        ...query,
+        branchId: parseInt(query.branchId)
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        total: 1,
+        discountValue: 1,
+        totalPayment: 1
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: '$total'
+        },
+        discountValue: {
+          $sum: '$discountValue'
+        },
+        totalPayment: {
+          $sum: '$totalPayment'
+        }
+      }
+    }
+  ])
+  if (summary.length > 0) {
+    return {
+      total: summary[0].total,
+      discountValue: summary[0].discountValue,
+      totalPayment: summary[0].totalPayment
+    }
+  }
+  return {
+    total: 0,
+    discountValue: 0,
+    totalPayment: 0
+  }
+}
 
 const fetchInvoiceInfoByQuery = async (query: any) => {
   return await InvoiceCollection.findOne(query)
     .populate('customer')
     .populate('branch')
-    .populate('paymentNote')
+    .populate('paymentNotes')
     .populate('createdBy')
+    .populate('saleOrder')
     .lean().exec();
 };
 
