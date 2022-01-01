@@ -49,7 +49,10 @@ const PurchaseOrderItemSchema = new mongoose.Schema({
 const PurchaseOrderSchema = new mongoose.Schema({
   code: String,
   purchaseOrderType: Number,
-  purchaseOrderCodeSequence: Number,
+  purchaseOrderCodeSequence: {
+    type: Number,
+    default: 1,
+  },
   paymentNoteIds: [
     {
       type: mongoose.Types.ObjectId,
