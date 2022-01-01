@@ -22,6 +22,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
 
   const purchaseOrder = {
+    purchaseOrderType: purchaseOrderInfo.purchaseOrderType,
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
     totalProduct: purchaseOrderInfo.purchaseItems.length,
     discountValue: purchaseOrderInfo.discountValue,
@@ -152,6 +153,7 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
   const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT, id);
 
   const willBeUpdatePurchaseOrder = {
+    purchaseOrderType: purchaseOrderInfo.purchaseOrderType,
     purchaseOrderItems: purchaseOrderInfo.purchaseItems,
     totalProduct: purchaseOrderInfo.purchaseItems.length,
     discountValue: purchaseOrderInfo.discountValue,

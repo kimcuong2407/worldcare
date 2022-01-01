@@ -25,6 +25,7 @@ const BatchSchema = new mongoose.Schema({
     ref: 'product_variant',
     required: true,
   },
+  manufacturingDate: Date,
   expirationDate: Date,
   status: String,
   quantity: Number,

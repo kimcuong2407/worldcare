@@ -48,6 +48,7 @@ const PurchaseOrderItemSchema = new mongoose.Schema({
 // Phieu nhap kho
 const PurchaseOrderSchema = new mongoose.Schema({
   code: String,
+  purchaseOrderType: Number,
   purchaseOrderCodeSequence: Number,
   paymentNoteIds: [
     {

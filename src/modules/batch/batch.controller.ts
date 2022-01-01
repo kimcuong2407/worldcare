@@ -29,6 +29,7 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
       lotNumber,
       aliasName,
       variantId,
+      manufacturingDate,
       expirationDate
     } = req.body;
 
@@ -36,6 +37,7 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
       lotNumber,
       aliasName,
       variantId,
+      manufacturingDate,
       expirationDate,
       branchId
     }
@@ -52,6 +54,7 @@ const createBatchAction = async (req: express.Request, res: express.Response, ne
 
     const existedBatch = await BatchCollection.findOne({
       variantId,
+      manufacturingDate,
       expirationDate,
       lotNumber
     }).exec();

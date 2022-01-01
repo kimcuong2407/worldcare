@@ -19,6 +19,9 @@ import { INVENTORY_TRANSACTION_TYPE } from '../inventory-transaction/constant';
 import { BATCH_STATUS } from '../batch/constant';
 import { SALE_ORDER_STATUS } from '../sale-orders/constant';
 import moment from 'moment';
+import SupplierCollection from '../supplier/supplier.collection';
+import PurchaseOrderCollection from '../purchase-order/purchaseOrder.collection';
+import { PURCHASE_ORDER_STATUS } from '../purchase-order/constant';
 
 // @Tuan.NG:> setup code sequence
 
@@ -323,14 +326,18 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
     .populate('productUnit').lean().exec();
     const productVariants = await Bluebird.map(variants, async (v) => {
       const variantId = get(v, '_id');
-      const batchQuery = { variantId };
-      const batch = [{quantity: 1}, {quantity: 2}];
+      const batchQuery: any = { variantId, deletedAt: null };
+      const batch = await BatchCollection.find(batchQuery).lean().exec();
+      const purchaseOrderQuery: any = { variantId, deletedAt: null, status: PURCHASE_ORDER_STATUS.COMPLETED };
+      const suppliers = await PurchaseOrderCollection.find(purchaseOrderQuery).select('supplierId').populate('supplier').lean().exec();
       const totalQuantity = await Bluebird.reduce(batch, (total, b) => {
-        return total += get(b, 'quantity', 0);
+        return total += get(b, 'quantity', 0) * get(v, 'exchangeValue', 0);
       }, 0);
+      
       return {
         ...v,
         batch,
+        suppliers,
         totalQuantity,
       };
     });

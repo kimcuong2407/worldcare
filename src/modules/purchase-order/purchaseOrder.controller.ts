@@ -13,6 +13,7 @@ const createPurchaseOrder = async (req: express.Request, res: express.Response, 
     const partnerId = req.user.partnerId;
 
     const {
+      purchaseOrderType,
       purchaseItems,
       supplierId,
       payment,
@@ -28,6 +29,7 @@ const createPurchaseOrder = async (req: express.Request, res: express.Response, 
 
     // Create purchase receipt
     const purchaseOrderInfo = {
+      purchaseOrderType,
       purchaseItems,
       supplierId,
       payment,
@@ -72,6 +74,7 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
     }
 
     const {
+      purchaseOrderType,
       purchaseItems,
       supplierId,
       payment,
@@ -88,6 +91,7 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
     // Update purchase receipt
     const purchaseOrderInfo = {
       purchaseOrderId,
+      purchaseOrderType,
       purchaseItems,
       supplierId,
       payment,
