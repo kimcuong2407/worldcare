@@ -1,3 +1,10 @@
+## [1.16.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.16.0...v1.16.1) (2022-01-01)
+
+
+### Bug Fixes
+
+* **product:** add required field from med department ([0f55463](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/0f554633d04cf95dbdb4c79679da46f257d05428))
+
 # [1.16.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.15.1...v1.16.0) (2021-12-30)
 
 
