@@ -5,7 +5,7 @@ import isNil from 'lodash/isNil';
 import { PRODUCT_CODE_PREFIX, PRODUCT_CODE_SEQUENCE, PRODUCT_STATUS, PRODUCT_VARIANT_STATUS, VARIANT_CODE_PREFIX, VARIANT_CODE_SEQUENCE } from './constant';
 import ProductCollection from './product.collection';
 import ProductVariantCollection from './productVariant.collection';
-import { forEach, map, omit, reduce, size, union, unionBy, uniq } from 'lodash';
+import { forEach, isEmpty, map, omit, reduce, size, union, unionBy, uniq } from 'lodash';
 import appUtil from '@app/utils/app.util';
 import Bluebird from 'bluebird';
 import MedicineCollection from './medicine.collection';
@@ -328,8 +328,13 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
       const variantId = get(v, '_id');
       const batchQuery: any = { variantId, deletedAt: null };
       const batch = await BatchCollection.find(batchQuery).lean().exec();
-      const purchaseOrderQuery: any = { variantId, deletedAt: null, status: PURCHASE_ORDER_STATUS.COMPLETED };
-      const suppliers = await PurchaseOrderCollection.find(purchaseOrderQuery).select('supplierId').populate('supplier').lean().exec();
+      const transactionQuery: any = { variantId, deletedAt: null }
+      const inventoryTransactions = await Bluebird.map(await InventoryTransactionCollection.find(transactionQuery).select('_id').lean().exec(), (item) => ({variantId: get(item, '_id')}));
+      let suppliers: any = [];
+      if (!isEmpty(inventoryTransactions)) {
+        const suppliersQuery: any = { $or: inventoryTransactions, deletedAt: null, status: PURCHASE_ORDER_STATUS.COMPLETED };
+        suppliers = await PurchaseOrderCollection.find(suppliersQuery).select('supplierId').populate('supplier').lean().exec();
+      }
       const totalQuantity = await Bluebird.reduce(batch, (total, b) => {
         return total += get(b, 'quantity', 0) * get(v, 'exchangeValue', 0);
       }, 0);
