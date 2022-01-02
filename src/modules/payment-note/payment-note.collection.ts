@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
 
 const { Schema } = mongoose;
 
@@ -21,7 +21,8 @@ const PaymentNoteSchema = new Schema({
     enum: [
       PaymentNoteConstants.PCPN.symbol,
       PaymentNoteConstants.TTHD.symbol,
-      PaymentNoteConstants.TTDH.symbol
+      PaymentNoteConstants.TTDH.symbol,
+      PaymentNoteConstants.PTTHN.symbol,
     ]
   },
   // Bases on transaction type to get corresponding reference document
@@ -50,7 +51,11 @@ const PaymentNoteSchema = new Schema({
   paymentAmount: Number,
   paymentPreAmount: Number, // Paid  61ae347da9673d2da37cd972
   totalPayment: Number, // Total amount => Need to pay
-  status: String,
+  status: {
+    type: String,
+    default: PAYMENT_NOTE_STATUS.ACTIVE,
+    enum: Object.values(PAYMENT_NOTE_STATUS)
+  },
   deletedAt: Date,
   __v: { type: Number, select: false }
 }, {

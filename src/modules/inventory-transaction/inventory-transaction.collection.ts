@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import {InventoryTransactionConstants} from '@modules/inventory-transaction/constant';
 
 const InventoryTransactionSchema = new mongoose.Schema({
   type: String,
@@ -20,7 +21,12 @@ const InventoryTransactionSchema = new mongoose.Schema({
   variantId: String,
   quantity: Number,
   referenceDocId: String,
-  deletedAt: Date
+  deletedAt: Date,
+  status: {
+    type: String,
+    enum: Object.values(InventoryTransactionConstants.STATUS)
+  },
+  latestQuantity: Number
 }, {
   timestamps: true,
 });

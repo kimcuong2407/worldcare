@@ -69,7 +69,7 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
       {path: 'saleOrderDetail.product'},
       {path: 'saleOrderDetail.batch'},
       {path: 'customer'},
-      {path: 'createdBy'},
+      {path: 'createdBy', select: '-password'},
       {
         path: 'saleOrderDetail.productVariant',
         strictPopulate: false,
