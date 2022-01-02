@@ -290,7 +290,11 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
       {path: 'supplier'},
       {path: 'branch'},
       {path: 'partner'},
-      {path: 'paymentNotes'}
+      {
+        path: 'paymentNotes',
+        strictPopulate: false,
+        populate: {path: 'createdBy', select: '-password'}
+      }
     ],
     lean: true
   });
@@ -358,7 +362,11 @@ const findById = async (query: any) => {
     .populate('branch')
     .populate('partner')
     .populate('fullBatches')
-    .populate('paymentNotes')
+    .populate({
+      path: 'paymentNotes',
+      strictPopulate: false,
+      populate: {path: 'createdBy', select: '-password'}
+    })
     .lean()
     .exec();
   await setPurchaseOrderFullBatches(result);

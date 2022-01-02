@@ -108,7 +108,8 @@ const createInvoice = async (invoiceInfo: any) => {
       .populate('unit').lean().exec();
     item.batch = await BatchCollection.findOne({_id: item.batchId}).lean().exec();
     item.product = await ProductCollection.findOne({_id: item.productId}).lean().exec();
-    invoice.total += +item.price;
+    // Calculate invoice's total
+    invoice.total += item.price * item.quantity;
   }
 
   const createdInvoiceDoc = await InvoiceCollection.create(invoice);
@@ -191,7 +192,7 @@ const createSaleOrder = async (saleOrderInfo: any) => {
     saleOrder.customerPaid = paymentNote['_doc']['paymentAmount'];
   }
   const total: number = saleOrder.saleOrderDetail
-    .reduce((a: any, b: { price: any }) => a + parseFloat(b.price), 0);
+    .reduce((a: any, b: { price: any, quantity: any }) => a + parseFloat(b.price) * parseInt(b.quantity), 0);
   const customerNeedToPay = total - saleOrder.discountValue - saleOrder.customerPaid;
   saleOrder.customerNeedToPay = customerNeedToPay < 0 ? 0 : customerNeedToPay;
 

@@ -63,7 +63,11 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
     populate: [
       { path: 'customer' },
       { path: 'branch' },
-      { path: 'paymentNotes' },
+      {
+        path: 'paymentNotes',
+        strictPopulate: false,
+        populate: {path: 'createdBy', select: '-password'}
+      },
       { path: 'createdBy', select: '-password' }
     ]
   })
@@ -125,7 +129,11 @@ const fetchInvoiceInfoByQuery = async (query: any) => {
   return await InvoiceCollection.findOne(query)
     .populate('customer')
     .populate('branch')
-    .populate('paymentNotes')
+    .populate({
+      path: 'paymentNotes',
+      strictPopulate: false,
+      populate: {path: 'createdBy', select: '-password'}
+    })
     .populate({
       path: 'createdBy',
       select: '-password'
