@@ -1,3 +1,11 @@
+# [1.17.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.16.3...v1.17.0) (2022-01-02)
+
+
+### Features
+
+* **damage-item:** damage item feature implementation ([7c0d975](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/7c0d97545534ffc6093d95c281e85d279962ed34))
+* **purchase-return:** purchase return feature implementation ([ca110d8](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/ca110d8a17b5d2ffe702312e4bfd5d982cd684a4))
+
 ## [1.16.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.16.2...v1.16.3) (2022-01-02)
 
 
