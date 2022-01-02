@@ -1,9 +1,10 @@
 import express from 'express';
 import loggerHelper from '@utils/logger.util';
 import purchaseReturnService from './purchaseReturn.service';
-import {isNil} from 'lodash';
+import {get, isNil} from 'lodash';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import appUtil from '@utils/app.util';
+import {PURCHASE_RETURN_STATUS} from '@modules/purchase-return/constant';
 
 const logger = loggerHelper.getLogger('purchaseReturn.controller');
 
@@ -161,6 +162,9 @@ const cancelPurchaseReturnById = async (req: express.Request, res: express.Respo
     })
     if (isNil(purchaseReturn)) {
       throw new ValidationFailedError('Can not find Purchase Return.');
+    }
+    if (get(purchaseReturn, '_doc.status') === PURCHASE_RETURN_STATUS.CANCELED) {
+      throw new ValidationFailedError('Purchase Return is already canceled.');
     }
     const voidPayment: boolean = req.query.voidPayment === 'true';
     const data = await purchaseReturnService.cancelPurchaseReturn(id, voidPayment);

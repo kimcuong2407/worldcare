@@ -1,12 +1,10 @@
 import loggerHelper from '@utils/logger.util';
 import {get, isNil} from 'lodash';
-import PurchaseOrderCollection from './purchaseReturn.collection';
 import PurchaseReturnCollection from './purchaseReturn.collection';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
 import {INVENTORY_TRANSACTION_TYPE, InventoryTransactionConstants} from '@modules/inventory-transaction/constant';
 import {PaymentNoteConstants} from '@modules/payment-note/constant';
 import BatchCollection from '@modules/batch/batch.collection';
-import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 import paymentNoteService from '@modules/payment-note/payment-note.service';
 import SupplierCollection from '@modules/supplier/supplier.collection';
@@ -271,19 +269,19 @@ const fetchPurchaseReturns = async (queryInput: any, options: any) => {
       $in: statuses
     }
   }
-  const purchaseReturns = await PurchaseOrderCollection.paginate(query, {
+  const purchaseReturns = await PurchaseReturnCollection.paginate(query, {
     ...options,
     sort: {
       createdAt: -1,
     },
     populate: [
-      {path: 'purchaseOrderItems.product'},
+      {path: 'purchaseReturnItems.product'},
       {
-        path: 'purchaseOrderItems.productVariant',
+        path: 'purchaseReturnItems.productVariant',
         strictPopulate: false,
         populate: 'unit'
       },
-      {path: 'purchaseOrderItems.batches.batch'},
+      {path: 'purchaseReturnItems.batches.batch'},
       {path: 'supplier'},
       {path: 'branch'},
       {path: 'partner'},
@@ -362,13 +360,13 @@ const getPurchaseReturn = async (query: any) => {
 
 const findByQuery = async (query: any) => {
   const result = await PurchaseReturnCollection.findOne(query)
-    .populate('purchaseOrderItems.product')
+    .populate('purchaseReturnItems.product')
     .populate({
-      path: 'purchaseOrderItems.productVariant',
+      path: 'purchaseReturnItems.productVariant',
       strictPopulate: false,
       populate: 'unit'
     })
-    .populate('purchaseOrderItems.batches.batch')
+    .populate('purchaseReturnItems.batches.batch')
     .populate('supplier')
     .populate('branch')
     .populate('partner')
@@ -396,18 +394,18 @@ const findByQuery = async (query: any) => {
  * @param voidPayment
  */
 const cancelPurchaseReturn = async (purchaseReturnId: string, voidPayment: boolean) => {
-  const canceledPurchaseOrder = await PurchaseOrderCollection.findByIdAndUpdate(
+  const canceledPurchaseReturn = await PurchaseReturnCollection.findByIdAndUpdate(
     purchaseReturnId, {
       $set: {
         status: PURCHASE_RETURN_STATUS.CANCELED
       }
     }, {new: true}).lean();
-  const inventoryTransactions = canceledPurchaseOrder.inventoryTransactions || [];
-  for (const inventoryTransactionId of inventoryTransactions) {
+  const inventoryTransactionIds = canceledPurchaseReturn.inventoryTransactionIds || [];
+  for (const inventoryTransactionId of inventoryTransactionIds) {
     await inventoryTransactionService.cancelInventoryTransaction(inventoryTransactionId)
   }
   if (voidPayment) {
-    const paymentNoteIds = canceledPurchaseOrder.paymentNoteIds || [];
+    const paymentNoteIds = canceledPurchaseReturn.paymentNoteIds || [];
     for (const paymentNoteId of paymentNoteIds) {
       await paymentNoteService.cancelPaymentNote({_id: paymentNoteId})
     }

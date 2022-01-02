@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
-import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
-import {PurchaseReturnConstants} from '@modules/purchase-return/constant';
+import {PURCHASE_RETURN_STATUS, PurchaseReturnConstants} from '@modules/purchase-return/constant';
 
 const PurchaseReturnItemBatchSchema = new mongoose.Schema({
   batchId: {
@@ -17,10 +16,10 @@ const PurchaseReturnItemBatchSchema = new mongoose.Schema({
 });
 
 PurchaseReturnItemBatchSchema.virtual('batch', {
-  ref: 'batch', // the collection/model name
+  ref: 'batch',
   localField: 'batchId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 
 const PurchaseReturnItemSchema = new mongoose.Schema({
@@ -47,7 +46,6 @@ const PurchaseReturnItemSchema = new mongoose.Schema({
   toObject: {virtuals: true}
 });
 
-// Phieu nhap kho
 const PurchaseReturnSchema = new mongoose.Schema({
   code: String,
   codeSequence: Number,
@@ -82,11 +80,7 @@ const PurchaseReturnSchema = new mongoose.Schema({
   branchId: Number,
   status: {
     type: String,
-    enum: [
-      PURCHASE_ORDER_STATUS.COMPLETED,
-      PURCHASE_ORDER_STATUS.CANCELED,
-      PURCHASE_ORDER_STATUS.DRAFT
-    ]
+    enum: Object.values(PURCHASE_RETURN_STATUS)
   },
   supplierId: String,
   note: String,
@@ -109,45 +103,45 @@ const PurchaseReturnSchema = new mongoose.Schema({
 });
 
 PurchaseReturnSchema.virtual('product', {
-  ref: 'product', // the collection/model name
+  ref: 'product',
   localField: 'productId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 PurchaseReturnSchema.virtual('productVariant', {
-  ref: 'product_variant', // the collection/model name
+  ref: 'product_variant',
   localField: 'variantId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 
 PurchaseReturnSchema.virtual('supplier', {
-  ref: 'supplier', // the collection/model name
+  ref: 'supplier',
   localField: 'supplierId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 
 PurchaseReturnSchema.virtual('branch', {
-  ref: 'branch', // the collection/model name
+  ref: 'branch',
   localField: 'branchId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 
 PurchaseReturnSchema.virtual('partner', {
-  ref: 'partner', // the collection/model name
+  ref: 'partner',
   localField: 'partnerId',
   foreignField: '_id',
-  justOne: true, // default is false
+  justOne: true,
 });
 PurchaseReturnSchema.virtual('paymentNotes', {
-  ref: 'payment_note', // the collection/model name
+  ref: 'payment_note',
   localField: 'paymentNoteIds',
   foreignField: '_id'
 });
 PurchaseReturnSchema.virtual('inventoryTransactions', {
-  ref: 'inventory_transaction', // the collection/model name
+  ref: 'inventory_transaction',
   localField: 'inventoryTransactionIds',
   foreignField: '_id'
 });
