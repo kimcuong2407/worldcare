@@ -1,10 +1,8 @@
 import loggerHelper from '@utils/logger.util';
 import {get, isNil} from 'lodash';
 import PurchaseOrderCollection from './purchaseOrder.collection';
-import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
-import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
-import {PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
+import {PaymentNoteConstants} from '@modules/payment-note/constant';
 import BatchCollection from '@modules/batch/batch.collection';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
@@ -19,7 +17,9 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT);
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, purchaseOrderInfo, PaymentNoteConstants.PCPN, false
+  );
 
   const purchaseOrder = {
     purchaseOrderType: purchaseOrderInfo.purchaseOrderType,
@@ -67,7 +67,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
 
   if (paymentNote) {
     paymentNote.referenceDocId = purchaseOrderId;
-    paymentNote.save();
+    await paymentNote.save();
   }
 
   await createInventoryTransaction(purchaseOrderInfo, supplierId, partnerId, branchId, purchaseOrderId, createdPurchaseOrder);
@@ -97,50 +97,15 @@ async function createInventoryTransaction(purchaseOrderInfo: any, supplierId: an
           quantity: batch.quantity,
           referenceDocId: purchaseOrderId
         }
-        const inventoryTransaction = await InventoryTransactionCollection.create(inventoryTransactionInfo);
-        const batchDoc = await BatchCollection.findOne({_id: batch.batchId}).lean().exec();
-        if (!isNil(batchDoc)) {
-          await BatchCollection.findOneAndUpdate({_id: batch.batchId}, {
-            $set: {
-              quantity: batchDoc.quantity + batch.quantity
-            }
-          }).exec();
-        }
+        const inventoryTransaction = await inventoryTransactionService.createInventoryTransaction(
+          inventoryTransactionInfo, INVENTORY_TRANSACTION_TYPE.PURCHASE_RECEIPT);
         inventoryTransactionIds.push(get(inventoryTransaction, '_doc._id'));
       }
     });
 
     purchaseOrderDoc.inventoryTransactions = inventoryTransactionIds;
     await purchaseOrderDoc.save()
-
   }
-}
-
-async function createPurchasePaymentNote(payment: any, purchaseOrderInfo: any, type: string, purchaseOrderId: string = undefined) {
-  const { branchId, supplierId } = purchaseOrderInfo;
-  if (payment && !isNil(payment.amount) && payment.amount > 0) {
-    const paymentNoteInfo = {
-      type,
-      branchId,
-      supplierId,
-      involvedById: purchaseOrderInfo.involvedById,
-      createdById: purchaseOrderInfo.createdBy,
-      paymentMethod: payment.method,
-      paymentDetail: payment.detail,
-      paymentAmount: payment.amount,
-      totalPayment: payment.totalPayment,
-      transactionType: PaymentNoteConstants.PCPN.symbol,
-      referenceDocName: PaymentNoteConstants.PCPN.referenceDocName,
-      referenceDocId: purchaseOrderId
-    };
-
-    let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = initCode(PaymentNoteConstants.PCPN.symbol, paymentNote.paymentNoteCodeSequence);
-    await paymentNote.save();
-    logger.info(`Created payment note with code[${paymentNote.code}] branchId[${branchId}] amount[${payment.amount}] type[${type}]`)
-    return paymentNote;
-  }
-  return null;
 }
 
 const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
@@ -150,7 +115,8 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
   const partnerId = purchaseOrderInfo.partnerId;
   const supplierId = purchaseOrderInfo.supplierId;
 
-  const paymentNote = await createPurchasePaymentNote(payment, purchaseOrderInfo, PAYMENT_NOTE_TYPE.PAYMENT, id);
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, purchaseOrderInfo, PaymentNoteConstants.PCPN, false, id);
 
   const willBeUpdatePurchaseOrder = {
     purchaseOrderType: purchaseOrderInfo.purchaseOrderType,
@@ -243,9 +209,12 @@ async function createSupplierCashbackPaymentNote(paymentSummary: any, purchaseOr
   }
   const purchaseOrderId = purchaseOrderInfo.purchaseOrderId;
 
-  const receiptPaymentNote = await createPurchasePaymentNote({
+  const cashbackPayment = {
     amount: Math.abs(paymentSummary.currentDebt)
-  }, purchaseOrderInfo, PAYMENT_NOTE_TYPE.RECEIPT, get(savedPurchaseOrder, '_doc._id'));
+  }
+  const receiptPaymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    cashbackPayment, purchaseOrderInfo, PaymentNoteConstants.PCPN, true, get(savedPurchaseOrder, '_doc._id')
+  )
   if (!receiptPaymentNote) {
     return;
   }
@@ -397,7 +366,7 @@ const deletePurchaseOrder = async (purchaseOrderId: string, removePaymentNote: b
   if (removePaymentNote) {
     const paymentNoteIds = deletedPurchaseOrder.paymentNoteIds || [];
     for (const paymentNoteId of paymentNoteIds) {
-      await paymentNoteService.deletePaymentNote({_id: paymentNoteId})
+      await paymentNoteService.cancelPaymentNote({_id: paymentNoteId})
     }
   }
   return true;

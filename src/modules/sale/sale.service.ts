@@ -1,7 +1,5 @@
 import loggerHelper from '@utils/logger.util';
 import {get, isNil} from 'lodash';
-import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
-import InventoryTransactionCollection from '@modules/inventory-transaction/inventory-transaction.collection';
 import InvoiceCollection from '@modules/invoice/invoice.collection';
 import SaleOrderCollection from '@modules/sale-orders/sale-order.collection';
 import BatchCollection from '@modules/batch/batch.collection';
@@ -16,6 +14,8 @@ import {ValidationFailedError} from '@core/types/ErrorTypes';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 import ProductVariantCollection from '@modules/product/productVariant.collection';
 import ProductCollection from '@modules/product/product.collection';
+import paymentNoteService from '@modules/payment-note/payment-note.service';
+import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 
 const logger = loggerHelper.getLogger('sale.service');
 
@@ -130,7 +130,8 @@ const createInvoice = async (invoiceInfo: any) => {
 
   // 2. Create payment note.
   const payment = invoiceInfo.payment;
-  const paymentNote = await createPaymentNote(payment, invoiceInfo, PaymentNoteConstants.TTHD, createdInvoice._id);
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, invoiceInfo, PaymentNoteConstants.TTHD, true, createdInvoice._id);
 
   if (paymentNote) {
     const invoicePaymentNoteIds = createdInvoice.paymentNoteIds || [];
@@ -165,7 +166,8 @@ const createSaleOrder = async (saleOrderInfo: any) => {
   // 0. Check quantity status
 
   // 1. Create payment note.
-  const paymentNote = await createPaymentNote(payment, saleOrderInfo, PaymentNoteConstants.TTDH);
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, saleOrderInfo, PaymentNoteConstants.TTDH, true);
 
   // 2. Create sale order record.
   const saleOrder = {
@@ -209,55 +211,21 @@ const createSaleOrder = async (saleOrderInfo: any) => {
   return await saleOrderService.fetchSaleOrderInfoByQuery({_id: createdSaleOrder._id});
 }
 
-async function createInventoryTransaction(type: string, inputInfo: any, referenceId: string) {
+async function createInventoryTransaction(type: INVENTORY_TRANSACTION_TYPE, inputInfo: any, referenceId: string) {
   for (const detailItem of inputInfo.items) {
     const inventoryTransactionInfo = {
       type,
       partnerId: inputInfo.partnerId,
       branchId: inputInfo.branchId,
+      customerId: inputInfo.customerId,
       productId: detailItem.productId,
       variantId: detailItem.variantId,
       batchId: detailItem.batchId,
       quantity: detailItem.quantity,
       referenceDocId: referenceId
     }
-    const inventoryTransaction = await InventoryTransactionCollection.create(inventoryTransactionInfo);
-    logger.info(`Created InventoryTransaction with ID[${inventoryTransaction['_doc']['_id']}]`)
-    const batchDoc = await BatchCollection.findOne({_id: detailItem.batchId}).exec();
-    if (!isNil(batchDoc)) {
-      await BatchCollection.findOneAndUpdate({_id: detailItem.batchId}, {
-        $set: {
-          quantity: get(batchDoc, '_doc').quantity - detailItem.quantity
-        }
-      }).exec();
-    }
+    await inventoryTransactionService.createInventoryTransaction(inventoryTransactionInfo, type);
   }
-}
-
-async function createPaymentNote(payment: any, info: any, transactionType: PaymentNoteConstants.TransactionType, referenceDocId: string = undefined) {
-  if (payment && payment.amount && payment.amount > 0) {
-    const paymentNoteInfo = {
-      type: PAYMENT_NOTE_TYPE.RECEIPT,
-      transactionType: transactionType.symbol,
-      referenceDocName: transactionType.referenceDocName,
-      referenceDocId: referenceDocId,
-      branchId: info.branchId,
-      involvedById: info.involvedById,
-      createdById: info.createdBy,
-      paymentMethod: payment.method,
-      paymentDetail: payment.detail,
-      paymentAmount: payment.amount,
-      totalPayment: payment.totalPayment,
-    };
-
-    let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = initCode(transactionType.symbol, paymentNote.paymentNoteCodeSequence);
-    logger.info(`Saving payment note with code[${paymentNote.code}]`)
-    await paymentNote.save();
-    logger.info(`Created payment note with code[${paymentNote.code}]`)
-    return paymentNote;
-  }
-  return null;
 }
 
 /**
@@ -282,7 +250,8 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
   }
 
   const payment = saleOrderInfo.payment;
-  const paymentNote = await createPaymentNote(payment, saleOrderInfo, PaymentNoteConstants.TTDH, id);
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, saleOrderInfo, PaymentNoteConstants.TTDH, true, id);
   const paymentNoteIds = savedSaleOrder.paymentNoteIds || [];
   let customerPaid = savedSaleOrder.customerPaid || 0;
   if (paymentNote) {
@@ -312,11 +281,6 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
   }, { new: true }).exec();
 
   return get(updatedSaleOrderDoc, '_doc')
-}
-
-const initCode = (prefix: string, seq: number) => {
-  let s = '000000000' + seq;
-  return prefix + s.substr(s.length - 6);
 }
 
 export default {

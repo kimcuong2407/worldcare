@@ -2,6 +2,8 @@ import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import SaleOrderCollection from './sale-order.collection';
+import {Types} from 'mongoose';
+import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 
 const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -182,11 +184,58 @@ const deleteSaleOrder = async (query: any) => {
   );
 };
 
+const calculateTotalOrderQuantity = async (variantId: string, branchId: string) => {
+  const aggregate = [
+    {
+      $match: {
+        saleOrderDetail: {
+          $elemMatch: {
+            variantId: Types.ObjectId(variantId)
+          }
+        },
+        branchId: parseInt(branchId),
+        status: SALE_ORDER_STATUS.DRAFT
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        saleOrderDetail: 1
+      }
+    },
+    {
+      $unwind: {
+        path: '$saleOrderDetail'
+      }
+    },
+    {
+      $match: {
+        'saleOrderDetail.variantId': Types.ObjectId(variantId)
+      }
+    },
+    {
+      $group: {
+        _id: 'quantity',
+        quantity: {
+          $sum: '$saleOrderDetail.quantity'
+        }
+      }
+    }
+  ]
+  const summary = await SaleOrderCollection.aggregate(aggregate);
+  if (summary && summary.length !== 0) {
+    return summary[0].quantity;
+  } else {
+    return 0;
+  }
+};
+
 export default {
   createSaleOrder,
   fetchSaleOrderListByQuery,
   fetchSaleOrderInfoByQuery,
   updateSaleOrder,
   deleteSaleOrder,
-  saleOrderAutoIncrease
+  saleOrderAutoIncrease,
+  calculateTotalOrderQuantity
 };
