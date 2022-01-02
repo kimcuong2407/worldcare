@@ -40,6 +40,7 @@ import generalLedgerRoutes from './modules/general-ledger';
 import paymentNoteRoutes from './modules/payment-note';
 import saleOrdersRoutes from './modules/sale-orders';
 import invoiceRoutes from './modules/invoice';
+import purchaseReturnRoutes from './modules/purchase-return';
 
 export default (app: express.Application): void => {
   serverRoutes(app);
@@ -83,4 +84,5 @@ export default (app: express.Application): void => {
   paymentNoteRoutes(app);
   saleOrdersRoutes(app);
   invoiceRoutes(app);
+  purchaseReturnRoutes(app);
 };

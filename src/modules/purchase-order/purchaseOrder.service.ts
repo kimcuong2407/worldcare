@@ -384,7 +384,7 @@ const deletePurchaseOrder = async (purchaseOrderId: string, removePaymentNote: b
   }).lean();
   const inventoryTransactions = deletedPurchaseOrder.inventoryTransactions || [];
   for (const inventoryTransactionId of inventoryTransactions) {
-    await inventoryTransactionService.deleteInventoryTransaction(inventoryTransactionId)
+    await inventoryTransactionService.cancelInventoryTransaction(inventoryTransactionId)
   }
   if (removePaymentNote) {
     const paymentNoteIds = deletedPurchaseOrder.paymentNoteIds || [];

@@ -1,6 +1,7 @@
 export enum PAYMENT_NOTE_STATUS {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
+  CANCELED = 'CANCELED',
 }
 
 export enum PAYMENT_NOTE_TYPE {
@@ -28,5 +29,11 @@ export namespace PaymentNoteConstants {
   export const TTDH: TransactionType ={
     symbol: 'TTDH',
     referenceDocName: 'sale_order'
+  }
+
+  // Phieu thu tra hang nhap
+  export const PTTHN: TransactionType ={
+    symbol: 'PTTHN',
+    referenceDocName: 'purchase_return'
   }
 }

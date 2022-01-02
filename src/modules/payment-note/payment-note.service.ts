@@ -1,9 +1,12 @@
 import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
-import {PAYMENT_NOTE_STATUS} from './constant';
+import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants} from './constant';
 import PaymentNoteCollection from './payment-note.collection';
+import loggerHelper from '@utils/logger.util';
+import documentCodeUtils from '@utils/documentCode.util';
 
+const logger = loggerHelper.getLogger('payment-note.service');
 
 const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -84,10 +87,69 @@ const deletePaymentNote = async (query: any) => {
   );
 };
 
+const cancelPaymentNote = async (query: any) => {
+  logger.info('Canceling payment note. query=' + JSON.stringify(query))
+  return PaymentNoteCollection.updateOne(
+    query,
+    {
+      $set: {
+        status: PAYMENT_NOTE_STATUS.CANCELED
+      },
+    },
+    {new: true}
+  );
+};
+
+/**
+ *
+ * Create paymentNote bases on transaction type.
+ *
+ * @param payment: Payment info
+ * @param info: payment note additional info such as: branchId, involvedById, createdById, supplierId
+ * @param transactionType
+ * @param isIncome: if True, PaymentNoteType is RECEIPT, else PAYMENT
+ * @param referenceDocId
+ */
+const createPaymentNoteWithTransactionType = async (payment: any, info: any,
+                                 transactionType: PaymentNoteConstants.TransactionType,
+                                 isIncome: boolean,
+                                 referenceDocId: string = undefined) => {
+  if (isNil(transactionType) || isNil(isIncome)) {
+    logger.warn(`Transaction type is null. payment=${JSON.stringify(payment)}. info=${JSON.stringify(info)}`);
+    return null;
+  }
+  if (payment && payment.amount && payment.amount > 0) {
+    const paymentNoteInfo = {
+      status: PAYMENT_NOTE_STATUS.ACTIVE,
+      type: isIncome ? PAYMENT_NOTE_TYPE.RECEIPT : PAYMENT_NOTE_TYPE.PAYMENT,
+      transactionType: transactionType.symbol,
+      referenceDocName: transactionType.referenceDocName,
+      referenceDocId: referenceDocId,
+      branchId: info.branchId,
+      involvedById: info.involvedById,
+      createdById: info.createdBy,
+      paymentMethod: payment.method,
+      paymentDetail: payment.detail,
+      paymentAmount: payment.amount,
+      totalPayment: payment.totalPayment
+    };
+
+    let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
+    paymentNote.code = documentCodeUtils.initDocumentCode(transactionType.symbol, paymentNote.paymentNoteCodeSequence);
+    logger.info(`Saving payment note with code[${paymentNote.code}]`)
+    await paymentNote.save();
+    logger.info(`Created payment note with code[${paymentNote.code}]`)
+    return paymentNote;
+  }
+  return null;
+}
+
 export default {
   createPaymentNote,
   fetchPaymentNoteListByQuery,
   fetchPaymentNoteInfoByQuery,
   updatePaymentNote,
   deletePaymentNote,
+  createPaymentNoteWithTransactionType,
+  cancelPaymentNote
 };
