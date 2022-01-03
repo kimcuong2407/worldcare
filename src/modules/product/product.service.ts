@@ -22,6 +22,7 @@ import moment from 'moment';
 import SupplierCollection from '../supplier/supplier.collection';
 import PurchaseOrderCollection from '../purchase-order/purchaseOrder.collection';
 import { PURCHASE_ORDER_STATUS } from '../purchase-order/constant';
+import saleOrderService from '@modules/sale-orders/sale-order.service';
 
 // @Tuan.NG:> setup code sequence
 
@@ -430,6 +431,8 @@ const fetchProductVariantStockV2 = async (params: any) => {
   }).lean().exec();
   const exchangeValue = get(variant, 'exchangeValue');
   const productId = get(variant, 'productId');
+  const totalOrderQuantity = await saleOrderService.calculateTotalOrderQuantity(variantId, branchId);
+  /*
   const orderTransactions = await InventoryTransactionCollection.find({ 
     deletedAt: null,
     variantId,
@@ -454,6 +457,7 @@ const fetchProductVariantStockV2 = async (params: any) => {
     }
     return total;
   }, 0);
+   */
   const batches = await BatchCollection.find({
     deletedAt: null,
     productId,

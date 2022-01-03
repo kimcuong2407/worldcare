@@ -285,7 +285,11 @@ const fetchPurchaseReturns = async (queryInput: any, options: any) => {
       {path: 'supplier'},
       {path: 'branch'},
       {path: 'partner'},
-      {path: 'paymentNotes'},
+      {
+        path: 'paymentNotes',
+        strictPopulate: false,
+        populate: {path: 'createdBy', select: '-password'}
+      },
       {path: 'inventoryTransactions', match: {status: {$ne: InventoryTransactionConstants.STATUS.CANCELED}}},
       {path: 'createdBy', select: '-password'}
     ],
@@ -371,7 +375,11 @@ const findByQuery = async (query: any) => {
     .populate('branch')
     .populate('partner')
     .populate('fullBatches')
-    .populate('paymentNotes')
+    .populate({
+      path: 'paymentNotes',
+      strictPopulate: false,
+      populate: {path: 'createdBy', select: '-password'}
+    })
     .populate({
       path: 'inventoryTransactions',
       match: {status: {$ne: InventoryTransactionConstants.STATUS.CANCELED}}
