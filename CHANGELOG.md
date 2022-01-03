@@ -1,3 +1,11 @@
+## [1.17.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.0...v1.17.1) (2022-01-03)
+
+
+### Bug Fixes
+
+* **sale:** fix sale issues ([02679db](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/02679dbc4f28605606a22c62349649da5f4a4fac))
+* **sale:** fix sale issues ([c291fd7](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/c291fd7fc1fa744091d72498d3d09a84f9007b59))
+
 # [1.17.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.16.3...v1.17.0) (2022-01-02)
 
 
