@@ -330,7 +330,7 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
       const batchQuery: any = { variantId, deletedAt: null };
       const batch = await BatchCollection.find(batchQuery).lean().exec();
       const transactionQuery: any = { variantId, deletedAt: null }
-      const inventoryTransactions = await Bluebird.map(await InventoryTransactionCollection.find(transactionQuery).select('_id').lean().exec(), (item) => ({variantId: get(item, '_id')}));
+      const inventoryTransactions = await Bluebird.map(await InventoryTransactionCollection.find(transactionQuery).select('_id').lean().exec(), (item) => ({inventoryTransactions: get(item, '_id')}));
       let suppliers: any = [];
       if (!isEmpty(inventoryTransactions)) {
         const suppliersQuery: any = { $or: inventoryTransactions, deletedAt: null, status: PURCHASE_ORDER_STATUS.COMPLETED };
