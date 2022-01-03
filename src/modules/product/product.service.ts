@@ -306,7 +306,7 @@ const fetchProductListV2 = async (params: any, language = 'vi', isRaw = false) =
   if (keyword) {
     query['$text'] = { $search: keyword };
   }
-  const variantList = await ProductVariantCollection.find(query).lean().exec();
+  const variantList = await ProductVariantCollection.find(query).sort({ createdAt: -1 }).lean().exec();
   const productIdList = uniq(await Bluebird.map(variantList, (v) => `${v.productId}`));
   const data = await Bluebird.map(productIdList, async (id) => {
     const product = await ProductCollection.findOne({_id: id})
