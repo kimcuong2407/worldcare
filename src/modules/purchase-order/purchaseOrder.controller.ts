@@ -64,9 +64,9 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
     const branchId = req.companyId;
     const partnerId = req.user.partnerId;
 
-    const id = req.params.id;
+    const purchaseOrderId = req.params.purchaseOrderId;
     const purchaseOrder = await purchaseOrderService.getPurchaseOrder({
-      _id: id,
+      _id: purchaseOrderId,
       branchId
     })
     if (isNil(purchaseOrder)) {
@@ -90,7 +90,7 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
 
     // Update purchase receipt
     const purchaseOrderInfo = {
-      purchaseOrderId: id,
+      purchaseOrderId,
       purchaseOrderType,
       purchaseItems,
       supplierId,
@@ -107,7 +107,7 @@ const updatePurchaseOrder = async (req: express.Request, res: express.Response, 
       purchasedAt
     }
 
-    const data = await purchaseOrderService.updatePurchaseOrder(id, purchaseOrderInfo);
+    const data = await purchaseOrderService.updatePurchaseOrder(purchaseOrderId, purchaseOrderInfo);
     res.send(data);
   } catch (e) {
     logger.error('updatePurchaseOrder', e);

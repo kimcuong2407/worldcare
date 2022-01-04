@@ -195,7 +195,7 @@ const createSaleOrder = async (saleOrderInfo: any) => {
   }
   const total: number = saleOrder.saleOrderDetail
     .reduce((a: any, b: { price: any, quantity: any }) => a + parseFloat(b.price) * parseInt(b.quantity), 0);
-  const customerNeedToPay = total - saleOrder.discountValue - saleOrder.customerPaid;
+  const customerNeedToPay = total - saleOrder.discountValue;
   saleOrder.customerNeedToPay = customerNeedToPay < 0 ? 0 : customerNeedToPay;
 
   const createdSaleOrderDoc = await SaleOrderCollection.create(saleOrder);
@@ -260,7 +260,7 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
   }
   const total: number = saleOrderInfo.items
     .reduce((a: any, b: { price: any }) => a + parseFloat(b.price), 0);
-  const customerNeedToPay = total - saleOrderInfo.discountValue - customerPaid;
+  const customerNeedToPay = total - saleOrderInfo.discountValue;
 
   // status DRAFT
   const updatedSaleOrderDoc = await SaleOrderCollection.findByIdAndUpdate(id, {
