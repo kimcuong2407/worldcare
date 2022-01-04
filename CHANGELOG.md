@@ -1,3 +1,11 @@
+## [1.17.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.1...v1.17.2) (2022-01-04)
+
+
+### Bug Fixes
+
+* **purchase-return:** get correct id to update ([2518e64](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2518e64231e9c4c3798f83590ae2300033ecc8c8))
+* **sale-order:** recalculate customerNeedToPay field ([e41c442](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/e41c442ae9cda9d1ef58d8399f1e821267553417))
+
 ## [1.17.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.0...v1.17.1) (2022-01-03)
 
 
