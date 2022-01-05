@@ -1,3 +1,11 @@
+## [1.17.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.2...v1.17.3) (2022-01-05)
+
+
+### Bug Fixes
+
+* **product:** fix fetch suppliers ([2ff2509](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/2ff25093dd43c5a3554ca3b2608c61e64e5e8cec))
+* **product:** support sort in product ([8c47f56](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/8c47f56a95433a13d65b7f584287c48ab21cddad))
+
 ## [1.17.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.1...v1.17.2) (2022-01-04)
 
 
