@@ -1,3 +1,10 @@
+## [1.17.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.3...v1.17.4) (2022-01-06)
+
+
+### Bug Fixes
+
+* **sale-order:** calculate customerNeedToPay when updating sale-order ([36f54a6](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/36f54a6b7f14fcf57896691f67b50e3f5949adc0))
+
 ## [1.17.3](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.2...v1.17.3) (2022-01-05)
 
 
