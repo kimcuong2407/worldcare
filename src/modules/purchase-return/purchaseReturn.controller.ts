@@ -102,7 +102,8 @@ const updatePurchaseReturn = async (req: express.Request, res: express.Response,
       discountPercent,
       discountType,
       note,
-      purchasedAt
+      purchasedAt,
+      updatedBy: req.user.id,
     }
 
     const data = await purchaseReturnService.updatePurchaseReturn(id, purchaseReturnInfo);

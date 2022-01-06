@@ -4,6 +4,7 @@ import isNil from 'lodash/isNil';
 import SaleOrderCollection from './sale-order.collection';
 import {Types} from 'mongoose';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
+import batchService from '@modules/batch/batch.service';
 
 const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -132,7 +133,7 @@ const summarySaleOrders = async (query: any) => {
 }
 
 const fetchSaleOrderInfoByQuery = async (query: any) => {
-  return await SaleOrderCollection.findOne(query)
+  const saleOrder = await SaleOrderCollection.findOne(query)
     .populate('branch')
     .populate({
       path: 'invoice',
@@ -158,6 +159,8 @@ const fetchSaleOrderInfoByQuery = async (query: any) => {
         populate: 'unit'
       })
     .lean().exec();
+  await batchService.setItemsFullBatches(saleOrder.saleOrderDetail);
+  return saleOrder;
 };
 
 const updateSaleOrder = async (query: any, info: any) => {
