@@ -193,10 +193,9 @@ const createSaleOrder = async (saleOrderInfo: any) => {
     saleOrder.paymentNoteIds.push(paymentNote['_doc']['_id']);
     saleOrder.customerPaid = paymentNote['_doc']['paymentAmount'];
   }
-  const total: number = saleOrder.saleOrderDetail
-    .reduce((a: any, b: { price: any, quantity: any }) => a + parseFloat(b.price) * parseInt(b.quantity), 0);
-  const customerNeedToPay = total - saleOrder.discountValue;
-  saleOrder.customerNeedToPay = customerNeedToPay < 0 ? 0 : customerNeedToPay;
+
+  const saleOrderPayment = calculateSaleOrderPayment(saleOrder.saleOrderDetail, saleOrder.discountValue);
+  saleOrder.customerNeedToPay = saleOrderPayment.customerNeedToPay;
 
   const createdSaleOrderDoc = await SaleOrderCollection.create(saleOrder);
   await saleOrderService.saleOrderAutoIncrease(createdSaleOrderDoc);
@@ -258,9 +257,9 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
     customerPaid += +get(paymentNote, '_doc.paymentAmount')
     paymentNoteIds.push(get(paymentNote, '_doc._id'));
   }
-  const total: number = saleOrderInfo.items
-    .reduce((a: any, b: { price: any }) => a + parseFloat(b.price), 0);
-  const customerNeedToPay = total - saleOrderInfo.discountValue;
+
+  const saleOrderPayment = calculateSaleOrderPayment(saleOrderInfo.items, saleOrderInfo.discountValue);
+  const customerNeedToPay = saleOrderPayment.customerNeedToPay;
 
   // status DRAFT
   const updatedSaleOrderDoc = await SaleOrderCollection.findByIdAndUpdate(id, {
@@ -276,11 +275,21 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
       involvedBy: saleOrderInfo.involvedBy,
       paymentNoteIds,
       customerPaid,
-      customerNeedToPay: customerNeedToPay < 0 ? 0 : customerNeedToPay
+      customerNeedToPay
     }
   }, { new: true }).exec();
 
   return get(updatedSaleOrderDoc, '_doc')
+}
+
+const calculateSaleOrderPayment = (items: any[], discountValue: number = 0) => {
+  const total: number = items
+    .reduce((a: any, b: { price: any, quantity: any }) => a + parseFloat(b.price) * parseInt(b.quantity), 0);
+  const customerNeedToPay = total - discountValue;
+  return {
+    total,
+    customerNeedToPay: customerNeedToPay < 0 ? 0 : customerNeedToPay
+  }
 }
 
 export default {
