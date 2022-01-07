@@ -3,10 +3,10 @@ import {get, isNil} from 'lodash';
 import PurchaseOrderCollection from './purchaseOrder.collection';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
 import {PaymentNoteConstants} from '@modules/payment-note/constant';
-import BatchCollection from '@modules/batch/batch.collection';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 import paymentNoteService from '@modules/payment-note/payment-note.service';
+import batchService from '@modules/batch/batch.service';
 
 const logger = loggerHelper.getLogger('purchaseOrder.service');
 
@@ -36,6 +36,7 @@ const createPurchaseOrder = async (purchaseOrderInfo: any) => {
     involvedById: purchaseOrderInfo.involvedById,
     involvedBy: purchaseOrderInfo.involvedBy,
     purchasedAt: purchaseOrderInfo.purchasedAt,
+    createdBy: purchaseOrderInfo.createdBy,
     paymentNoteIds: undefined as any,
     totalQuantity: undefined as any,
     subTotal: undefined as any,
@@ -134,7 +135,8 @@ const updatePurchaseOrder = async (id: string, purchaseOrderInfo: any) => {
     subTotal: undefined as any,
     totalPayment: undefined as any,
     currentDebt: undefined as any,
-    purchasedAt: purchaseOrderInfo.purchasedAt
+    purchasedAt: purchaseOrderInfo.purchasedAt,
+    updatedBy: purchaseOrderInfo.updatedBy
   }
 
   // Update list PaymentNote ID 
@@ -263,7 +265,9 @@ const fetchPurchaseOrders = async (queryInput: any, options: any) => {
         path: 'paymentNotes',
         strictPopulate: false,
         populate: {path: 'createdBy', select: '-password'}
-      }
+      },
+      {path: 'createdBy', select: '-password'},
+      {path: 'updatedBy', select: '-password'}
     ],
     lean: true
   });
@@ -336,6 +340,8 @@ const findById = async (query: any) => {
       strictPopulate: false,
       populate: {path: 'createdBy', select: '-password'}
     })
+    .populate({path: 'createdBy', select: '-password'})
+    .populate({path: 'updatedBy', select: '-password'})
     .lean()
     .exec();
   await setPurchaseOrderFullBatches(result);
@@ -374,9 +380,7 @@ const deletePurchaseOrder = async (purchaseOrderId: string, removePaymentNote: b
 
 const setPurchaseOrderFullBatches = async (doc: any) => {
   if (doc && doc?.purchaseOrderItems) {
-    for (const item of doc.purchaseOrderItems) {
-      item.fullBatches = await BatchCollection.find({variantId: item.variantId}).lean().exec();
-    }
+    await batchService.setItemsFullBatches(doc.purchaseOrderItems);
   }
 }
 

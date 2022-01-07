@@ -87,8 +87,14 @@ const PurchaseOrderSchema = new mongoose.Schema({
   },
   involvedBy: String,
   currentDebt: Number,
-  createdBy: String,
-  updatedBy: String,
+  createdBy: {
+    type: mongoose.Types.ObjectId,
+    ref: 'user',
+  },
+  updatedBy: {
+    type: mongoose.Types.ObjectId,
+    ref: 'user',
+  },
   deletedAt: Date
 }, {
   timestamps: true,

@@ -46,9 +46,19 @@ const updateQuantity = async (batchId: string, quantity: number, isIncrease: boo
   }
 }
 
+const setItemsFullBatches = async (items: any[]) => {
+  if (!items) {
+    return;
+  }
+  for (const item of items) {
+    item.fullBatches = await BatchCollection.find({variantId: item.variantId}).lean().exec();
+  }
+}
+
 export default {
   fetchBatches,
   decreaseQuantity,
   increaseQuantity,
-  updateQuantity
+  updateQuantity,
+  setItemsFullBatches
 };

@@ -37,7 +37,6 @@ const createPurchaseReturn = async (info: any) => {
   const purchaseReturn = mapInfoToPurchaseReturn(info, false);
 
   const paymentSummary = await calculatePaymentSummary(info);
-  purchaseReturn.subTotal = paymentSummary.subtotal;
   purchaseReturn.totalSupplierPayment = paymentSummary.totalSupplierPayment;
   purchaseReturn.totalSupplierPaid = paymentSummary.totalSupplierPaid;
   purchaseReturn.supplierDebt = paymentSummary.supplierDebt;
@@ -105,7 +104,6 @@ const updatePurchaseReturn = async (id: string, info: any) => {
   willBeUpdate.paymentNoteIds = paymentNoteIds;
 
   const paymentSummary = await calculatePaymentSummary(info);
-  willBeUpdate.subTotal = paymentSummary.subtotal;
   willBeUpdate.totalSupplierPayment = paymentSummary.totalSupplierPayment;
   willBeUpdate.totalSupplierPaid = paymentSummary.totalSupplierPaid;
   willBeUpdate.supplierDebt = paymentSummary.supplierDebt;
@@ -228,9 +226,8 @@ async function createPurchaseReturnInventoryTransaction(purchaseReturnInfo: any,
  * @param id
  */
 const calculatePaymentSummary = async (info: any, id: string = undefined) => {
-  const subtotal = info.purchaseReturnItems.reduce((a: any, b: { finalPrice: any; }) => a + b.finalPrice, 0);
-  const discountValue = info.discountValue || 0;
-  const totalSupplierPayment = subtotal - discountValue;
+  const totalSupplierPayment = info.purchaseReturnItems.reduce((a: any, b: { finalPrice: any; }) => a + b.finalPrice, 0);
+
   let totalSupplierPaid = 0;
   if (id) {
     const paymentNotes = await PaymentNoteCollection.find({
@@ -246,11 +243,12 @@ const calculatePaymentSummary = async (info: any, id: string = undefined) => {
   if (info.payment && info.payment.amount) {
     totalSupplierPaid += info.payment.amount;
   }
+  const discountValue = info.discountValue || 0;
+  const supplierDebt = totalSupplierPayment - discountValue;
   return {
-    subtotal,
     totalSupplierPayment,
     totalSupplierPaid,
-    supplierDebt: totalSupplierPayment - totalSupplierPaid
+    supplierDebt: supplierDebt < 0 ? 0 : supplierDebt
   };
 }
 
@@ -291,7 +289,8 @@ const fetchPurchaseReturns = async (queryInput: any, options: any) => {
         populate: {path: 'createdBy', select: '-password'}
       },
       {path: 'inventoryTransactions', match: {status: {$ne: InventoryTransactionConstants.STATUS.CANCELED}}},
-      {path: 'createdBy', select: '-password'}
+      {path: 'createdBy', select: '-password'},
+      {path: 'updatedBy', select: '-password'}
     ],
     lean: true
   });
@@ -384,10 +383,8 @@ const findByQuery = async (query: any) => {
       path: 'inventoryTransactions',
       match: {status: {$ne: InventoryTransactionConstants.STATUS.CANCELED}}
     })
-    .populate({
-      path: 'createdBy',
-      select: '-password'
-    })
+    .populate({path: 'createdBy', select: '-password'})
+    .populate({path: 'updatedBy', select: '-password'})
     .lean()
     .exec();
   await setPurchaseReturnFullBatches(result);
@@ -452,13 +449,17 @@ const mapInfoToPurchaseReturn = (info: any, isUpdate: boolean) => {
     supplierDebt: undefined as any
   }
 
-  if (!isUpdate) {
+  if (isUpdate) {
     return {
       ...baseInfoPurchaseReturn,
-      createBy: info.createdBy
+      updatedBy: info.updatedBy
+    }
+  } else {
+    return {
+      ...baseInfoPurchaseReturn,
+      createdBy: info.createdBy
     }
   }
-  return baseInfoPurchaseReturn;
 }
 
 const checkBatchQuantity = async (items: any) => {

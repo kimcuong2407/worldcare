@@ -59,6 +59,7 @@ const fetchPaymentNoteInfoByQuery = async (query: any) => {
     .populate('referenceDoc')
     .populate('branch')
     .populate('user')
+    .populate({path: 'createdBy', select: '-password'})
     .lean().exec();
 };
 

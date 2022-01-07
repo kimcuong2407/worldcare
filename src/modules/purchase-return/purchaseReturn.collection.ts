@@ -72,9 +72,9 @@ const PurchaseReturnSchema = new mongoose.Schema({
   discountPercent: Number,
   discountType: String,
 
-  totalSupplierPayment: Number,
-  totalSupplierPaid: Number,
-  supplierDebt: Number,
+  totalSupplierPayment: Number, // Tong tien hang
+  totalSupplierPaid: Number, // NCC da tra
+  supplierDebt: Number, // NCC can tra = Tong tien hang - discountValue
 
   partnerId: Number,
   branchId: Number,
@@ -94,7 +94,10 @@ const PurchaseReturnSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'user',
   },
-  updatedBy: String,
+  updatedBy: {
+    type: mongoose.Types.ObjectId,
+    ref: 'user',
+  },
   deletedAt: Date
 }, {
   timestamps: true,
@@ -102,13 +105,13 @@ const PurchaseReturnSchema = new mongoose.Schema({
   toObject: {virtuals: true}
 });
 
-PurchaseReturnSchema.virtual('product', {
+PurchaseReturnItemSchema.virtual('product', {
   ref: 'product',
   localField: 'productId',
   foreignField: '_id',
   justOne: true,
 });
-PurchaseReturnSchema.virtual('productVariant', {
+PurchaseReturnItemSchema.virtual('productVariant', {
   ref: 'product_variant',
   localField: 'variantId',
   foreignField: '_id',
