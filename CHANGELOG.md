@@ -1,3 +1,10 @@
+## [1.17.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.4...v1.17.5) (2022-01-07)
+
+
+### Bug Fixes
+
+* **purchase-return:** fix api issues ([d0c6ab2](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/d0c6ab24db9afad0c28faa427805ac684db9fd5f))
+
 ## [1.17.4](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.3...v1.17.4) (2022-01-06)
 
 
