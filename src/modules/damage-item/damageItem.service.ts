@@ -296,15 +296,15 @@ const mapInfoToDamageItem = async (info: any, isUpdate: boolean) => {
   }
   baseInfo.totalCost = totalCost;
 
-  if (!isUpdate) {
+  if (isUpdate) {
     return {
       ...baseInfo,
-      createBy: info.currentUserId
+      updatedBy: info.currentUserId
     }
   } else {
     return {
       ...baseInfo,
-      updatedBy: info.currentUserId
+      createdBy: info.currentUserId
     }
   }
 }

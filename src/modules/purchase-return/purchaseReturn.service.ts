@@ -32,8 +32,6 @@ const createPurchaseReturn = async (info: any) => {
     await checkBatchQuantity(info.purchaseReturnItems);
   }
 
-  const payment = info.payment;
-
   const purchaseReturn = mapInfoToPurchaseReturn(info, false);
 
   const paymentSummary = await calculatePaymentSummary(info);
@@ -51,6 +49,7 @@ const createPurchaseReturn = async (info: any) => {
   const purchaseReturnId = get(createdPurchaseReturn, '_doc._id');
 
   // Create payment note
+  const payment = info.payment;
   const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(payment, info,
     PaymentNoteConstants.PTTHN, true, purchaseReturnId)
   if (paymentNote) {
@@ -94,8 +93,12 @@ const updatePurchaseReturn = async (id: string, info: any) => {
   }
 
   const paymentNoteIds = persistedPurchaseReturn.paymentNoteIds || [];
-  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(info.payment, info,
-    PaymentNoteConstants.PTTHN, true, id)
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    info.payment,
+    {
+      ...info,
+      createdBy: info.updatedBy
+    }, PaymentNoteConstants.PTTHN, true, id)
   if (paymentNote) {
     paymentNoteIds.push(get(paymentNote, '_doc._id'));
   }
@@ -103,7 +106,7 @@ const updatePurchaseReturn = async (id: string, info: any) => {
   const willBeUpdate = mapInfoToPurchaseReturn(info, true);
   willBeUpdate.paymentNoteIds = paymentNoteIds;
 
-  const paymentSummary = await calculatePaymentSummary(info);
+  const paymentSummary = await calculatePaymentSummary(info, id);
   willBeUpdate.totalSupplierPayment = paymentSummary.totalSupplierPayment;
   willBeUpdate.totalSupplierPaid = paymentSummary.totalSupplierPaid;
   willBeUpdate.supplierDebt = paymentSummary.supplierDebt;
@@ -239,10 +242,12 @@ const calculatePaymentSummary = async (info: any, id: string = undefined) => {
         totalSupplierPaid += paymentNote.paymentAmount;
       }
     }
+  } else {
+    if (info.payment && info.payment.amount) {
+      totalSupplierPaid += info.payment.amount;
+    }
   }
-  if (info.payment && info.payment.amount) {
-    totalSupplierPaid += info.payment.amount;
-  }
+
   const discountValue = info.discountValue || 0;
   const supplierDebt = totalSupplierPayment - discountValue;
   return {

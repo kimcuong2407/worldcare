@@ -83,7 +83,8 @@ const fetchGeneralLedger = async (queryInfo: any, options: any) => {
     },
     populate: [
       {path: 'customer', select: ['_id', 'name']},
-      {path: 'referenceDoc', select: ['-invoiceDetail']}
+      {path: 'referenceDoc', select: ['-invoiceDetail']},
+      {path: 'createdBy', select: ['-password']}
     ]
   })
 
