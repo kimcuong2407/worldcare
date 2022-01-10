@@ -1,3 +1,10 @@
+## [1.17.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.5...v1.17.6) (2022-01-10)
+
+
+### Bug Fixes
+
+* **purchase-return:** re-calculate toal suppleir paid ([ab0ce34](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/ab0ce347faf34a25d6ccfa234ecf665d5bd77091))
+
 ## [1.17.5](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.4...v1.17.5) (2022-01-07)
 
 
