@@ -91,6 +91,12 @@ PaymentNoteSchema.virtual('createdBy', {
   foreignField: '_id',
   justOne: true
 })
+PaymentNoteSchema.virtual('supplier', {
+  ref: 'supplier',
+  localField: 'supplierId',
+  foreignField: '_id',
+  justOne: true
+})
 
 PaymentNoteSchema.plugin(mongoosePaginate);
 PaymentNoteSchema.plugin(mongooseAggregatePaginate);
