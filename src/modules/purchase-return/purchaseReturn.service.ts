@@ -259,6 +259,7 @@ const calculatePaymentSummary = async (info: any, id: string = undefined) => {
 
 const fetchPurchaseReturns = async (queryInput: any, options: any) => {
   let query = {
+    branchId: queryInput.branchId,
     deletedAt: null
   } as any;
   if (queryInput.keyword && queryInput.keyword.trim().length !== 0) {

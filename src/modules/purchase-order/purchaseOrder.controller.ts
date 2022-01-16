@@ -124,8 +124,10 @@ const fetchPurchaseOrder = async (req: express.Request, res: express.Response, n
       page,
       limit,
     }
+    const branchId = req.companyId;
     const query: any = {
-      keyword
+      keyword,
+      branchId
     }
     const data = await purchaseOrderService.fetchPurchaseOrders(query, options);
     res.send(data);
