@@ -122,9 +122,11 @@ const fetchPurchaseReturn = async (req: express.Request, res: express.Response, 
       page,
       limit,
     }
+    const branchId = req.companyId;
     const query: any = {
       keyword,
-      status
+      status,
+      branchId
     }
     const data = await purchaseReturnService.fetchPurchaseReturns(query, options);
     res.send(data);

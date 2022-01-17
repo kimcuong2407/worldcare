@@ -130,6 +130,7 @@ const searchCustomer = async (keyword: string, partnerId: number) => {
     $or: [
       { code: { $regex: '.*' + keyword + '.*', $options: 'i' } },
       { name: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { phoneNumber: { $regex: '.*' + keyword + '.*', $options: 'i' } },
     ],
     partnerId,
     deletedAt: null

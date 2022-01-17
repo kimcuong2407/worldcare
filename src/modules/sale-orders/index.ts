@@ -20,9 +20,9 @@ const saleOrderRoutes = (app: express.Application): void => {
   //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
   // ]), saleOrderController.updateSaleOrderAction);
 
-  // app.delete('/api/v1/sale-order/:id', middleware.authorization([
-  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
-  // ]),  saleOrderController.deleteSaleOrderAction);
+  app.delete('/api/v1/sale-order/:id', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
+  ]),  saleOrderController.deleteSaleOrderAction);
 
 }
 

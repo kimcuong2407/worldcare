@@ -1,10 +1,14 @@
-import {InternalServerError} from '@app/core/types/ErrorTypes';
+import {InternalServerError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import SaleOrderCollection from './sale-order.collection';
 import {Types} from 'mongoose';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 import batchService from '@modules/batch/batch.service';
+import paymentNoteService from '@modules/payment-note/payment-note.service';
+import loggerHelper from '@utils/logger.util';
+
+const logger = loggerHelper.getLogger('sale-order.service');
 
 const initIdSequence = (idSequence: number) => {
   let s = '000000000' + idSequence;
@@ -175,16 +179,41 @@ const updateSaleOrder = async (query: any, info: any) => {
   );
 };
 
-const deleteSaleOrder = async (query: any) => {
-  return await SaleOrderCollection.updateOne(
-    query,
-    {
+const deleteSaleOrder = async (id: string, branchId: number, voidPayment: boolean) => {
+  logger.info(`Canceling Sale order. Id=${id} branchId=${branchId} voidPayment=${voidPayment}`)
+  const query: any = {
+    _id: id,
+    branchId,
+    deletedAt: null
+  }
+  const saleOrder = await SaleOrderCollection.findOne(query).lean().exec();
+  if (isNil(saleOrder)) {
+    throw new ValidationFailedError('Sale order is not found.');
+  }
+  switch (saleOrder.status) {
+    case SALE_ORDER_STATUS.COMPLETED:
+      throw new ValidationFailedError('Can not delete Sale order has status Completed.');
+    case SALE_ORDER_STATUS.CANCELED:
+      throw new ValidationFailedError('Sale order is canceled.');
+  }
+
+  await SaleOrderCollection.updateOne(query, {
       $set: {
-        deletedAt: new Date()
-      },
+        status: SALE_ORDER_STATUS.CANCELED
+      }
     },
-    { new: true }
+    {new: true}
   );
+
+  if (voidPayment) {
+    const paymentNoteIds = saleOrder.paymentNoteIds || [];
+    for (const paymentNoteId of paymentNoteIds) {
+      await paymentNoteService.cancelPaymentNote({_id: paymentNoteId})
+    }
+  }
+  logger.info(`Sale order id=${id} is canceled`);
+
+  return true;
 };
 
 const calculateTotalOrderQuantity = async (variantId: string, branchId: string) => {

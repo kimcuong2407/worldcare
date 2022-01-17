@@ -238,6 +238,7 @@ async function createSupplierCashbackPaymentNote(paymentSummary: any, purchaseOr
 
 const fetchPurchaseOrders = async (queryInput: any, options: any) => {
   let query = {
+    branchId: queryInput.branchId,
     deletedAt: null
   } as any;
   if (queryInput.keyword) {

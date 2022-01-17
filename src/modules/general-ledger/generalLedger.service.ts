@@ -3,7 +3,7 @@ import PaymentNoteCollection from '@modules/payment-note/payment-note.collection
 import {PAYMENT_NOTE_TYPE} from '@modules/payment-note/constant';
 import {isNil} from 'lodash';
 
-const logger = loggerHelper.getLogger('batch.service');
+const logger = loggerHelper.getLogger('generalLedger.service');
 
 async function getGeneralLedgerSummary(query: any) {
   const generalLedgerReport = await PaymentNoteCollection.aggregate([
@@ -82,9 +82,11 @@ const fetchGeneralLedger = async (queryInfo: any, options: any) => {
       createdAt: -1
     },
     populate: [
-      {path: 'customer', select: ['_id', 'name']},
+      {path: 'customer'},
       {path: 'referenceDoc', select: ['-invoiceDetail']},
-      {path: 'createdBy', select: ['-password']}
+      {path: 'createdBy', select: ['-password']},
+      {path: 'branch'},
+      {path: 'supplier'}
     ]
   })
 

@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import saleOrderService from './sale-order.service';
 import appUtil from '@utils/app.util';
 import {Types} from 'mongoose';
+import SaleOrderCollection from '@modules/sale-orders/sale-order.collection';
 
 const logger = loggerHelper.getLogger('purchase-order.controller');
 
@@ -116,9 +117,10 @@ const deleteSaleOrderAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId') ;
-    const id = get(req, 'id');
-    const record = await saleOrderService.deleteSaleOrder({ _id: id, branchId });
-    return record;
+    const id = req.params.id;
+    const voidPayment: boolean = req.query.voidPayment === 'true';
+    const data = await saleOrderService.deleteSaleOrder(id, branchId, voidPayment);
+    res.send(data);
   } catch (error) {
     logger.error('', error);
     next(error);

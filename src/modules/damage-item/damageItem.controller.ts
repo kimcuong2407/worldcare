@@ -102,9 +102,12 @@ const fetchDamageItems = async (req: express.Request, res: express.Response, nex
       page,
       limit,
     }
+    const branchId = req.companyId;
+    const partnerId = req.user.partnerId;
     const query: any = {
       keyword,
-      status
+      status,
+      branchId
     }
     const data = await damageItemService.fetchDamageItems(query, options);
     res.send(data);
