@@ -1,3 +1,16 @@
+# [1.18.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.6...v1.18.0) (2022-01-17)
+
+
+### Bug Fixes
+
+* **fetch-data:** add branchid to fetch data query ([8d6410e](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/8d6410e97033c33e4722ebee016cd8b17e72ebf4))
+* **general-ledger:** populate more fields to return when fetching ([450f6b8](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/450f6b82e8a4559988dfab4749317fc43be217e9))
+
+
+### Features
+
+* **sale-order:** cancel sale order endpoint implementation ([1e14b09](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/1e14b095cfcb3577394d653ba614b47152b10116))
+
 ## [1.17.6](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.5...v1.17.6) (2022-01-10)
 
 
