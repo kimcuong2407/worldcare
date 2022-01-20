@@ -14,7 +14,7 @@ const fetchBatchesAction = async (req: express.Request, res: express.Response, n
     const variantId = req.query.variantId;
     const branchId = req.companyId;
 
-    const data = await batchService.fetchBatches(variantId, branchId);
+    const data = await batchService.fetchBatches(variantId as string, branchId);
     res.send(data);
   } catch (e) {
     logger.error('Error while fetchBatchesAction', e);

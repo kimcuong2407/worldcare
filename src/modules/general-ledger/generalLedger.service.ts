@@ -1,6 +1,6 @@
 import loggerHelper from '@utils/logger.util';
 import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
-import {PAYMENT_NOTE_TYPE} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE} from '@modules/payment-note/constant';
 import {isNil} from 'lodash';
 
 const logger = loggerHelper.getLogger('generalLedger.service');
@@ -74,6 +74,15 @@ const fetchGeneralLedger = async (queryInfo: any, options: any) => {
   if (queryInfo.involvedById) {
     query.involvedById = queryInfo.involvedById
   }
+  if (!isNil(queryInfo.status) && queryInfo.status.trim().length !== 0) {
+    const statuses = queryInfo.status.split(',');
+    query.status = {
+      $in: statuses
+    }
+  } else {
+    query.status = PAYMENT_NOTE_STATUS.ACTIVE
+  }
+
   const generalLedgerSummary = await getGeneralLedgerSummary(query);
 
   const paymentNotes = await PaymentNoteCollection.paginate(query, {

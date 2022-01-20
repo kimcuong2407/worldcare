@@ -1,20 +1,29 @@
-import {InternalServerError} from '@app/core/types/ErrorTypes';
+import {InternalServerError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import InvoiceCollection from './invoice.collection';
+import loggerHelper from '@utils/logger.util';
+import paymentNoteService from '@modules/payment-note/payment-note.service';
+import {INVOICE_STATUS} from '@modules/invoice/constant';
+import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
+import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
+import documentCodeUtils from '@utils/documentCode.util';
 
-const initIdSequence = (idSequence: number) => {
-  let s = '000000000' + idSequence;
-  return s.substr(s.length - 6);
-}
+const logger = loggerHelper.getLogger('invoice.service');
 
-const invoiceAutoIncrease = async (record: any) => {
+const invoiceAutoIncrease = async (record: any, code: string | undefined = undefined) => {
+  if (code) {
+    record.code = documentCodeUtils.generateDocumentSubCode(code);
+    await record.save();
+    return;
+  }
+
   await new Promise((resolve, reject) => {
     record.setNext('invoice_code_sequence', async (err: any, record: any) => {
       if (err) {
         reject(err)
       }
-      const invoiceCode = `HD${initIdSequence(record.codeSequence)}`;
+      const invoiceCode = documentCodeUtils.initDocumentCode('HD', record.codeSequence);
       const doc = await InvoiceCollection
         .findOne({code: invoiceCode, branchId: get(record, '_doc').branchId})
         .lean().exec();
@@ -154,16 +163,56 @@ const updateInvoice = async (query: any, info: any) => {
   );
 };
 
-const deleteInvoice = async (query: any) => {
-  return await InvoiceCollection.updateOne(
-    query,
-    {
-      $set: {
-        deletedAt: new Date()
-      },
-    },
-    { new: true }
-  );
+function validateCancelInvoice(invoice: any) {
+  if (isNil(invoice)) {
+    throw new ValidationFailedError('Invoice is not found.');
+  }
+  if (invoice.status === INVOICE_STATUS.CANCELED) {
+    throw new ValidationFailedError('Invoice is already canceled.');
+  }
+}
+
+/**
+ * cancel an invoice
+ * 1. set status is CANCELED
+ * 2. cancel inventory transactions
+ * 3. Void payment
+ * @param id
+ * @param branchId
+ * @param voidPayment
+ */
+const cancelInvoice = async (id: string, branchId: number, voidPayment: boolean) => {
+  logger.info(`Canceling Invoice. Id=${id} branchId=${branchId} voidPayment=${voidPayment}`)
+  const query: any = {
+    _id: id,
+    branchId,
+    deletedAt: null
+  }
+  const invoice = await InvoiceCollection.findOne(query).lean().exec();
+
+  validateCancelInvoice(invoice);
+
+  // Update status
+  await InvoiceCollection.updateOne(query, {
+      $set: {status: INVOICE_STATUS.CANCELED}
+    },{new: true});
+
+  // Cancel Inventory transaction
+  const inventoryTransactions = await inventoryTransactionService.fetchInventoryTransactionsByQuery({
+    type: INVENTORY_TRANSACTION_TYPE.SELL_PRODUCT,
+    referenceDocId: id
+  })
+  await inventoryTransactionService.cancelInventoryTransactions(inventoryTransactions);
+
+  // void payment
+  if (voidPayment) {
+    const paymentNoteIds = invoice.paymentNoteIds || [];
+    for (const paymentNoteId of paymentNoteIds) {
+      await paymentNoteService.cancelPaymentNote({_id: paymentNoteId})
+    }
+  }
+  logger.info(`Invoice id=${id} is canceled`);
+  return true;
 };
 
 export default {
@@ -171,6 +220,6 @@ export default {
   fetchInvoiceListByQuery,
   fetchInvoiceInfoByQuery,
   updateInvoice,
-  deleteInvoice,
+  cancelInvoice,
   invoiceAutoIncrease
 };

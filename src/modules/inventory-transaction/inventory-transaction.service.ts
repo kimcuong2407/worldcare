@@ -85,7 +85,7 @@ const createInventoryTransaction = async (info: any, type: INVENTORY_TRANSACTION
 }
 
 const updateLatestQuantity = async (variantId: string, branchId: string, inventoryDocument: any) => {
-  const batches = await batchService.fetchBatches(variantId, branchId);
+  const batches = await batchService.fetchBatches(variantId, parseInt(branchId));
   let latestQuantity = 0;
   for (const batch of batches) {
     latestQuantity += batch.quantity;
@@ -94,7 +94,25 @@ const updateLatestQuantity = async (variantId: string, branchId: string, invento
   await inventoryDocument.save();
 }
 
+const fetchInventoryTransactionsByQuery = async (query: any) => {
+  return await InventoryTransactionCollection.find(query).lean().exec();
+}
+
+const cancelInventoryTransactions = async (inventoryTransactions: any[]) => {
+  const ids = inventoryTransactions.map(transaction => transaction._id);
+  await cancelInventoryTransactionsByIds(ids);
+}
+
+const cancelInventoryTransactionsByIds = async (ids: string[]) => {
+  for (const id of ids) {
+    await cancelInventoryTransaction(id);
+  }
+}
+
 export default {
   cancelInventoryTransaction,
-  createInventoryTransaction
+  createInventoryTransaction,
+  fetchInventoryTransactionsByQuery,
+  cancelInventoryTransactions,
+  cancelInventoryTransactionsByIds
 }

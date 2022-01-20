@@ -4,7 +4,8 @@ import get from 'lodash/get';
 import invoiceService from './invoice.service';
 import appUtil from '@utils/app.util';
 import {Types} from 'mongoose';
-import {ValidationFailedError} from '@core/types/ErrorTypes';
+import {NotFoundError, ValidationFailedError} from '@core/types/ErrorTypes';
+import {isNil} from 'lodash';
 
 const logger = loggerHelper.getLogger('invoice.controller');
 
@@ -78,6 +79,9 @@ const fetchInvoiceInfoByQueryAction = async (
     }
     const query = { _id: id, branchId };
     const record = await invoiceService.fetchInvoiceInfoByQuery(query);
+    if (isNil(record)) {
+      throw new NotFoundError('Invoice could not be found.');
+    }
     return res.send(record);
   } catch (error) {
     logger.error('fetchInvoiceInfoByQueryAction', error);
@@ -125,10 +129,10 @@ const deleteInvoiceAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const id = get(req, 'id');
-    const query = { _id: id, branchId };
-    const record = await invoiceService.deleteInvoice(query);
-    return record;
+    const id = req.params.id;
+    const voidPayment: boolean = req.query.voidPayment === 'true';
+    const data = await invoiceService.cancelInvoice(id, branchId, voidPayment);
+    res.send(data);
   } catch (error) {
     logger.error('deleteInvoiceAction', error);
     next(error);
