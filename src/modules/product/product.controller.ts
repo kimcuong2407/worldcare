@@ -23,6 +23,7 @@ const transformProduct = async (type: PRODUCT_TYPE, data: any) => {
       const medicinetDetail: medicineModel = {
         ingredient: get(data, 'ingredient', ''),
         dosage: get(data, 'dosage', ''),
+        doseInUse: get(data, 'doseInUse', ''),
         medicineCode: get(data, 'medicineCode', ''),
         registrationNo: get(data, 'registrationNo', ''),
         weight: get(data, 'weight', ''),
