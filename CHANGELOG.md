@@ -1,3 +1,16 @@
+# [1.19.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.18.0...v1.19.0) (2022-01-24)
+
+
+### Bug Fixes
+
+* **prescription:** add healthcareFacilityId field ([7f8f787](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/7f8f787bc785404141378388065866e85b77f544))
+* **product:** support dosage ([9f23be0](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/9f23be0e86aa33cb849ef9b18a0736f2bd636e13))
+
+
+### Features
+
+* **sale:** update and cancel invoice feature implementation ([95c01c4](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/95c01c4a9015354ef146db7db507a9f464d1f151))
+
 # [1.18.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.17.6...v1.18.0) (2022-01-17)
 
 
