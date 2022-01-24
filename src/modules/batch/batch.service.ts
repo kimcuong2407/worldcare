@@ -3,7 +3,7 @@ import BatchCollection from '@modules/batch/batch.collection';
 
 const logger = loggerHelper.getLogger('batch.service');
 
-const fetchBatches = async (variantId: string, branchId: string) => {
+const fetchBatches = async (variantId: string, branchId: number) => {
 
   const query: any = {
     deletedAt: null,

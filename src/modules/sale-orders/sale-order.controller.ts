@@ -1,4 +1,4 @@
-import { ValidationFailedError } from '@app/core/types/ErrorTypes';
+import {NotFoundError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import loggerHelper from '@utils/logger.util';
 import express from 'express';
 import { isNil } from 'lodash';
@@ -76,6 +76,9 @@ const fetchSaleOrderInfoByQueryAction = async (
       throw new ValidationFailedError('ID is not valid.');
     }
     const record = await saleOrderService.fetchSaleOrderInfoByQuery({ _id: id, branchId });
+    if (isNil(record)) {
+      throw new NotFoundError('Sale order could not be found.');
+    }
     res.send(record);
   } catch (error) {
     logger.error('', error);

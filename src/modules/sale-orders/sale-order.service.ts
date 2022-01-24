@@ -7,6 +7,7 @@ import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 import batchService from '@modules/batch/batch.service';
 import paymentNoteService from '@modules/payment-note/payment-note.service';
 import loggerHelper from '@utils/logger.util';
+import {INVOICE_STATUS} from '@modules/invoice/constant';
 
 const logger = loggerHelper.getLogger('sale-order.service');
 
@@ -71,7 +72,7 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
     lean: true,
     populate: [
       {path: 'branch'},
-      {path: 'invoice'},
+      {path: 'invoices'},
       {
         path: 'paymentNotes',
         strictPopulate: false,
@@ -140,7 +141,7 @@ const fetchSaleOrderInfoByQuery = async (query: any) => {
   const saleOrder = await SaleOrderCollection.findOne(query)
     .populate('branch')
     .populate({
-      path: 'invoice',
+      path: 'invoices',
       strictPopulate: false,
       populate: [
         {path: 'customer'},
@@ -163,7 +164,9 @@ const fetchSaleOrderInfoByQuery = async (query: any) => {
         populate: 'unit'
       })
     .lean().exec();
-  await batchService.setItemsFullBatches(saleOrder.saleOrderDetail);
+  if (saleOrder) {
+    await batchService.setItemsFullBatches(saleOrder.saleOrderDetail);
+  }
   return saleOrder;
 };
 
@@ -186,15 +189,19 @@ const deleteSaleOrder = async (id: string, branchId: number, voidPayment: boolea
     branchId,
     deletedAt: null
   }
-  const saleOrder = await SaleOrderCollection.findOne(query).lean().exec();
+  const saleOrder = await SaleOrderCollection.findOne(query).populate('invoices').lean().exec();
   if (isNil(saleOrder)) {
     throw new ValidationFailedError('Sale order is not found.');
   }
   switch (saleOrder.status) {
     case SALE_ORDER_STATUS.COMPLETED:
-      throw new ValidationFailedError('Can not delete Sale order has status Completed.');
+      if (saleOrder.invoices
+        && saleOrder.invoices.some((invoice: any) => invoice.status === INVOICE_STATUS.COMPLETED)) {
+        throw new ValidationFailedError('Can not delete Sale order already has Invoice.');
+      }
+      break;
     case SALE_ORDER_STATUS.CANCELED:
-      throw new ValidationFailedError('Sale order is canceled.');
+      throw new ValidationFailedError('Sale order is already canceled.');
   }
 
   await SaleOrderCollection.updateOne(query, {

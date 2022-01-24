@@ -5,6 +5,7 @@ import {ValidationFailedError} from '@core/types/ErrorTypes';
 import saleService from './sale.service';
 import saleOrderService from '../sale-orders/sale-order.service';
 import {SALE_CHANNELS, SALE_TYPE} from './constant';
+import invoiceService from '@modules/invoice/invoice.service';
 
 const logger = loggerHelper.getLogger('purchaseOrder.controller');
 
@@ -47,6 +48,7 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
     }
     
     const saleId = req.params.saleId;
+    let result;
     switch (type) {
       case SALE_TYPE.ORDER:
         const saleOrder = await saleOrderService.fetchSaleOrderInfoByQuery({
@@ -54,17 +56,31 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
           branchId
         });
         if (isNil(saleOrder) || Object.keys(saleOrder).length === 0) {
-          throw new ValidationFailedError('Purchase order can not be found.');
+          throw new ValidationFailedError('Sale order can not be found.');
         }
+        await saleService.checkBatchQuantity(items);
+
         await saleService.updateSaleOrder(saleId, baseInfo);
-        const result = await saleOrderService.fetchSaleOrderInfoByQuery({
+
+        result = await saleOrderService.fetchSaleOrderInfoByQuery({
           _id: saleId,
           branchId
         });
         res.send(result);
         break;
       case SALE_TYPE.DIRECT:
-        throw new ValidationFailedError('Currently not support update invoice.');
+        const invoice = await invoiceService.fetchInvoiceInfoByQuery({
+          _id: saleId,
+          branchId
+        });
+        if (isNil(invoice)) {
+          throw new ValidationFailedError('Invoice can not be found.');
+        }
+        result = await saleService.updateInvoice(saleId, baseInfo);
+        res.send(result);
+        break;
+      default:
+        throw new ValidationFailedError(`Type ${type} does not support updating.`);
     }
   } catch (error) {
     logger.error('updateSaleTransaction', error);
@@ -114,6 +130,7 @@ const createSaleTransaction = async (req: express.Request, res: express.Response
       purchasedAt
     }
 
+    await saleService.validateSaleInput(baseInfo);
     switch (type) {
       case SALE_TYPE.DIRECT:
         console.log('Direct selling')

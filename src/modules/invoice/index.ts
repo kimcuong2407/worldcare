@@ -20,9 +20,9 @@ const invoiceRoutes = (app: express.Application): void => {
   //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
   // ]), invoiceController.updateInvoiceAction);
 
-  // app.delete('/api/v1/invoice/:id', middleware.authorization([
-  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
-  // ]), invoiceController.deleteInvoiceAction);
+  app.delete('/api/v1/invoice/:id', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
+  ]), invoiceController.deleteInvoiceAction);
 
 }
 

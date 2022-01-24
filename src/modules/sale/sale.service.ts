@@ -16,6 +16,7 @@ import ProductVariantCollection from '@modules/product/productVariant.collection
 import ProductCollection from '@modules/product/product.collection';
 import paymentNoteService from '@modules/payment-note/payment-note.service';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
+import {SaleItemModel} from '@modules/sale/sale.model';
 
 const logger = loggerHelper.getLogger('sale.service');
 
@@ -48,14 +49,14 @@ const checkBatchQuantity = async (items: any) => {
  * 2. Create payment note. code prefix: TTHD
  * 3. Create inventory transaction. type: SELL_PRODUCT
  */
-const createInvoice = async (invoiceInfo: any) => {
+const createInvoice = async (invoiceInfo: any, isUpdating: boolean = false) => {
   logger.info('Start create invoice. ' + JSON.stringify(invoiceInfo));
 
   const paymentNoteIds: any[] = [];
   let totalPayment = 0;
 
   // 0. Check if invoice is creating bases on a sale order.
-  if (!isNil(invoiceInfo.saleOrderId)) {
+  if (!isUpdating && !isNil(invoiceInfo.saleOrderId)) {
     const saleOrder = await SaleOrderCollection.findOne({
       _id: invoiceInfo.saleOrderId,
       branchId: invoiceInfo.branchId
@@ -76,78 +77,44 @@ const createInvoice = async (invoiceInfo: any) => {
 
   // 1. Create invoice record.
   const invoice = {
-    customerId: invoiceInfo.customerId,
-    branchId: invoiceInfo.branchId,
-    partnerId: invoiceInfo.partnerId,
+    ...mapInvoiceInfo(invoiceInfo),
     status: INVOICE_STATUS.COMPLETED,
-    saleChannel: invoiceInfo.saleChannel,
-    soldById: invoiceInfo.soldById,
-    createdById: invoiceInfo.createdBy,
-    invoiceDetail: invoiceInfo.items,
-    paymentNoteIds,
-    discountValue: invoiceInfo.discountValue,
-    discountPercent: invoiceInfo.discountPercent,
-    discountType: invoiceInfo.discountType,
     prescriptionId: undefined as any,
-    involvedBy: invoiceInfo.involvedBy,
-    purchasedAt: invoiceInfo.purchasedAt,
-    saleOrderId: invoiceInfo.saleOrderId,
-    totalPayment,
-    total: 0 as number
+    total: 0 as number,
+    paymentNoteIds: isUpdating ? invoiceInfo.paymentNoteIds : paymentNoteIds,
+    totalPayment: isUpdating ? invoiceInfo.totalPayment : totalPayment,
   }
 
   if (invoiceInfo.isPrescriptionFilled && !isNil(invoiceInfo.prescription)) {
-    invoiceInfo.prescription.branchId = invoiceInfo.branchId;
-    const prescription = await prescriptionService.persistPrescription(invoiceInfo.prescription);
-    invoice.prescriptionId = get(prescription, '_id')
+    if (invoiceInfo.prescription._id) {
+      invoice.prescriptionId = invoiceInfo.prescription._id
+    } else {
+      invoiceInfo.prescription.branchId = invoiceInfo.branchId;
+      const prescription = await prescriptionService.persistPrescription(invoiceInfo.prescription);
+      invoice.prescriptionId = get(prescription, '_id')
+    }
     logger.info(`set invoice.prescriptionId=${invoice.prescriptionId}`);
   }
 
-  for (const item of invoice.invoiceDetail) {
-    item.variant = await ProductVariantCollection.findOne({_id: item.variantId})
-      .populate('unit').lean().exec();
-    item.batch = await BatchCollection.findOne({_id: item.batchId}).lean().exec();
-    item.product = await ProductCollection.findOne({_id: item.productId}).lean().exec();
-    // Calculate invoice's total
-    invoice.total += item.price * item.quantity;
-  }
+  await setInvoiceTotalAndSnapshotDetail(invoice);
 
   const createdInvoiceDoc = await InvoiceCollection.create(invoice);
-  await invoiceService.invoiceAutoIncrease(createdInvoiceDoc)
+  await invoiceService.invoiceAutoIncrease(createdInvoiceDoc, invoiceInfo.code)
   const createdInvoice = createdInvoiceDoc['_doc']
   logger.info(`Created Invoice Code[${createdInvoice.code}]`);
 
   // update SaleOrder status and invoiceId
   if (!isNil(invoiceInfo.saleOrderId)) {
-    const updatedSaleOrder = await SaleOrderCollection.findByIdAndUpdate(invoiceInfo.saleOrderId, {
-      $set: {
-        status: SALE_ORDER_STATUS.COMPLETED,
-        invoiceId: createdInvoice._id
-      }
-    }, {new: true}).lean().exec();
-    logger.info(`update saleOrder code=${updatedSaleOrder.code}: status=COMPLETED, invoiceId=${createdInvoice._id}`);
+    await updateSaleOrderStatusAndInvoiceId(isUpdating, invoiceInfo, createdInvoice);
   }
 
   // 2. Create payment note.
-  const payment = invoiceInfo.payment;
-  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
-    payment, invoiceInfo, PaymentNoteConstants.TTHD, true, createdInvoice._id);
-
-  if (paymentNote) {
-    const invoicePaymentNoteIds = createdInvoice.paymentNoteIds || [];
-    invoicePaymentNoteIds.push(get(paymentNote, '_doc._id'));
-    totalPayment += +get(paymentNote, '_doc.paymentAmount')
-    await InvoiceCollection.findByIdAndUpdate(createdInvoice._id, {
-      $set: {
-        paymentNoteIds: invoicePaymentNoteIds,
-        totalPayment
-      }
-    })
-  }
+  await createInvoicePaymentNote(invoiceInfo, createdInvoice, totalPayment);
 
   // 3. Create inventory transaction.
   await createInventoryTransaction(INVENTORY_TRANSACTION_TYPE.SELL_PRODUCT, invoiceInfo, createdInvoice['_id']);
 
+  logger.info(`Creating invoice successfully. Code=${createdInvoice.code} ID=${createdInvoice._id}`)
   return await invoiceService.fetchInvoiceInfoByQuery({_id: createdInvoice._id});
 
 }
@@ -230,7 +197,6 @@ async function createInventoryTransaction(type: INVENTORY_TRANSACTION_TYPE, inpu
 /**
  * if status is COMPLETED. only update Note
  * if status is DRAFT. update data. update batch quantity.
- * if status from DRAFT to COMPLETED. update data. update batch quantity. create Invoice.
  * @param id
  * @param saleOrderInfo
  */
@@ -247,6 +213,7 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
     });
     return get(resultDoc, '_doc');
   }
+  await validateSaleInput(saleOrderInfo.items);
 
   const payment = saleOrderInfo.payment;
   const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
@@ -282,6 +249,44 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
   return get(updatedSaleOrderDoc, '_doc')
 }
 
+/**
+ * 1. Cancel the old invoice and create a new invoice
+ * 2. Link payment-notes of the old invoice to the new invoice
+ * 3. Cancel inventory-transaction of the old invoice
+ * 4. Check batch quantity
+ * 5. Create invoice and new payment
+ * 
+ * @param id
+ * @param invoiceInfo
+ */
+const updateInvoice = async (id: string, invoiceInfo: any) => {
+  logger.info(`Updating invoice id=${id} invoiceInfo=${JSON.stringify(invoiceInfo)}`)
+  const processingInvoice = await InvoiceCollection.findById(id).populate('paymentNotes').lean().exec();
+  if (!processingInvoice) {
+    throw new ValidationFailedError('Invoice is not found.');
+  }
+  if (processingInvoice.status === INVOICE_STATUS.CANCELED) {
+    throw new ValidationFailedError('Can not updated canceled Invoice.');
+  }
+
+  const {branchId, partnerId} = invoiceInfo;
+
+  // Check batch quantity
+  await checkBatchQuantityForUpdatingInvoice(invoiceInfo.items, processingInvoice.invoiceDetail);
+
+  // cancel invoice
+  await invoiceService.cancelInvoice(id, branchId, false);
+
+  // Create new invoice
+  invoiceInfo.totalPayment = processingInvoice.totalPayment || 0;
+  invoiceInfo.paymentNoteIds = processingInvoice.paymentNoteIds || [];
+  invoiceInfo.code = processingInvoice.code;
+
+  const updatedInvoice = await createInvoice(invoiceInfo, true);
+  logger.info(`Updated invoice id=${id}. new invoice has been created. ${updatedInvoice._id} invoiceInfo=${JSON.stringify(invoiceInfo)}`)
+  return updatedInvoice;
+}
+
 const calculateSaleOrderPayment = (items: any[], discountValue: number = 0) => {
   const total: number = items
     .reduce((a: any, b: { price: any, quantity: any }) => a + parseFloat(b.price) * parseInt(b.quantity), 0);
@@ -292,9 +297,165 @@ const calculateSaleOrderPayment = (items: any[], discountValue: number = 0) => {
   }
 }
 
+const mapInvoiceInfo = (invoiceInfo: any) => {
+  return {
+    customerId: invoiceInfo.customerId,
+    branchId: invoiceInfo.branchId,
+    partnerId: invoiceInfo.partnerId,
+    saleChannel: invoiceInfo.saleChannel,
+    soldById: invoiceInfo.soldById,
+    createdById: invoiceInfo.createdBy,
+    invoiceDetail: invoiceInfo.items,
+    discountValue: invoiceInfo.discountValue,
+    discountPercent: invoiceInfo.discountPercent,
+    discountType: invoiceInfo.discountType,
+    involvedBy: invoiceInfo.involvedBy,
+    purchasedAt: invoiceInfo.purchasedAt,
+    saleOrderId: invoiceInfo.saleOrderId,
+  }
+}
+
+async function setInvoiceTotalAndSnapshotDetail(invoice: any) {
+  for (const item of invoice.invoiceDetail) {
+    item.variant = await ProductVariantCollection.findOne({_id: item.variantId})
+      .populate('unit').lean().exec();
+    item.batch = await BatchCollection.findOne({_id: item.batchId}).lean().exec();
+    item.product = await ProductCollection.findOne({_id: item.productId}).lean().exec();
+    // Calculate invoice's total
+    invoice.total += item.price * item.quantity;
+  }
+}
+
+/**
+ * Create payment-note.
+ * Update Invoice's payment-note data
+ * @param invoiceInfo
+ * @param createdInvoice
+ * @param totalPayment
+ */
+async function createInvoicePaymentNote(invoiceInfo: any, createdInvoice: any, totalPayment: number) {
+  const payment = invoiceInfo.payment;
+  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
+    payment, invoiceInfo, PaymentNoteConstants.TTHD, true, createdInvoice._id);
+
+  if (paymentNote) {
+    const invoicePaymentNoteIds = createdInvoice.paymentNoteIds || [];
+    invoicePaymentNoteIds.push(get(paymentNote, '_doc._id'));
+    totalPayment += +get(paymentNote, '_doc.paymentAmount')
+    await InvoiceCollection.findByIdAndUpdate(createdInvoice._id, {
+      $set: {
+        paymentNoteIds: invoicePaymentNoteIds,
+        totalPayment
+      }
+    })
+  }
+  return paymentNote;
+}
+
+const validateSaleInput = async (saleInput: any) => {
+  logger.info('validating sale input. saleInput=' + JSON.stringify(saleInput))
+  const items: SaleItemModel[] = saleInput.items;
+  if (isNil(items) || items.length === 0) {
+    throw new ValidationFailedError('items is not valid.');
+  }
+  const branchId = saleInput.branchId;
+  for (const item of items) {
+    if (isNil(item.variantId)) {
+      throw new ValidationFailedError('items.variantId is required.');
+    }
+    if (isNil(item.productId)) {
+      throw new ValidationFailedError('items.productId is required.');
+    }
+    if (isNil(item.batchId)) {
+      throw new ValidationFailedError('items.batchId is required.');
+    }
+    if (isNil(item.quantity)) {
+      throw new ValidationFailedError('items.batchId is required.');
+    }
+    if (isNil(item.price)) {
+      throw new ValidationFailedError('items.price or items.price is required.');
+    }
+    if (isNil(item.cost)) {
+      throw new ValidationFailedError('items.cost or items.cost is required.');
+    }
+    const productVariant = await ProductVariantCollection.findOne({
+      _id: item.variantId,
+      branchId
+    }).lean().exec();
+    if (isNil(productVariant)) {
+      throw new ValidationFailedError('items.variantId is not valid.');
+    }
+    const batch = await BatchCollection.findOne({
+      _id: item.batchId,
+      variantId: item.variantId,
+      productId: item.productId
+    }).lean().exec();
+    if (isNil(batch)) {
+      throw new ValidationFailedError('items.batchId is not valid.');
+    }
+  }
+}
+
+/**
+ * Update Sale order which is Invoice bases on to create.
+ * @param isInvoiceUpdating is updating invoice or not
+ * @param invoiceInfo
+ * @param createdInvoice
+ */
+async function updateSaleOrderStatusAndInvoiceId(isInvoiceUpdating: boolean, invoiceInfo: any, createdInvoice: any) {
+  if (isInvoiceUpdating) {
+    const saleOrder = await SaleOrderCollection.findById(invoiceInfo.saleOrderId).lean().exec();
+    if (saleOrder) {
+      const invoiceIds = saleOrder.invoiceIds || [];
+      const updatedSaleOrder = await SaleOrderCollection.findByIdAndUpdate(invoiceInfo.saleOrderId, {
+        $set: {
+          invoiceIds: [...invoiceIds, createdInvoice._id]
+        }
+      }, {new: true}).lean().exec();
+      logger.info(`update saleOrder code=${updatedSaleOrder.code}: status=COMPLETED, invoiceId=${createdInvoice._id}`);
+    }
+  } else {
+    const updatedSaleOrder = await SaleOrderCollection.findByIdAndUpdate(invoiceInfo.saleOrderId, {
+      $set: {
+        status: SALE_ORDER_STATUS.COMPLETED,
+        invoiceIds: [createdInvoice._id]
+      }
+    }, {new: true}).lean().exec();
+    logger.info(`update saleOrder code=${updatedSaleOrder.code}: status=COMPLETED, invoiceId=${createdInvoice._id}`);
+  }
+}
+
+/**
+ * Check quantity available before updating invoice
+ * @param currentItems
+ * @param oldItems
+ */
+const checkBatchQuantityForUpdatingInvoice = async (currentItems: any[], oldItems: any[]) => {
+  if (!currentItems || currentItems.length === 0) {
+    throw new ValidationFailedError('Invoice detail is not valid.');
+  }
+  for (const detailItem of currentItems) {
+    const batch = await BatchCollection.findById(detailItem.batchId).lean().exec();
+    if (isNil(batch)) {
+      throw new ValidationFailedError(`Batch ID ${detailItem.batchId} does not exist.`);
+    }
+    
+    const oldItemSameBatch = oldItems.find(item => item.batchId.toString() === detailItem.batchId);
+    if (oldItemSameBatch) {
+      if (detailItem.quantity > (batch.quantity + oldItemSameBatch.quantity)) {
+        throw new ValidationFailedError(`Quantity is not valid for Batch ID ${detailItem.batchId}.`);
+      }
+    } else if (detailItem.quantity > batch.quantity) {
+      throw new ValidationFailedError(`Quantity is not valid for Batch ID ${detailItem.batchId}.`);
+    }
+  }
+}
+
 export default {
   createInvoice,
   createSaleOrder,
   checkBatchQuantity,
-  updateSaleOrder
+  updateSaleOrder,
+  updateInvoice,
+  validateSaleInput
 };

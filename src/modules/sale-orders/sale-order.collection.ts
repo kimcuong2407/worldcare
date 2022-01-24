@@ -55,10 +55,13 @@ const SaleOrderSchema = new mongoose.Schema({
       ref: 'payment_note'
     }
   ],
-  invoiceId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'invoice'
-  },
+  invoiceIds: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'invoice',
+      default: []
+    }
+  ],
   customerId: {
     type: mongoose.Types.ObjectId,
     ref: 'customer_v2'
@@ -101,11 +104,10 @@ SaleOrderSchema.virtual('branch', {
   foreignField: '_id',
   justOne: true
 });
-SaleOrderSchema.virtual('invoice', {
+SaleOrderSchema.virtual('invoices', {
   ref: 'invoice',
-  localField: 'invoiceId',
-  foreignField: '_id',
-  justOne: true
+  localField: 'invoiceIds',
+  foreignField: '_id'
 });
 SaleOrderSchema.virtual('paymentNotes', {
   ref: 'payment_note',
