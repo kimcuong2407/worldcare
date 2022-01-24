@@ -12,6 +12,7 @@ const PrescriptionV2Schema = new Schema({
   prescriptionCodeSequence: Number,
   doctor: String,
   healthcareFacility: String,
+  healthcareFacilityId: String,
   patientName: String,
   patientId: String,
   patientHealthInsuranceCardNumber: String,
