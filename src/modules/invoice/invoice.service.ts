@@ -65,6 +65,12 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
       $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
     }
   }
+  if (!isNil(queryInput.status) && queryInput.status.trim().length !== 0) {
+    const statuses = queryInput.status.split(',');
+    query.status = {
+      $in: statuses
+    }
+  }
   const invoices = await InvoiceCollection.paginate(query, {
     ...options,
     sort: { createdAt: -1 },

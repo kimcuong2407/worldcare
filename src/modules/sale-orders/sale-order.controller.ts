@@ -46,7 +46,7 @@ const fetchSaleOrderListByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const {keyword} = req.query;
+    const {keyword, status} = req.query;
     const {page, limit} = appUtil.getPaging(req);
     const options = {
       page,
@@ -54,7 +54,8 @@ const fetchSaleOrderListByQueryAction = async (
     }
     const query = {
       branchId,
-      keyword
+      keyword,
+      status
     };
     const list = await saleOrderService.fetchSaleOrderListByQuery(query, options);
     return res.status(200).send(list);
