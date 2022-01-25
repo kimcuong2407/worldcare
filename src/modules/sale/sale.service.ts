@@ -213,7 +213,7 @@ const updateSaleOrder = async (id: string, saleOrderInfo: any) => {
     });
     return get(resultDoc, '_doc');
   }
-  await validateSaleInput(saleOrderInfo.items);
+  await validateSaleInput(saleOrderInfo);
 
   const payment = saleOrderInfo.payment;
   const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(
