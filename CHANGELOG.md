@@ -1,3 +1,10 @@
+## [1.19.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.19.0...v1.19.1) (2022-01-25)
+
+
+### Bug Fixes
+
+* **sale:** fix can not update sale-order ([c92d7db](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/c92d7dbdc0d61cb5e798975ed939df8c2f05c705))
+
 # [1.19.0](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.18.0...v1.19.0) (2022-01-24)
 
 
