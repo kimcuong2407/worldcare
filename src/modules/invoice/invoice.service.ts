@@ -83,7 +83,9 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
         strictPopulate: false,
         populate: {path: 'createdBy', select: '-password'}
       },
-      { path: 'createdBy', select: '-password' }
+      { path: 'createdBy', select: '-password' },
+      { path: 'saleOrder' },
+      { path: 'prescription' }
     ]
   })
   const summary = await summaryInvoice(query);
@@ -154,6 +156,7 @@ const fetchInvoiceInfoByQuery = async (query: any) => {
       select: '-password'
     })
     .populate('saleOrder')
+    .populate('prescription')
     .lean().exec();
 };
 
