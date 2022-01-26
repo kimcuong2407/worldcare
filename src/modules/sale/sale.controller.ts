@@ -24,7 +24,10 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
       payment,
       note,
       purchasedAt,
-      involvedBy
+      involvedBy,
+      prescription,
+      isPrescriptionFilled,
+      saleOrderId
     } = req.body;
     if (type !== SALE_TYPE.DIRECT && type !== SALE_TYPE.ORDER) {
       throw new ValidationFailedError('Sale type is not correct.');
@@ -76,7 +79,15 @@ const updateSaleTransaction = async (req: express.Request, res: express.Response
         if (isNil(invoice)) {
           throw new ValidationFailedError('Invoice can not be found.');
         }
-        result = await saleService.updateInvoice(saleId, baseInfo);
+        const invoiceInfo = {
+          ...baseInfo,
+          prescription,
+          isPrescriptionFilled,
+          saleOrderId,
+          // TODO: hardcode sale channel. update when sale channel feature implementation is finished
+          saleChannel: SALE_CHANNELS.DIRECT
+        };
+        result = await saleService.updateInvoice(saleId, invoiceInfo);
         res.send(result);
         break;
       default:

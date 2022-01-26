@@ -115,6 +115,12 @@ InvoiceSchema.virtual('saleOrder', {
   foreignField: '_id',
   justOne: true
 });
+InvoiceSchema.virtual('prescription', {
+  ref: 'prescription_v2',
+  localField: 'prescriptionId',
+  foreignField: '_id',
+  justOne: true
+});
 
 InvoiceSchema.plugin(mongoosePaginate);
 InvoiceSchema.plugin(AutoIncrement(mongoose), {

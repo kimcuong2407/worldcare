@@ -64,6 +64,12 @@ const fetchSaleOrderListByQuery = async (queryInput: any, options: any) => {
       $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
     }
   }
+  if (!isNil(queryInput.status) && queryInput.status.trim().length !== 0) {
+    const statuses = queryInput.status.split(',');
+    query.status = {
+      $in: statuses
+    }
+  }
   const saleOrders = await SaleOrderCollection.paginate(query, {
     ...options,
     sort: {
