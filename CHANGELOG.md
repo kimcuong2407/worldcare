@@ -1,3 +1,11 @@
+## [1.19.2](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.19.1...v1.19.2) (2022-01-26)
+
+
+### Bug Fixes
+
+* **sale:** fetch invoice and sale-order by status ([effcbb9](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/effcbb9539e37b69774875094d1461317d30fb7b))
+* **sale:** update invoice fully info ([98e1d8f](https://gitlab.com/worldtech-ltd/worldclinic-backend/commit/98e1d8f879c17396ad93b818fc3cc10a5a54a309))
+
 ## [1.19.1](https://gitlab.com/worldtech-ltd/worldclinic-backend/compare/v1.19.0...v1.19.1) (2022-01-25)
 
 
