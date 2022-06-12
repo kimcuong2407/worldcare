@@ -46,6 +46,10 @@ const PaymentNoteSchema = new Schema({
     type: mongoose.Types.ObjectId,
     ref: 'user',
   },
+  paymentNoteTypeId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'payment_note_type'
+  },
   paymentMethod: String,
   paymentDetail: Object,
   paymentAmount: Number,
@@ -94,6 +98,12 @@ PaymentNoteSchema.virtual('createdBy', {
 PaymentNoteSchema.virtual('supplier', {
   ref: 'supplier',
   localField: 'supplierId',
+  foreignField: '_id',
+  justOne: true
+})
+PaymentNoteSchema.virtual('paymentNoteType', {
+  ref: 'payment_note_type',
+  localField: 'paymentNoteTypeId',
   foreignField: '_id',
   justOne: true
 })
