@@ -119,10 +119,23 @@ const deletePaymentNoteAction = async (
     next(error);
   }
 }
+
+const searchPayerReceiverAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { keyword, target } = req.query;
+    const data = await paymentNoteService.searchPayerReceiver(keyword as string, target as string, partnerId );
+    res.send(data);
+  } catch (error) {
+    logger.error('searchPayerReceiverAction', error);
+    next(error);
+  }
+}
 export default {
   createPaymentNoteAction,
   fetchPaymentNoteListByQueryAction,
   fetchPaymentNoteInfoByQueryAction,
   updatePaymentNoteAction,
   deletePaymentNoteAction,
+  searchPayerReceiverAction
 };

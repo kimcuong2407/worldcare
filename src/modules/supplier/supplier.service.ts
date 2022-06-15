@@ -191,11 +191,24 @@ const deleteSupplier = async (supplierId: string) => {
   return true;
 };
 
+const searchSupplier = async (keyword: string, partnerId: number) => {
+  return await SupplierCollection.find({
+    $or: [
+      { code: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { name: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { phoneNumber: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+    ],
+    partnerId,
+    deletedAt: null
+  }).limit(10).lean().exec();
+}
+
 export default {
   createSupplier,
   findSupplierByName,
   fetchSuppliers,
   getSupplierInfo,
   updateSupplierInfo,
-  deleteSupplier
+  deleteSupplier,
+  searchSupplier
 };

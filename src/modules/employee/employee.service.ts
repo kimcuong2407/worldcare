@@ -291,6 +291,17 @@ const getEmployeeByBranchId = async (queryInput: any, options: any) => {
   };
 }
 
+const searchEmplyee = async (keyword: string, partnerId: number) => {
+  return await EmployeeCollection.find({
+    $or: [
+      { fullName: { $regex: '.*' + keyword + '.*', $options: 'i'} },
+      { phoneNumber: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+    ],
+    partnerId,
+    deletedAt: null
+  }).limit(10).lean().exec();
+}
+
 export default {
   createEmployee,
   fetchEmployee,
@@ -300,4 +311,5 @@ export default {
   getEmployeeByBranchId,
   createBranchUser,
   updateEmployeeGroups,
+  searchEmplyee
 };

@@ -272,6 +272,17 @@ const findPartnerById = async (partnerId: number) => {
   return PartnerCollection.findById(partnerId);
 }
 
+const searchPartner = async (keyword: string) => {
+  return PartnerCollection.find({
+    $or: [
+      { partnerCode: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { name: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+      { phoneNumber: { $regex: '.*' + keyword + '.*', $options: 'i' } },
+    ],
+    deletedAt: null
+  })
+}
+
 export default {
   createPartner,
   fetchPartner,
@@ -287,4 +298,5 @@ export default {
   getPartnerUsers,
   fetchPartnerBranch,
   findPartnerById,
+  searchPartner
 };

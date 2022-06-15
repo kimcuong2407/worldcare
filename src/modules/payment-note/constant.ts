@@ -9,6 +9,13 @@ export enum PAYMENT_NOTE_TYPE {
   RECEIPT = 'RECEIPT', // Thu tien
 }
 
+export enum TARGET {
+  CUSTOMER = 'CUSTOMER',
+  SUPPLIER = 'SUPPLIER',
+  EMPLOYEE = 'EMPLOYEE',
+  PARTNER = 'PARTNER'
+}
+
 export namespace PaymentNoteConstants {
   export interface TransactionType {
     symbol: string,

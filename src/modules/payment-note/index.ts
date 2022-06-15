@@ -24,6 +24,10 @@ const PaymentNoteRoutes = (app: express.Application): void => {
   app.delete('/api/v1/payment-note/:id', middleware.authorization([
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.delete]
   ]), paymentNoteController.deletePaymentNoteAction);
+
+  app.get('/api/v1/payment-note/payer-receiver/search', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
+  ]), paymentNoteController.searchPayerReceiverAction);
   
 }
 

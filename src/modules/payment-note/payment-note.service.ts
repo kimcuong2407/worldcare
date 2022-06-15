@@ -1,11 +1,14 @@
 import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
-import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants} from './constant';
+import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants, TARGET} from './constant';
 import PaymentNoteCollection from './payment-note.collection';
 import loggerHelper from '@utils/logger.util';
 import documentCodeUtils from '@utils/documentCode.util';
-
+import customerService from '../customer-v2/customerV2.service';
+import supplierService from '../supplier/supplier.service';
+import employeeService from '../employee/employee.service';
+import partnerService from '../partner/partner.service';
 const logger = loggerHelper.getLogger('payment-note.service');
 
 const initIdSequence = (idSequence: number) => {
@@ -148,6 +151,60 @@ const createPaymentNoteWithTransactionType = async (payment: any, info: any,
   return null;
 }
 
+const searchPayerReceiver = async (keyword: string, target: string, partnerId: number) => {
+  let data;
+  switch(target){
+    case TARGET.CUSTOMER: {
+      const customers = await customerService.searchCustomer(keyword, partnerId);
+      data = customers.map( (customer) => {
+        return {
+          _id: customer._id,
+          name: customer.name,
+          code: customer.code
+        }
+      });
+      break;
+    }
+    case TARGET.EMPLOYEE: {
+      const employees = await employeeService.searchEmplyee(keyword, partnerId);
+      data = employees.map((employee) => {
+        return {
+          _id: employee._id,
+          name: employee.fullName,
+          code: employee.employeeNumber
+        }
+      });
+      break;
+    }
+    case TARGET.SUPPLIER: {
+      const suppliers = await supplierService.searchSupplier(keyword, partnerId);
+      data = suppliers.map((supplier) => {
+        return {
+          _id: supplier._id,
+          name: supplier.name,
+          code: supplier.supplierCode
+        }
+      });
+      break;
+    }
+    case TARGET.PARTNER: {
+      const partners = await partnerService.searchPartner(keyword);
+      data = partners.map((partner) =>{
+        return {
+          _id: partner._id,
+          name: partner.name,
+          code: partner.partnerCode
+        }
+      });
+      break;
+    }
+    default:
+      return [];
+  }
+  return data;
+}
+
+
 export default {
   createPaymentNote,
   fetchPaymentNoteListByQuery,
@@ -155,5 +212,6 @@ export default {
   updatePaymentNote,
   deletePaymentNote,
   createPaymentNoteWithTransactionType,
-  cancelPaymentNote
+  cancelPaymentNote,
+  searchPayerReceiver
 };
