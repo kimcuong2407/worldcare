@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants} from '@modules/payment-note/constant';
+import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants, TARGET} from '@modules/payment-note/constant';
 
 const { Schema } = mongoose;
 
@@ -23,6 +23,8 @@ const PaymentNoteSchema = new Schema({
       PaymentNoteConstants.TTHD.symbol,
       PaymentNoteConstants.TTDH.symbol,
       PaymentNoteConstants.PTTHN.symbol,
+      PaymentNoteConstants.TTM.symbol,
+      PaymentNoteConstants.CTM.symbol
     ]
   },
   // Bases on transaction type to get corresponding reference document
@@ -49,6 +51,19 @@ const PaymentNoteSchema = new Schema({
   paymentNoteTypeId: {
     type: mongoose.Types.ObjectId,
     ref: 'payment_note_type'
+  },
+  payerReceiver: {
+    _id: mongoose.Types.ObjectId,
+    name: String,
+    target: {
+      type: String,
+      enum: [
+        TARGET.CUSTOMER,
+        TARGET.EMPLOYEE,
+        TARGET.PARTNER,
+        TARGET.SUPPLIER
+      ]
+    }
   },
   paymentMethod: String,
   paymentDetail: Object,

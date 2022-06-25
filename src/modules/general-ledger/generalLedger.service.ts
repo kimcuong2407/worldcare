@@ -1,5 +1,5 @@
 import loggerHelper from '@utils/logger.util';
-import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
+import PaymentNoteCollection from '@app/modules/payment-note/paymentNote.collection';
 import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE} from '@modules/payment-note/constant';
 import {isNil} from 'lodash';
 
@@ -95,7 +95,8 @@ const fetchGeneralLedger = async (queryInfo: any, options: any) => {
       {path: 'referenceDoc', select: ['-invoiceDetail']},
       {path: 'createdBy', select: ['-password']},
       {path: 'branch'},
-      {path: 'supplier'}
+      {path: 'supplier'},
+      {path: 'paymentNoteType'}
     ]
   })
 

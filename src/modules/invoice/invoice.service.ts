@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import InvoiceCollection from './invoice.collection';
 import loggerHelper from '@utils/logger.util';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import {INVOICE_STATUS} from '@modules/invoice/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';

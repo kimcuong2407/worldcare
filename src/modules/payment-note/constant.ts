@@ -21,7 +21,7 @@ export namespace PaymentNoteConstants {
     symbol: string,
     referenceDocName: string
   }
-  
+
   // Phieu chi phieu nhap
   export const PCPN: TransactionType = {
     symbol: 'PCPN',
@@ -33,14 +33,25 @@ export namespace PaymentNoteConstants {
     referenceDocName: 'invoice'
   }
   // Thanh toan don hang
-  export const TTDH: TransactionType ={
+  export const TTDH: TransactionType = {
     symbol: 'TTDH',
     referenceDocName: 'sale_order'
   }
 
   // Phieu thu tra hang nhap
-  export const PTTHN: TransactionType ={
+  export const PTTHN: TransactionType = {
     symbol: 'PTTHN',
     referenceDocName: 'purchase_return'
+  }
+
+  // Phieu chi tien mat
+  export const TTM: TransactionType = {
+    symbol: 'TTM',
+    referenceDocName: 'purchase_order'
+  }
+  // Phieu thu tien mat
+  export const CTM: TransactionType = {
+    symbol: 'CTM',
+    referenceDocName: 'invoice'
   }
 }

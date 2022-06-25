@@ -5,7 +5,7 @@ import SaleOrderCollection from './sale-order.collection';
 import {Types} from 'mongoose';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 import batchService from '@modules/batch/batch.service';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import loggerHelper from '@utils/logger.util';
 import {INVOICE_STATUS} from '@modules/invoice/constant';
 

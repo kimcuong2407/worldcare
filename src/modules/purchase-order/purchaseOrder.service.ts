@@ -5,7 +5,7 @@ import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constan
 import {PaymentNoteConstants} from '@modules/payment-note/constant';
 import {PURCHASE_ORDER_STATUS} from '@modules/purchase-order/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import batchService from '@modules/batch/batch.service';
 
 const logger = loggerHelper.getLogger('purchaseOrder.service');

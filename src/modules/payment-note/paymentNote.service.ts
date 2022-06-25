@@ -2,7 +2,7 @@ import {InternalServerError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
 import {PAYMENT_NOTE_STATUS, PAYMENT_NOTE_TYPE, PaymentNoteConstants, TARGET} from './constant';
-import PaymentNoteCollection from './payment-note.collection';
+import PaymentNoteCollection from './paymentNote.collection';
 import loggerHelper from '@utils/logger.util';
 import documentCodeUtils from '@utils/documentCode.util';
 import customerService from '../customer-v2/customerV2.service';
@@ -32,11 +32,11 @@ const paymentNoteAutoIncrease = (record: any, type: string) => {
 }
 
 const persistsPaymentNote = async (info: any, type: string) => {
-  const code = get(info, 'code', null);
+  const transactionType = info.type == PAYMENT_NOTE_TYPE.PAYMENT ? PaymentNoteConstants.TTM : PaymentNoteConstants.CTM;
   const invoice = await PaymentNoteCollection.create(info);
-  if (isNil(code)) {
-    paymentNoteAutoIncrease(invoice, type);
-  }
+  invoice.transactionType = transactionType.symbol;
+  invoice.code = documentCodeUtils.initDocumentCode(transactionType.symbol, invoice.paymentNoteCodeSequence);
+  await invoice.save();
 
   return {
     ...get(invoice, '_doc', {})

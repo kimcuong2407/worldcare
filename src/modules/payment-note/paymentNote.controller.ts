@@ -1,7 +1,7 @@
 import loggerHelper from '@app/utils/logger.util';
 import express from 'express';
 import get from 'lodash/get';
-import paymentNoteService from './payment-note.service';
+import paymentNoteService from './paymentNote.service';
 
 const logger = loggerHelper.getLogger('payment-note.controller');
 
@@ -12,28 +12,26 @@ const createPaymentNoteAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const type = get(req.query, 'type');
     const {
-      supplierId,
-      customerId,
-      involvedById,
+      type,
       createdById,
       paymentMethod,
       paymentDetail,
       paymentAmount,
       totalPayment,
+      payerReceiver,
+      paymentNoteTypeId
     } = req.body;
     const info = {
       type,
       branchId,
-      supplierId,
-      customerId,
-      involvedById,
       createdById,
       paymentMethod,
       paymentDetail,
       paymentAmount,
       totalPayment,
+      payerReceiver,
+      paymentNoteTypeId
     };
     const record = await paymentNoteService.createPaymentNote(info);
     res.send(record);
