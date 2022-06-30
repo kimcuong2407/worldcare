@@ -20,7 +20,9 @@ const createPaymentNoteAction = async (
       paymentAmount,
       totalPayment,
       payerReceiver,
-      paymentNoteTypeId
+      paymentNoteTypeId,
+      createdDate,
+      description
     } = req.body;
     const info = {
       type,
@@ -31,7 +33,9 @@ const createPaymentNoteAction = async (
       paymentAmount,
       totalPayment,
       payerReceiver,
-      paymentNoteTypeId
+      paymentNoteTypeId,
+      createdDate,
+      description
     };
     const record = await paymentNoteService.createPaymentNote(info);
     res.send(record);

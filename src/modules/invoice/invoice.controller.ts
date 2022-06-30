@@ -48,7 +48,8 @@ const fetchInvoiceListByQueryAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const {keyword, status} = req.query;
+    const partnerId = req.user.partnerId;
+    const {keyword, status, batchInfo, customerInfo, productCode, productName, fromDate, toDate} = req.query;
     const {page, limit} = appUtil.getPaging(req);
     const options = {
       page,
@@ -57,7 +58,14 @@ const fetchInvoiceListByQueryAction = async (
     const query = {
       branchId,
       keyword,
-      status
+      status,
+      batchInfo,
+      customerInfo,
+      productCode,
+      productName,
+      partnerId,
+      fromDate,
+      toDate
     };
     const list = await invoiceService.fetchInvoiceListByQuery(query, options);
     return res.send(list);
