@@ -76,6 +76,7 @@ const createInventoryTransaction = async (info: any, type: INVENTORY_TRANSACTION
       await batchService.decreaseQuantity(info.batchId, info.quantity);
       break;
     case INVENTORY_TRANSACTION_TYPE.PURCHASE_RECEIPT:
+    case INVENTORY_TRANSACTION_TYPE.PRODUCT_RETURN:
       await batchService.increaseQuantity(info.batchId, info.quantity);
       break;
   }

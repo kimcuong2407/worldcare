@@ -24,7 +24,9 @@ const PaymentNoteSchema = new Schema({
       PaymentNoteConstants.TTDH.symbol,
       PaymentNoteConstants.PTTHN.symbol,
       PaymentNoteConstants.TTM.symbol,
-      PaymentNoteConstants.CTM.symbol
+      PaymentNoteConstants.CTM.symbol,
+      PaymentNoteConstants.TTTH.symbol,
+      PaymentNoteConstants.TTHDD_TH.symbol
     ]
   },
   // Bases on transaction type to get corresponding reference document

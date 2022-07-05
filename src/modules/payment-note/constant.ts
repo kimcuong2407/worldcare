@@ -47,11 +47,21 @@ export namespace PaymentNoteConstants {
   // Phieu chi tien mat
   export const TTM: TransactionType = {
     symbol: 'TTM',
-    referenceDocName: 'purchase_order'
+    referenceDocName: 'invoice'
   }
   // Phieu thu tien mat
   export const CTM: TransactionType = {
     symbol: 'CTM',
     referenceDocName: 'invoice'
+  }
+  //Thanh toan tra hang
+  export const TTTH: TransactionType = {
+    symbol: 'TTTH',
+    referenceDocName: 'product_return'
+  }
+  //Thanh toan hoa don doi tra hang
+  export const TTHDD_TH: TransactionType = {
+    symbol: 'TTHDD_TH',
+    referenceDocName: 'prodct_return'
   }
 }
