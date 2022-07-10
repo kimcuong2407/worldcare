@@ -73,6 +73,14 @@ const InvoiceSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'prescription_v2'
   },
+  productReturnId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'product_return'
+  },
+  attachedProductReturnId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'product_return'
+  },
   discountValue: Number,
   discountPercent: Number,
   discountType: String,
@@ -118,6 +126,18 @@ InvoiceSchema.virtual('saleOrder', {
 InvoiceSchema.virtual('prescription', {
   ref: 'prescription_v2',
   localField: 'prescriptionId',
+  foreignField: '_id',
+  justOne: true
+});
+InvoiceSchema.virtual('productReturn', {
+  ref: 'product_return',
+  localField: 'productReturnId',
+  foreignField: '_id',
+  justOne: true
+});
+InvoiceSchema.virtual('attachedProductReturn', {
+  ref: 'product_return',
+  localField: 'attachedProductReturnId',
   foreignField: '_id',
   justOne: true
 });

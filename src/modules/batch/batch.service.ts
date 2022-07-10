@@ -55,10 +55,22 @@ const setItemsFullBatches = async (items: any[]) => {
   }
 }
 
+const searchBatches = async (keyword: any, branchId: number) => {
+  return await BatchCollection.find({
+    batchSearch: {
+      $elemMatch: {
+        $regex: '.*' + keyword + '.*', $options: 'i'
+      }
+    },
+    branchId: branchId
+  }).lean().exec();
+}
+
 export default {
   fetchBatches,
   decreaseQuantity,
   increaseQuantity,
   updateQuantity,
-  setItemsFullBatches
+  setItemsFullBatches,
+  searchBatches
 };

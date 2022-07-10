@@ -42,7 +42,8 @@ import saleOrdersRoutes from './modules/sale-orders';
 import invoiceRoutes from './modules/invoice';
 import purchaseReturnRoutes from './modules/purchase-return';
 import damageItemRoutes from './modules/damage-item';
-
+import paymentNoteTypeRoutes from './modules/payment-note-type';
+import productReturnRoutes from './modules/product-return';
 export default (app: express.Application): void => {
   serverRoutes(app);
   authRoutes(app);
@@ -87,4 +88,6 @@ export default (app: express.Application): void => {
   invoiceRoutes(app);
   purchaseReturnRoutes(app);
   damageItemRoutes(app);
+  paymentNoteTypeRoutes(app);
+  productReturnRoutes(app);
 };

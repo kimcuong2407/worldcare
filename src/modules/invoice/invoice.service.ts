@@ -1,13 +1,19 @@
 import {InternalServerError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
+import { identity, map } from 'lodash';
 import InvoiceCollection from './invoice.collection';
 import loggerHelper from '@utils/logger.util';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import {INVOICE_STATUS} from '@modules/invoice/constant';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 import {INVENTORY_TRANSACTION_TYPE} from '@modules/inventory-transaction/constant';
 import documentCodeUtils from '@utils/documentCode.util';
+import customerV2Service from '../customer-v2/customerV2.service';
+import productService from '../product/product.service';
+import batchService from '../batch/batch.service';
+import saleService from '../sale/sale.service';
+
 
 const logger = loggerHelper.getLogger('invoice.service');
 
@@ -45,7 +51,7 @@ const persistsInvoice = async (info: any) => {
   if (isNil(code)) {
     await invoiceAutoIncrease(invoice);
   }
-
+  await saleService.createInventoryTransaction(INVENTORY_TRANSACTION_TYPE.SELL_PRODUCT, info, invoice['_id']);
   return {
     ...get(invoice, '_doc', {})
   }
@@ -65,12 +71,35 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
       $regex: '.*' + queryInput.keyword + '.*', $options: 'i'
     }
   }
+  if(queryInput.toDate) {
+    query.createdAt = {
+      $gte: new Date(queryInput.fromDate),
+      $lte: new Date(queryInput.toDate)
+    };
+  } else if (queryInput.fromDate) {
+    query.createdAt = {
+      $gte: new Date(queryInput.fromDate)
+    };
+  }
+  if(queryInput.batchInfo) {
+    const batches = await batchService.searchBatches(queryInput.batchInfo, queryInput.branchId);
+    query.invoiceDetail = {$elemMatch : {productId: {$in: map(batches, 'productId')}}};
+  }
+  if(queryInput.customerInfo) {
+    const customers = await customerV2Service.searchCustomer(queryInput.customerInfo, queryInput.partnerId);
+    query.customerId =  {$in: map(customers, '_id')};
+  };
+  if(queryInput.productCode || queryInput.productName) {
+    const keyword = queryInput.productCode ? queryInput.productCode : queryInput.productName;
+    const products = await productService.searchProductVariants(keyword, queryInput.branchId);
+    query.invoiceDetail = {$elemMatch : {productId: {$in: map(products, 'productId')}}};
+  };
   if (!isNil(queryInput.status) && queryInput.status.trim().length !== 0) {
     const statuses = queryInput.status.split(',');
     query.status = {
       $in: statuses
     }
-  }
+  } 
   const invoices = await InvoiceCollection.paginate(query, {
     ...options,
     sort: { createdAt: -1 },

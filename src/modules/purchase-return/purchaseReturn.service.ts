@@ -1,12 +1,12 @@
 import loggerHelper from '@utils/logger.util';
 import {get, isNil} from 'lodash';
 import PurchaseReturnCollection from './purchaseReturn.collection';
-import PaymentNoteCollection from '@modules/payment-note/payment-note.collection';
+import PaymentNoteCollection from '@app/modules/payment-note/paymentNote.collection';
 import {INVENTORY_TRANSACTION_TYPE, InventoryTransactionConstants} from '@modules/inventory-transaction/constant';
 import {PaymentNoteConstants} from '@modules/payment-note/constant';
 import BatchCollection from '@modules/batch/batch.collection';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import SupplierCollection from '@modules/supplier/supplier.collection';
 import {ValidationFailedError} from '@core/types/ErrorTypes';
 import {PURCHASE_RETURN_STATUS, PurchaseReturnConstants} from '@modules/purchase-return/constant';

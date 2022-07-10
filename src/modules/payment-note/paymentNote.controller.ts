@@ -1,7 +1,7 @@
 import loggerHelper from '@app/utils/logger.util';
 import express from 'express';
 import get from 'lodash/get';
-import paymentNoteService from './payment-note.service';
+import paymentNoteService from './paymentNote.service';
 
 const logger = loggerHelper.getLogger('payment-note.controller');
 
@@ -12,28 +12,30 @@ const createPaymentNoteAction = async (
 ) => {
   try {
     const branchId = get(req, 'companyId');
-    const type = get(req.query, 'type');
     const {
-      supplierId,
-      customerId,
-      involvedById,
+      type,
       createdById,
       paymentMethod,
       paymentDetail,
       paymentAmount,
       totalPayment,
+      payerReceiver,
+      paymentNoteTypeId,
+      createdDate,
+      description
     } = req.body;
     const info = {
       type,
       branchId,
-      supplierId,
-      customerId,
-      involvedById,
       createdById,
       paymentMethod,
       paymentDetail,
       paymentAmount,
       totalPayment,
+      payerReceiver,
+      paymentNoteTypeId,
+      createdDate,
+      description
     };
     const record = await paymentNoteService.createPaymentNote(info);
     res.send(record);
@@ -119,10 +121,23 @@ const deletePaymentNoteAction = async (
     next(error);
   }
 }
+
+const searchPayerReceiverAction = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    const partnerId = req.user.partnerId;
+    const { keyword, target } = req.query;
+    const data = await paymentNoteService.searchPayerReceiver(keyword as string, target as string, partnerId );
+    res.send(data);
+  } catch (error) {
+    logger.error('searchPayerReceiverAction', error);
+    next(error);
+  }
+}
 export default {
   createPaymentNoteAction,
   fetchPaymentNoteListByQueryAction,
   fetchPaymentNoteInfoByQueryAction,
   updatePaymentNoteAction,
   deletePaymentNoteAction,
+  searchPayerReceiverAction
 };

@@ -9,12 +9,19 @@ export enum PAYMENT_NOTE_TYPE {
   RECEIPT = 'RECEIPT', // Thu tien
 }
 
+export enum TARGET {
+  CUSTOMER = 'CUSTOMER',
+  SUPPLIER = 'SUPPLIER',
+  EMPLOYEE = 'EMPLOYEE',
+  PARTNER = 'PARTNER'
+}
+
 export namespace PaymentNoteConstants {
   export interface TransactionType {
     symbol: string,
     referenceDocName: string
   }
-  
+
   // Phieu chi phieu nhap
   export const PCPN: TransactionType = {
     symbol: 'PCPN',
@@ -26,14 +33,35 @@ export namespace PaymentNoteConstants {
     referenceDocName: 'invoice'
   }
   // Thanh toan don hang
-  export const TTDH: TransactionType ={
+  export const TTDH: TransactionType = {
     symbol: 'TTDH',
     referenceDocName: 'sale_order'
   }
 
   // Phieu thu tra hang nhap
-  export const PTTHN: TransactionType ={
+  export const PTTHN: TransactionType = {
     symbol: 'PTTHN',
     referenceDocName: 'purchase_return'
+  }
+
+  // Phieu chi tien mat
+  export const TTM: TransactionType = {
+    symbol: 'TTM',
+    referenceDocName: 'invoice'
+  }
+  // Phieu thu tien mat
+  export const CTM: TransactionType = {
+    symbol: 'CTM',
+    referenceDocName: 'invoice'
+  }
+  //Thanh toan tra hang
+  export const TTTH: TransactionType = {
+    symbol: 'TTTH',
+    referenceDocName: 'product_return'
+  }
+  //Thanh toan hoa don doi tra hang
+  export const TTHDD_TH: TransactionType = {
+    symbol: 'TTHDD_TH',
+    referenceDocName: 'invoice'
   }
 }

@@ -14,7 +14,7 @@ import {ValidationFailedError} from '@core/types/ErrorTypes';
 import {SALE_ORDER_STATUS} from '@modules/sale-orders/constant';
 import ProductVariantCollection from '@modules/product/productVariant.collection';
 import ProductCollection from '@modules/product/product.collection';
-import paymentNoteService from '@modules/payment-note/payment-note.service';
+import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
 import inventoryTransactionService from '@modules/inventory-transaction/inventory-transaction.service';
 import {SaleItemModel} from '@modules/sale/sale.model';
 
@@ -457,5 +457,6 @@ export default {
   checkBatchQuantity,
   updateSaleOrder,
   updateInvoice,
-  validateSaleInput
+  validateSaleInput,
+  createInventoryTransaction
 };
