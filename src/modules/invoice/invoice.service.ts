@@ -1,7 +1,7 @@
 import {InternalServerError, ValidationFailedError} from '@app/core/types/ErrorTypes';
 import get from 'lodash/get';
 import isNil from 'lodash/isNil';
-import { map } from 'lodash';
+import { identity, map } from 'lodash';
 import InvoiceCollection from './invoice.collection';
 import loggerHelper from '@utils/logger.util';
 import paymentNoteService from '@app/modules/payment-note/paymentNote.service';
@@ -12,6 +12,7 @@ import documentCodeUtils from '@utils/documentCode.util';
 import customerV2Service from '../customer-v2/customerV2.service';
 import productService from '../product/product.service';
 import batchService from '../batch/batch.service';
+import saleService from '../sale/sale.service';
 
 
 const logger = loggerHelper.getLogger('invoice.service');
@@ -50,7 +51,7 @@ const persistsInvoice = async (info: any) => {
   if (isNil(code)) {
     await invoiceAutoIncrease(invoice);
   }
-
+  await saleService.createInventoryTransaction(INVENTORY_TRANSACTION_TYPE.SELL_PRODUCT, info, invoice['_id']);
   return {
     ...get(invoice, '_doc', {})
   }
@@ -75,7 +76,7 @@ const fetchInvoiceListByQuery = async (queryInput: any, options: any) => {
       $gte: new Date(queryInput.fromDate),
       $lte: new Date(queryInput.toDate)
     };
-  } else {
+  } else if (queryInput.fromDate) {
     query.createdAt = {
       $gte: new Date(queryInput.fromDate)
     };

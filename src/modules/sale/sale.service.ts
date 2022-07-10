@@ -457,5 +457,6 @@ export default {
   checkBatchQuantity,
   updateSaleOrder,
   updateInvoice,
-  validateSaleInput
+  validateSaleInput,
+  createInventoryTransaction
 };

@@ -62,6 +62,6 @@ export namespace PaymentNoteConstants {
   //Thanh toan hoa don doi tra hang
   export const TTHDD_TH: TransactionType = {
     symbol: 'TTHDD_TH',
-    referenceDocName: 'prodct_return'
+    referenceDocName: 'invoice'
   }
 }

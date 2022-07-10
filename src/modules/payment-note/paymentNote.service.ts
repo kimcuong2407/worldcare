@@ -140,12 +140,13 @@ const createPaymentNoteWithTransactionType = async (payment: any, info: any,
       paymentAmount: payment.amount,
       totalPayment: payment.totalPayment
     };
-
     let paymentNote = await PaymentNoteCollection.create(paymentNoteInfo);
-    paymentNote.code = documentCodeUtils.initDocumentCode(transactionType.symbol, paymentNote.paymentNoteCodeSequence);
-    logger.info(`Saving payment note with code[${paymentNote.code}]`)
-    await paymentNote.save();
-    logger.info(`Created payment note with code[${paymentNote.code}]`)
+    if(transactionType != PaymentNoteConstants.TTHDD_TH || transactionType != PaymentNoteConstants.TTTH){
+      paymentNote.code = documentCodeUtils.initDocumentCode(transactionType.symbol, paymentNote.paymentNoteCodeSequence);
+      logger.info(`Saving payment note with code[${paymentNote.code}]`)
+      await paymentNote.save();
+      logger.info(`Created payment note with code[${paymentNote.code}]`)
+    }
     return paymentNote;
   }
   return null;

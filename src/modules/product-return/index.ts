@@ -9,9 +9,9 @@ const productReturnRoutes = (app: express.Application): void => {
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
   ]), productReturnController.createProductReturnAction);
 
-  // app.post('/api/v1/exchange', middleware.authorization([
-  //   [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
-  // ]), productReturnController.createProductReturnAction);
+  app.post('/api/v1/exchange', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
+  ]), productReturnController.createProductExchangeAction);
 }
 
 export default productReturnRoutes;

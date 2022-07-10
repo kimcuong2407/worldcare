@@ -32,21 +32,58 @@ const persistsProductReturn = async (info: any) => {
   const code = get(info, 'code', null);
   const productReturn = await ProductReturnCollection.create(info);
   if (isNil(code)) {
-    productReturnAutoIncrease(productReturn);
+    await productReturnAutoIncrease(productReturn);
   }
   return productReturn;
 }
 
-const createProductReturn = async (info: any) => {
+const createProductReturn = async (info: any, isIncome: boolean) => {
   await validateProductReturnInput(info);
   const productReturn = await persistsProductReturn(info);
-  const paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(info.payment, info, PaymentNoteConstants.TTTH, false, productReturn._id);
+
+  let paymentNote;
+  if (isIncome) {
+    paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(info.payment, info, PaymentNoteConstants.TTHDD_TH, isIncome, null);
+  } else {
+    paymentNote = await paymentNoteService.createPaymentNoteWithTransactionType(info.payment, info, PaymentNoteConstants.TTTH, isIncome, productReturn._id);
+  }
+  if (!isNil(info.invoiceId)) {
+    await invoiceService.updateInvoice({ _id: info.invoiceId, branchId: info.branchId }, { productReturnId: productReturn._id });
+  }
   await createProductReturnInventoryTransaction(productReturn);
   productReturn.paymentNoteId = paymentNote._id;
+  await productReturn.save();
+  await paymentNoteService.updatePaymentNote({ _id: paymentNote._id }, { code: documentCodeUtils.initDocumentCode(paymentNote.transactionType, productReturn.codeSequence) });
   return {
     ...get(productReturn, '_doc', {}),
-    paymentNote
   }
+}
+
+const createProductExchange = async (info: any) => {
+  let productReturn;
+  const refundInfo = {
+    ...info.refund, branchId: info.branchId, partnerId: info.partnerId
+  };
+  if (info.refund.totalReturn < info.invoice.total) {
+    productReturn = await createProductReturn(refundInfo, true);
+  } else {
+    productReturn = await createProductReturn(refundInfo, false);
+  }
+  const invoiceInfo = {
+    ...info.invoice,
+    items: info.invoice.invoiceDetail,
+    branchId: info.branchId,
+    partnerId: info.partnerId,
+    attachedProductReturnId: productReturn._id,
+    code: documentCodeUtils.initDocumentCode("HDD_TH", productReturn.codeSequence)
+  };
+  const exchangeInvoice = await invoiceService.createInvoice(invoiceInfo);
+  await updateProductReturn({ _id: productReturn._id, branchId: info.branchId }, { exchangeInvoiceId: exchangeInvoice._id });
+  if (info.refund.totalReturn < info.invoice.total) {
+    await paymentNoteService.updatePaymentNote({ _id: productReturn.paymentNoteId }, { referenceDocId: exchangeInvoice._id });
+  }
+  return productReturn;
+
 }
 
 const createProductReturnInventoryTransaction = async (productReturnDoc: any) => {
@@ -111,22 +148,38 @@ const validateProductReturnInput = async (input: any) => {
     if (isNil(batch)) {
       throw new ValidationFailedError('batchId is not valid.');
     }
-    if(!isNil(input.invoiceId)){
+    if (!isNil(input.invoiceId)) {
       const query = {
         _id: input.invoiceId,
-        invoiceDetail : {
-          $elemMatch: { productId: item.productId}
+        invoiceDetail: {
+          $elemMatch: { productId: item.productId }
         }
       }
       const invoice = await invoiceService.fetchInvoiceInfoByQuery(query);
+      if (isNil(invoice)) {
+        throw new ValidationFailedError(`invoice with ${input.invoiceId} id is not valid.`);
+      }
       const detail = invoice.invoiceDetail.filter((detail: any) => detail.productId == item.productId);
-      if(detail[0].quantity < item.quantity){
+      if (detail[0].quantity < item.quantity) {
         throw new ValidationFailedError(`return quantity greater than quantity in invoice. InvoiceId: ${input.invoiceId}`);
       }
     }
   }
 }
 
+const updateProductReturn = async (query: any, info: any) => {
+  return await ProductReturnCollection.updateOne(
+    query,
+    {
+      $set: {
+        ...info,
+      },
+    },
+    { new: true }
+  );
+};
+
 export default {
-  createProductReturn
+  createProductReturn,
+  createProductExchange
 }

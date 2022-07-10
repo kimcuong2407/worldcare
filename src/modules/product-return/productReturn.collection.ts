@@ -33,7 +33,7 @@ const ProductReturnSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'invoice'
   },
-  newInvoiceId: {
+  exchangeInvoiceId: {
     type: mongoose.Types.ObjectId,
     ref: 'invoice'
   },
@@ -100,7 +100,7 @@ ProductReturnSchema.virtual('invoices', {
 });
 ProductReturnSchema.virtual('invoices', {
   ref: 'invoice',
-  localField: 'newInvoiceId',
+  localField: 'exchangeInvoiceId',
   foreignField: '_id'
 });
 ProductReturnSchema.virtual('paymentNote', {

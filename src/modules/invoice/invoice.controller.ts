@@ -22,7 +22,7 @@ const createInvoiceAction = async (
       createdById,
       saleChannel,
       invoiceDetail,
-      paymentmNote,
+      paymentNote,
     } = req.body;
     const info = {
       branchId,
@@ -31,7 +31,7 @@ const createInvoiceAction = async (
       createdById,
       saleChannel,
       invoiceDetail,
-      paymentmNote,
+      paymentNote,
     };
     const record = await invoiceService.createInvoice(info);
     res.send(record);
