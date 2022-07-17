@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import AutoIncrement from 'mongoose-sequence';
-import { PRODUCT_RETURN_STATUS } from './constant';
 
 const ProductReturnDetail = new mongoose.Schema({
   variantId: {
@@ -70,8 +69,8 @@ const ProductReturnSchema = new mongoose.Schema({
   discountType: String,
   status: String,
   note: String,
-
-
+  totalReturn: Number,    //after minus discount and fee
+  deletedAt: Date
 }, {
   timestamps: true
 })
@@ -93,20 +92,23 @@ ProductReturnDetail.virtual('batch', {
   foreignField: '_id',
   justOne: true
 });
-ProductReturnSchema.virtual('invoices', {
+ProductReturnSchema.virtual('invoice', {
   ref: 'invoice',
   localField: 'invoiceId',
-  foreignField: '_id'
+  foreignField: '_id',
+  justOne: true
 });
-ProductReturnSchema.virtual('invoices', {
+ProductReturnSchema.virtual('exchangeInvoice', {
   ref: 'invoice',
   localField: 'exchangeInvoiceId',
-  foreignField: '_id'
+  foreignField: '_id',
+  justOne: true
 });
 ProductReturnSchema.virtual('paymentNote', {
   ref: 'payment_note',
   localField: 'paymentNoteId',
-  foreignField: '_id'
+  foreignField: '_id',
+  justOne: true
 });
 ProductReturnSchema.virtual('customer', {
   ref: 'customer_v2',
@@ -115,10 +117,21 @@ ProductReturnSchema.virtual('customer', {
   justOne: true
 });
 ProductReturnSchema.virtual('receivedBy', {
-  ref: 'employee',
+  ref: 'user',
   localField: 'receivedById',
   foreignField: '_id',
   justOne: true
+});
+ProductReturnSchema.virtual('createdBy', {
+  ref: 'user',
+  localField: 'createdById',
+  foreignField: '_id',
+  justOne: true
+});
+ProductReturnSchema.virtual('inventoryTransactions', {
+  ref: 'inventory_transaction',
+  localField: 'inventoryTransactionIds',
+  foreignField: '_id'
 });
 
 ProductReturnSchema.plugin(mongoosePaginate);
@@ -130,11 +143,6 @@ ProductReturnSchema.plugin(AutoIncrement(mongoose), {
   disable_hooks: true
 });
 
-ProductReturnSchema.virtual('inventoryTransactions', {
-  ref: 'inventory_transaction',
-  localField: 'inventoryTransactionIds',
-  foreignField: '_id'
-});
 const ProductReturnCollection = mongoose.model(
   'product_return',
   ProductReturnSchema,

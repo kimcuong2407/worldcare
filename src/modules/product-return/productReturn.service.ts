@@ -1,4 +1,4 @@
-import { isNil, get } from "lodash";
+import { isNil, get, isNull, forEach, mapKeys } from "lodash";
 import ProductReturnCollection from "./productReturn.collection";
 import loggerHelper from '@utils/logger.util';
 import { InternalServerError, ValidationFailedError } from "@app/core/types/ErrorTypes";
@@ -10,6 +10,10 @@ import { PaymentNoteConstants } from "../payment-note/constant";
 import inventoryTransactionService from "../inventory-transaction/inventory-transaction.service";
 import { INVENTORY_TRANSACTION_TYPE } from "../inventory-transaction/constant";
 import invoiceService from "../invoice/invoice.service";
+import { PRODUCT_RETURN_STATUS } from "./constant";
+import { INVOICE_STATUS } from "../invoice/constant";
+import _ from "lodash";
+
 
 const logger = loggerHelper.getLogger('product-return.service');
 
@@ -74,6 +78,7 @@ const createProductExchange = async (info: any) => {
     items: info.invoice.invoiceDetail,
     branchId: info.branchId,
     partnerId: info.partnerId,
+    status: INVOICE_STATUS.COMPLETED,
     attachedProductReturnId: productReturn._id,
     code: documentCodeUtils.initDocumentCode("HDD_TH", productReturn.codeSequence)
   };
@@ -179,7 +184,104 @@ const updateProductReturn = async (query: any, info: any) => {
   );
 };
 
+const deleteProductReturn = async (query: any, branchId: number) => {
+  const productReturn = await ProductReturnCollection.findOneAndUpdate(query, {
+    deletedAt: new Date(),
+    status: PRODUCT_RETURN_STATUS.CANCELED
+  }).lean().exec();
+  const paymentQuery = {
+    _id: get(productReturn, 'paymentNoteId', null)
+  };
+  if (!isNil(paymentQuery)) {
+    await paymentNoteService.deletePaymentNote(paymentQuery);
+  }
+  const inventoryTransactions = get(productReturn, 'inventoryTransactionIds');
+  forEach(inventoryTransactions, async (inventoryTransaction) => {
+    await inventoryTransactionService.cancelInventoryTransaction(inventoryTransaction);
+  })
+  const exchangeInvoiceId = get(productReturn, 'exchangeInvoiceId', null);
+  if (!isNil(exchangeInvoiceId)) {
+    await invoiceService.cancelInvoice(exchangeInvoiceId, branchId, null);
+  }
+  return true;
+}
+
+const fetchProductReturnListByQuery = async (queryInput: any, options: any) => {
+  let statuses;
+  if(isNil(queryInput.status)){
+    statuses = null;
+  } else {
+    statuses = queryInput.status.split(',');
+  }
+  const query = {
+    status: {
+      $in: statuses
+    },
+    branchId: queryInput.branchId,
+    partnerId: queryInput.partnerId
+  } as any;
+
+  const productReturn = await ProductReturnCollection.paginate(query, {
+    ...options,
+    sort: { createdAt: -1 },
+    lean: true,
+    populate: [
+      { path: 'customer' },
+      { path: 'paymentNote' },
+      {
+        path: 'exchangeInvoice',
+        strictPopulate: false,
+        populate: {
+          path: 'invoiceDetail',
+          populate: [
+            {
+              path: 'productId',
+              model: 'product',
+
+            },
+            {
+              path: 'variantId',
+              model: 'product_variant'
+            }
+          ]
+        },
+      },
+      {
+        path: 'productReturnDetail',
+        strictPopulate: false,
+        populate: [
+          {
+            path: 'productId',
+            model: 'product',
+            justOne: true
+          },
+          {
+            path: 'variantId',
+            model: 'product_variant'
+          }
+        ]
+      },
+      { path: 'product' },
+      { path: 'productVariant' },
+      { path: 'invoice' },
+      { path: 'receivedBy', select: '-password' },
+      { path: 'inventoryTransactions' },
+      { path: 'createdBy', select: '-password' },
+    ]
+  });
+  const { docs, ...rest } = productReturn;
+  return {
+    docs,
+    ...rest,
+  }
+
+}
+
+
 export default {
   createProductReturn,
-  createProductExchange
+  createProductExchange,
+  deleteProductReturn,
+  fetchProductReturnListByQuery,
+  updateProductReturn
 }

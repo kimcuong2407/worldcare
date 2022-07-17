@@ -12,6 +12,18 @@ const productReturnRoutes = (app: express.Application): void => {
   app.post('/api/v1/exchange', middleware.authorization([
     [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
   ]), productReturnController.createProductExchangeAction);
+
+  app.delete('/api/v1/return/:id', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.write]
+  ]), productReturnController.deleteProductReturnAction);
+
+  app.get('/api/v1/return', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.read]
+  ]), productReturnController.fetchProductReturnListByQueryAction);
+
+  app.patch('/api/v1/return', middleware.authorization([
+    [CLINIC_RESOURCES.sale, CORE_ACTIONS.update]
+  ]), productReturnController.updateProductReturnAction);
 }
 
 export default productReturnRoutes;
