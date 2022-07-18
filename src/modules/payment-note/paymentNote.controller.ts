@@ -11,10 +11,10 @@ const createPaymentNoteAction = async (
   next: express.NextFunction
 ) => {
   try {
+    const user = get(req, 'user');
     const branchId = get(req, 'companyId');
     const {
       type,
-      createdById,
       paymentMethod,
       paymentDetail,
       paymentAmount,
@@ -22,12 +22,12 @@ const createPaymentNoteAction = async (
       payerReceiver,
       paymentNoteTypeId,
       createdDate,
-      description
+      note
     } = req.body;
     const info = {
       type,
       branchId,
-      createdById,
+      createdById: user.id,
       paymentMethod,
       paymentDetail,
       paymentAmount,
@@ -35,7 +35,7 @@ const createPaymentNoteAction = async (
       payerReceiver,
       paymentNoteTypeId,
       createdDate,
-      description
+      note
     };
     const record = await paymentNoteService.createPaymentNote(info);
     res.send(record);

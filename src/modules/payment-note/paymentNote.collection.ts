@@ -68,7 +68,6 @@ const PaymentNoteSchema = new Schema({
     }
   },
   createdDate: Date,
-  description: String,
   paymentMethod: String,
   paymentDetail: Object,
   paymentAmount: Number,
